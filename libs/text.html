@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Cache-Control" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>CPS效果数据 - 京东联盟</title>
+    <link rel="icon" href="http://www.jd.com/favicon.ico" mce_href="http://www.jd.com/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="/static/css/bootstrap.min.css?1520946981459">
+<link rel="stylesheet" href="/static/css/daterangepicker.css?1520946981459">
+<link rel="stylesheet" href="/static/css/main.min.css?1520946981459">
+<link rel="stylesheet" href="/static/css/font.css?1520946981459">
+<link rel="stylesheet" href="/static/css/base.css?1520946981459">
+        <script type="text/javascript" src="/static/js/jquery.min.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/bootstrap.min.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/respond.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/moment.min.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/daterangepicker.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/comm.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/plugin/jquery.form.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/jquery.ad-gallery.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/bootstrap-hover-dropdown.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/common/cookieUtil.js?1520946981459"></script>
+<script type="text/javascript" src="/static/js/JPlaceHolder.js?1520946981459"></script>
+<script type="text/javascript">
+
+$(function() {
+        var agreementConfirmFlag = $("#agreement").val();
+        var cpcAgreementConfirmFlag = $("#cpcAgreement").val();
+        var appAgreementConfirmFlag = $("#appAgreement").val();
+        if(agreementConfirmFlag == -1){
+                $("#agreementConfirm").modal();
+        }
+        if(cpcAgreementConfirmFlag == -1){
+                $("#cpcAgreementConfirm").modal();
+        }
+        if(appAgreementConfirmFlag == -1){
+                $("#appAgreementConfirm").modal();
+        }
+
+});
+        //获得coolie的值
+        function cookie(name){
+           var cookieArray=document.cookie.split("; "); //得到分割的cookie名值对
+           var cookie=new Object();
+           for (var i=0;i<cookieArray.length;i++){
+              var arr=cookieArray[i].split("=");       //将名和值分开
+              if(arr[0]==name)return unescape(arr[1]); //如果是指定的cookie，则返回它的值
+           }
+           return "";
+        }
+        //删除cookie
+        function delCookie(name){
+                var date=new Date();
+            date.setTime(date.getTime()-10000);
+            document.cookie=name+"=v;expire="+date.toGMTString()+";path=/;domain=.media.jd.com;";
+        }
+        //删除cookie
+        function deleteCookie(name) {
+            var date=new Date();
+            date.setTime(date.getTime()-10000);
+            document.cookie=name+"=;expire="+date.toGMTString()+";path=/;domain=.jd.com";
+        }
+        function toEnter(){
+                deleteCookie("pin");
+                window.location.href="/logout";
+        }
+        function confirmAgreement(ele){
+                if($("#agreementCheckbox").is(':checked') == false){
+                        alert("请阅读《京东CPS营销协议》并确认");
+                return false;
+                }else{
+                        $.ajax({
+                                type: "POST",
+                                url: "/user/confirmAgreement",
+                                error : function() {
+                                        alert("系统异常！");
+                                },
+                                success: function(){
+                                        window.location.reload();
+                                }
+
+                    });
+                }
+        }
+
+        function confirmCpcAgreement(ele){
+                if($("#cpcAgreementCheckbox").is(':checked') == false){
+                        alert("请阅读《京东CPC营销协议》并确认");
+                return false;
+                }else{
+                        $.ajax({
+                                type: "POST",
+                                url: "/user/confirmCpcAgreement",
+                                error : function() {
+                                        alert("系统异常！");
+                                },
+                                success: function(){
+                                        window.location.reload();
+                                }
+
+                    });
+                }
+        }
+        function confirmAppAgreement(ele){
+                if($("#appAgreementCheckbox").is(':checked') == false){
+                        alert("请阅读《京东APP营销协议》并确认");
+                return false;
+                }else{
+                        $.ajax({
+                                type: "POST",
+                                url: "/user/confirmAppAgreement",
+                                error : function() {
+                                        alert("系统异常！");
+                                },
+                                success: function(){
+                                        window.location.reload();
+                                }
+
+                    });
+                }
+        }
+        function confirmWelcome(){
+                        $.ajax({
+                                type: "POST",
+                                url: "/user/confirmWelcomeFlag",
+                                error : function() {
+                                        alert("系统异常！");
+                                },
+                                success: function(){
+                                        window.location.reload();
+                                }
+
+                    });
+        }
+        function confirmTaxRatioChange(ele){
+                        $.ajax({
+                                type: "POST",
+                                url: "/user/confirmTaxRatioChange",
+                                error : function() {
+                                        alert("系统异常！");
+                                },
+                                success: function(){
+                                        window.location.reload();
+                                }
+
+                    });
+        }
+//      function confirmFeedback(ele){
+//              $.ajax({
+//                      type: "POST",
+//                      url: "/user/confirmFeedback",
+//                      error : function() {
+//                              alert("系统异常！");
+//                      },
+//                      success: function(){
+//                              window.location.reload();
+//                      }
+//
+//          });
+//
+//      }
+</script>
+</head>
+<body >
+
+<script type="text/javascript">
+    $(function () {
+        /* 获取未读消息个数*/
+        $.ajax({
+            type: "POST",
+            url: "/user/myunion/msg/getUnReadMessageCounter",
+            success: function (data) {
+                    if(data.readCount > 99){
+                        $("#head_message").append("(99+)");
+                    }else{
+                        $("#head_message").append("(" + data.readCount + ")");
+                    }
+            }
+        });
+    });
+</script>
+
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="jdadContainer">
+        <!-- logo处一共有4种，normal，cpc，cps，app，对应的class="logo",class="logo logo-cpc",class="logo logo-cps",class="logo logo-app" -->
+        <!--  style="background:url(/static/reg/img/logo-new.jpg) no-repeat;" -->
+                    <div clstag="pageclick|keycount|201708142|1"   class="logo logo-cps"  id="logo"><a href="
+             /gotoadv/goods             "></a></div>
+
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+        </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                                    <li class="dropdown">
+                        <a   onclick="c1();" href="/index/overview" class="dropdown-toggle js-active" data-toggle="dropdown" >首页<b class="caret"></b></a>
+                        <ul class="dropdown-menu sec-lev-menu">
+                            <span></span>
+                            <li clstag="pageclick|keycount|201708142|3"><a href="/gotoadv/goods?pageSize=50">CPS联盟</a></li>
+                            <li clstag="pageclick|keycount|201708142|4"><a href="/cpc/placement">CPC联盟</a></li>
+                            <li clstag="pageclick|keycount|201708142|5"><a href="/app/sdk">APP联盟</a></li>
+                        </ul>
+                    </li>
+
+                <li>
+                    <a class="dropdown" clstag="pageclick|keycount|201708142|6" onclick="javascript:window.location.href='/user/myunion'" href="/user/myunion" class="dropdown-toggle js-active" data-toggle="dropdown">账户管理</a>
+                </li>
+                <li class="dropdown">
+                    <a  onclick="c2();" href="/master/account/center" class="dropdown-toggle js-active" data-toggle="dropdown" >结算中心<b class="caret"></b></a>
+                    <ul class="dropdown-menu  sec-lev-menu">
+                        <span></span>
+                        <li clstag="pageclick|keycount|201708142|8"><a href="/master/account/center">收入结算</a></li>
+                        <li clstag="pageclick|keycount|201708142|9"><a href="/master/account/applyRecord">申请记录</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right hidden-sm">
+                <li clstag="pageclick|keycount|201708142|10">
+                    <a href="/user/myunion">欢迎您，33759885-123871</a>
+                </li>
+                <li clstag="pageclick|keycount|201708142|11"><a href="/user/myunion/msg" id="head_message">消息</a></li>
+                <li clstag="pageclick|keycount|201708142|12"><a target="_blank" href="//chat.jd.com/agile/NTQxMTU4">在线客服</a></li>
+                <li clstag="pageclick|keycount|201708142|13"><a target="_blank" href="/statc/help/hcindex.htm">帮助中心</a></li>
+                <li clstag="pageclick|keycount|201708142|14"><a target="_blank" href="/statc/product/fans.htm">产品介绍</a></li>
+                <li clstag="pageclick|keycount|201708142|15"><a href="javascript:toEnter()">退出</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<a onclick="clickReport()">test manual report</a>
+<script type="text/javascript">
+function c1() {
+    log('201708142', '2');
+    setTimeout(function() {
+        window.location.href="/index/overview";
+    }, 100);
+}
+function c2() {
+    log('201708142', '7');
+    setTimeout(function() {
+        window.location.href="/master/account/center";
+    }, 100);
+}
+</script>
+        <link rel="stylesheet" href="/static/css/k.css?1520946981459"">
+<link rel="stylesheet" href="/static/css/mingxi.css?1520946981459"">
+<style>
+    /*.con_main0 {*/
+    /*float: left;*/
+    /*}*/
+    /*.tggl-page-con{*/
+    /*float: left;*/
+    /*}*/
+    .openUrl .popover{
+        color: #000!important;
+    }
+    .blueC{
+        color: #003399;
+        width: 69px;
+        overflow: hidden;
+        display: block;
+    }
+    font-black{
+        color: #000;
+    }
+    .form-group {
+        padding-top: 10px;
+    }
+
+    .form-group button {
+        padding-top: 10px;
+    }
+
+    .form-inline-panel .btn {
+        margin-bottom: 0px !important;
+        /* vertical-align: top; */
+    }
+
+    #downCpsDetailBtn {
+        margin-top: 10px;
+    }
+
+    .form-inline-panel {
+        padding: 10px 18px 10px 18px;
+        padding-top: 1px \9;
+    }
+     .w300 { width:200px;}
+     .w70 {width:70px;}
+    .basic table#inOrderTable thead .tab-border-bottom {
+         height: 0; }
+    .basic table tr  td { display:table-cell; padding:10px 0;}
+</style>
+<div class="wrapper">
+    <div id="sidebar">
+    <ul class="side-menu">
+        <li  class="has-submenu"  >
+            <a href="">
+                <i class="icon-angle pull-right"></i>
+                <i class="icon-tg"></i>
+                <span>我要推广</span>
+            </a>
+            <ul>
+                <li >
+                    <a href="/gotoadv/picked" clstag="pageclick|keycount|201708112|1">
+                        <span>精选推荐</span>
+                    </a>
+                    <em class="new">new</em>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|2">
+                    <a href="/gotoadv/goods?pageSize=50">
+                        <span>商品推广</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|3">
+                    <a href="/jhtml/page/index.html?pagetype=groupbuy&navLeft=100">
+                        <span>拼购商品推广</span>
+                    </a>
+                    <em class="new">new</em>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|4">
+                    <a href="/gotoadv/shop">
+                        <span>店铺推广</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|5">
+                    <a href="/rest/promotion/content/">
+                        <span>内容推广</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|6">
+                    <a href="/gotoadv/newActivity">
+                        <span>活动推广</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|7">
+                    <a href="/gotoadv/zychannel">
+                        <span>频道页推广</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|8">
+                    <a href="/gotoadv/search">
+                        <span>搜索框推广</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|9">
+                    <a href="/gotoadv/placement">
+                        <span>橱窗推广</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|10">
+                    <a href="/gotoadv/customPromotion">
+                        <span>自定义链接推广</span>
+                    </a>
+                </li>
+
+            </ul>
+        </li>
+
+        <li  class="has-submenu active" >
+            <a href="">
+                <i class="icon-angle pull-right"></i>
+                <i class="icon-xgbb"></i>
+                <span>效果报表</span>
+            </a>
+            <ul>
+                <li   clstag="pageclick|keycount|201708112|11">
+                    <a href="/rest/report/extend">
+                        <span>推广效果</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|12">
+                    <a href="/rest/report/content">
+                        <span>内容效果</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|13">
+                    <a href="/rest/report/activity">
+                        <span>活动效果</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|14">
+                    <a href="/rest/report/sum">
+                        <span>订单汇总</span>
+                    </a>
+                </li>
+                <li  class="active" clstag="pageclick|keycount|201708112|15">
+                    <a href="/rest/report/detail">
+                        <span>订单明细</span>
+                    </a>
+                </li>
+            </ul>
+        </li>
+        <li  class="has-submenu"  >
+            <a href="">
+                <i class="icon-angle pull-right"></i>
+                <i class="icon-tggl"></i>
+                <span>推广管理</span>
+            </a>
+            <ul>
+                <li   clstag="pageclick|keycount|201708112|16">
+                    <a href="/myadv/web">
+                        <span>网站管理</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|17">
+                    <a href="/guide/app">
+                        <span>APP管理</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|18">
+                    <a href="/guide/socialManage">
+                        <span>社交媒体管理</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|19">
+                    <a href="/myadv/siteNew/1">
+                        <span>推广位管理</span>
+                    </a>
+                </li>
+                <li   clstag="pageclick|keycount|201708112|20">
+                    <a href="/master/account/josApiAuthApply">
+                        <span>API权限管理</span>
+                    </a>
+                </li>
+                <li  clstag="pageclick|keycount|201708112|21">
+                    <a href="/jhtml/page/index.html?navLeft=26">
+                        <span>京推计划管理</span>
+                    </a>
+                </li>
+                <!--校验站长是否同意母账号协议和站长用户类型是否是母站长-->
+
+            </ul>
+        </li>
+        <li  class="has-submenu"  >
+            <a href="">
+                <i class="icon-angle pull-right"></i>
+                <i class="icon-wgjl"></i>
+                <span>我的推广</span>
+                            </a>
+                <ul>
+                <li  clstag="pageclick|keycount|201708112|23">
+                    <a href="/gotoadv/cpsPromotionCenter">
+                        <span>推广记录</span>
+                    </a>
+                </li>
+                <li  clstag="pageclick|keycount|201708112|24">
+                    <a href="/gotoadv/planRemind">
+                        <span>佣金变更</span>
+                                            </a>
+                </li>
+            </ul>
+        </li>
+
+    </ul>
+</div>
+    <iframe id="ifile" style="display:none"></iframe>
+    <div id="container">
+        <div id="gundong">
+            <div id="gundong-in">
+                <div class="breadcrumb">
+                                  <span>
+                                        <i class="ico ico-xgbb-s"></i>
+                                        <a href="javascript:void(0);">效果报表</a>
+                                  </span>
+                    <i class="icon-angle-right"></i>
+                    <span id="orderItem" >
+                                        <a href="javascript:void(0);" >订单明细</a>
+                                    </span>
+                    <span id="otherTags" style="display: none">
+                                            <a href="javascript:void(0);" >商家维权订单</a>
+                                    </span>
+                    <span id="returnToOne" style="display:none" >
+                                       <i class="icon-angle-right"></i>
+                                        <a href="javascript:void(0);">订单详情</a>
+                                    </span>
+                </div>
+                <div class="con_main">
+                    <div class="tggl-page-con" style="width: 1841px;">
+                        <ul id="navTabs" class="nav nav-tabs">
+                            <li class="active">
+                                <a href="javascript:void(0);">订单明细</a>
+                            </li>
+
+                            <li>
+                                <a href="javascript:void(0);">商家维权订单</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!--引入订单明细 start-->
+                    <section class="con-one inOrderContent">
+                        <div class="header-out-w">
+                            <div id="orderIdTit" class="form-inline-panel bor_lt_gre_k " style="margin-left: 10px; width: 98.9%;overflow: hidden;margin-bottom:20px;">
+                                <div class="fit-w">
+
+                                    <div class="form-inline fixed_width">
+                                       <div class="first-line">
+                                        <div class="form-group">
+                                            <label for="">订单号</label>
+                                            <input id="inOrderId" type="text" class="form-control">
+                                        </div>
+                                         <div class="form-group">
+                                            <label for="">订单状态</label>
+                                             <select id="inOrderStatus" class="form-control">
+                                                <option value="0" selected>全部订单</option>
+                                                <option value="1">待付款</option>
+                                                <option value="2">已付款</option>
+                                                <option value="3">已完成</option>
+                                                <option value="4">已结算</option>
+                                                <option value="5">无效</option>
+                                             </select>
+                                          </div>
+
+                                          <div class="form-group w300">
+                                            <label for="">快捷日期</label>
+                                            <select id="inShortcutDate" class="form-control">
+                                                <option value="" selected>全部</option>
+                                                <option value="0">今天</option>
+                                                <option value="1">昨天</option>
+                                                <option value="7">过去7天</option>
+                                                <option value="15">过去15天</option>
+                                                <option value="30">过去30天</option>
+                                                <option value="60">过去60天</option>
+                                                <option value="90">过去90天</option>
+                                                <option value="120">过去120天</option>
+                                            </select>
+                                          </div>
+
+
+                                           <div class="form-group w300">
+                                               <label for="">推广渠道</label>
+                                               <select id="channelType" class="form-control">
+                                                   <option value="0" selected>全部</option>
+                                                   <option value="2">京东</option>
+                                                   <option value="1">1号店</option>
+                                               </select>
+                                           </div>
+
+                                          <div class="form-group"><button id="inOrderQueryBtn" type="button" class="btn btn-danger dropdown-toggle offset25 w70">查询
+                                               </button></div>
+                                      </div>
+                                     <div class="second-line">
+                                         <div class="form-group">
+                                          <label for="">
+                                             <select class="form-control" id="inOrderTime">
+                                                    <option selected value="1">下单时间</option>
+                                                    <option value="2">完成时间</option>
+                                                    <option value="3">结算时间</option>
+                                             </select>
+                                             </label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="inOrderStartDate"/>
+                                                <div class="input-group-addon">至</div>
+                                                <input type="text" class="form-control" id="inOrderEndDate"/>
+                                            </div>
+                                         </div>
+                                         <div class="form-group">
+                                            <button id="inOrderExportBtn" type="button" class="btn btn-gray dropdown-toggle offset10">
+                                                导出<i data-rel="popover" data-content="建议时间跨度不要太大，避免导出超时,且导出上限10000条"
+                                                     class="ico-ask-mingxi"><span></span></i>
+                                            </button>
+                                         </div>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="clear: both"></div>
+                            <div class="con_main0">
+                                <div class="tggl-page-con">
+                                    <div class="tab-content" id="scroll-one">
+                                        <div class="basic text-center">
+                                        <!--订单号明细开始-->
+                                            <table id="inOrderTable" style="width:1500px;">
+                                                <thead id="TBhead">
+                                                  <tr>
+                                                    <td colspan="14" class="tab-border-top"></td>
+                                                  </tr>
+                                                  <tr class="align-tr">
+                                                    <td width=110>下单时间</td>
+                                                    <td width=140>订单号</td>
+                                                    <td width=100>订单状态</td>
+                                                    <td width=120>商品</td>
+                                                    <td width=50>付款金额</td>
+                                                    <td width=50>佣金比例</td>
+                                                    <td width=80>实际分成比例</td>
+                                                    <td width=50>预估佣金</td>
+                                                    <td width=110>完成时间</td>
+                                                    <td width=50>实际金额</td>
+                                                    <td width=50>实际佣金</td>
+                                                    <td width=110>结算时间</td>
+                                                    <td width=50>下单平台</td>
+                                                    <td width=50>推广渠道</td>
+                                                  </tr>
+                                                  <tr>
+                                                    <td colspan="14" class="tab-border-bottom">
+                                                    </td>
+                                                  </tr>
+                                                </thead>
+                                            </table>
+                                            <div id="orderPage" class="pagination">
+                                                <ul class="pagination-length pagination-number pagination-left">
+                                                    <li class="each-page">每页</li>
+                                                    <li class="select">
+                                                        <select id="inResetPageSize">
+                                                            <option selected="">10</option>
+                                                            <option>20</option>
+                                                        </select>
+                                                    </li>
+                                                    <li>条</li>
+                                                </ul>
+                                                <ul id="inPn" class="pagination-number pagination-right">
+                                                    <li><a href="javascript:void(0)" class="last">«</a></li>
+                                                    <li><a class="current" href="javascript:void(0);">1</a></li>
+                                                    <li><a href="javascript:void(0);" class="next">»</a></li>
+                                                </ul>
+                                            </div>
+                                            <!--订单号明细结束-->
+                                           <!-- SKU商品明细start -->
+                                                <table id="inOrderIdTable" style="display:none;width:1500px; ">
+                                                        <thead id="TBhead" style="border-bottom:1px solid #e7e4ed;">
+                                                        <tr class="align-tr">
+                                                            <td rowspan="2" width=150>下单时间</td>
+                                                            <td rowspan="2" width="200">商品编号</td>
+                                                            <td rowspan="2" width="100">订单状态</td>
+                                                            <td colspan="2" style=" height:30px;border-bottom: 1px solid #e7e4ed;">商品信息</td>
+                                                            <td colspan="2" style="border-bottom: 1px solid #e7e4ed;">售后信息</td>
+                                                            <td rowspan="2" width="50">付款金额</td>
+                                                            <td rowspan="2" width="50">佣金比例</td>
+                                                            <td rowspan="2" width="50">实际分成比例</td>
+                                                            <td rowspan="2" width="50">预估佣金</td>
+                                                            <td rowspan="2" width="130">完成时间</td>
+                                                            <td rowspan="2" width="50">实际金额</td>
+                                                            <td rowspan="2" width="50">实际佣金</td>
+                                                            <td rowspan="2" width="80">结算时间</td>
+                                                            <td rowspan="2" width="50">下单平台</td>
+                                                        <td rowspan="2" width="50">推广渠道</td>
+                                                        </tr>
+                                                        <tr class="align-tr" style="height:30px;width:50px;"><td>商品</td><td width="40">数量</td><td width="40">售后中</td><td width="40">已退货</td></tr>
+
+                                                        </thead>
+                                                    </table>
+                                                <!-- 订单号下商品明细end -->
+                                           <!--<div id="skuPage" class="pagination" style="display:none;">
+                                                <ul class="pagination-length pagination-number pagination-left">
+                                                    <li class="each-page">每页</li>
+                                                    <li class="select">
+                                                        <select id="inResetSkuPageSize">
+                                                            <option selected="">10</option>
+                                                            <option>20</option>
+                                                        </select>
+                                                    </li>
+                                                    <li>条</li>
+                                                </ul>
+                                                <ul id="skuPn" class="pagination-number pagination-right">
+                                                    <li><a href="javascript:void(0)" class="last">«</a></li>
+                                                    <li><a class="current" href="javascript:void(0);">1</a></li>
+                                                    <li><a href="javascript:void(0);" class="next">»</a></li>
+                                                </ul>
+                                            </div>-->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </section>
+                    <!--引入订单明细 end-->
+
+
+                    <!--商家维权订单 start-->
+                    <section class="con-one freezeOrderContent" style="display: none">
+                        <div class="header-out-w">
+                            <div class="form-inline-panel bor_lt_gre_k " style="margin-left: 10px; width: 98.9%;overflow: hidden;margin-bottom:20px;">
+                                <div class="fit-w">
+
+                                    <div class="form-inline fixed_width">
+                                        <div class="form-group queryFirst">
+                                            <label for="">订单号</label>
+                                            <input id="inFreezeOrderId" type="text" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">
+                                                <select id="freezeTypeTime" class="form-control">
+                                                    <option value="jssj" selected>结算时间</option>
+                                                    <option value="wqcjsj">维权创建时间</option>
+                                                    <option value="wqjssj">维权完成时间</option>
+                                                </select>
+                                            </label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="infreezeStartDate"/>
+                                                <div class="input-group-addon">至</div>
+                                                <input type="text" class="form-control" id="infreezeEndDate"/>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="">维权状态</label>
+                                            <select id="processStatus" class="form-control">
+                                                <option value="" selected>全部</option>
+                                                <option value="2">等待补扣佣金</option>
+                                                <option value="3">维权成功</option>
+                                                <option value="4">维权失败</option>
+                                                <option value="5">维权创建,等待处理</option>
+                                            </select>
+                                        </div>
+
+
+                                        <div class="form-group">
+                                            <button id="freezeOrderQueryBtn" type="button" class="btn btn-danger dropdown-toggle">查询
+                                            </button>
+                                            <button id="freezeOrderExportBtn" type="button" class="btn btn-gray dropdown-toggle offset10">
+                                                导出<i data-rel="popover" data-content="建议时间跨度不要太大，避免导出超时,且导出上限10000条"
+                                                     class="ico-ask-mingxi"><span></span></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="clear: both"></div>
+                            <div class="con_main0">
+                                <div class="tggl-page-con">
+                                    <div class="tab-content" id="scroll-one">
+                                        <div class="basic text-center">
+                                            <table id="freezeOrderTable" >
+                                                <thead id="freezeOrderHead">
+                                                <tr>
+                                                    <td colspan="20" class="tab-border-top"></td>
+                                                </tr>
+                                                <tr class="align-tr">
+                                                    <td >订单号</td>
+                                                    <td >商品名称</td>
+                                                    <td style="position: relative;padding:0;" >
+                                                        <div style="width:100%">
+                                                            计佣金额
+                                                            <i data-rel="popover" data-content="经优惠分摊后可获得佣金的单一商品金额。"
+                                                               class="ico-ask-mingxi" data-original-title=""
+                                                               title=""><span></span></i>
+                                                        </div>
+                                                        <div style="position: absolute;width:100%;transform: scale(0.9);">
+                                                            （单位元）
+                                                        </div>
+                                                    </td>
+                                                    <td >商品数量</td>
+                                                    <td >
+                                                        佣金比例
+                                                        <i data-rel="popover"
+                                                           data-content="下单当日广告主设定的商品佣金比例，若当日无推广计划，则使用基础类目佣金比例。"
+                                                           class="ico-ask-mingxi" data-original-title=""
+                                                           title=""><span></span></i>
+                                                    </td>
+                                                    <td >
+                                                        分成比例
+                                                        <i data-rel="popover"
+                                                           data-content="您获得的收入分成比例"
+                                                           class="ico-ask-mingxi" data-original-title=""
+                                                           title=""><span></span></i>
+                                                    </td>
+                                                    <td class="boder0" >
+                                                        收入结算
+                                                        <i data-rel="popover"
+                                                           data-content="此数据为您选择的时间内引入订单产生的效果预估数据，并非最终实际收入，其作用是便于您了解效果发展的趋势，最终收入以您账户内实际收到的为准"
+                                                           class="ico-ask-mingxi" data-original-title=""
+                                                           title=""><span></span></i>
+                                                    </td>
+                                                    <td >结算时间</td>
+                                                    <td>维权状态
+                                                    </td>
+                                                    <td >维权创建时间</td>
+                                                    <td >维权完成时间</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="20" class="tab-border-bottom">
+                                                    </td>
+                                                </tr>
+                                                </thead>
+                                            </table>
+
+                                            <div class="pagination">
+                                                <ul class="pagination-length pagination-number pagination-left">
+                                                    <li class="each-page">每页</li>
+                                                    <li class="select">
+                                                        <select id="freezeResetPageSize">
+                                                            <option selected>10</option>
+                                                            <option>20</option>
+                                                        </select>
+                                                    </li>
+                                                    <li>条</li>
+                                                </ul>
+                                                <ul id="freezePn" class="pagination-number pagination-right">
+                                                    <li><a href="javascript:void(0)" class="last">«</a></li>
+                                                    <li><a class="current" href="javascript:void(0);" id="freezecurrent">1</a></li>
+                                                    <li><a href="javascript:void(0);" class="next">»</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </section>
+                    <!--商家维权订单 end-->
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="/static/js/account/date.js"></script>
+<script type="text/javascript" src="/static/js/common/history.js"></script>
+<script type="text/javascript" src="/static/js/report/effectDetail.js?t=21"></script>
+<script type="text/javascript">
+    var st = new DetailReport(2011005331, 2011005331);
+    st.init();
+</script>
+
+
+
+<script type="text/javascript">
+   var jaq = jaq || [];
+   jaq.push(['account','UA-J2011-39']);
+   jaq.push(['domain','media.jd.com']);
+   (function() {
+    var ja = document.createElement('script'); ja.type = 'text/javascript'; ja.async = true;
+    ja.src = ('https:' == document.location.protocol ? 'https://cscssl' : 'http://csc') + '.jd.com/joya.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ja, s);
+   })();
+</script>
+
+
+
+<!--  税率变更验证验证 -->
+<input type="hidden" value="${agreement}" id="agreement" name="agreement" />
+<input type="hidden" value="${cpcAgreement}" id="cpcAgreement" name="cpcAgreement" />
+<input type="hidden" value="${appAgreement}" id="appAgreement" name="appAgreement" />
+<input type="hidden" value="${taxRatioChange}" id="taxRatioChange" name="taxRatioChange" />
+<input type="hidden" value="${feedbackFlag}" id="feedbackFlag" name="feedbackFlag" />
+<!--  服务协议验证 -->
+
+<!--  服务协议验证 -->
+
+<!-- cpc 服务协议验证 -->
+<!--  cpc服务协议验证 -->
+<!--  app服务协议验证 -->
+
+
+<!--  服务协议验证 -->
+<!--  服务协议验证 -->
+<style>
+.feedsback { position: fixed; z-index: 1000; bottom:42px; border: 1px solid #ddd; background: #eee; width: 18px; color: #333; right: 10px; }
+.feedsback img{ display:block;font-style:normal;font-weight:bold; PADDING-RIGHT: 10px;}
+.feedsback img{ color:#333;}
+</style>
+
+
+
+<div class="notice-fixed" style="display: none">
+    <div class="hd clearfix">
+        <div class="pull-left"> <a onclick='closeNoticeWin()' href="/user/noticeList" style="margin-right: 20px"><strong>最新公告</strong></a></div>
+        <div class="pull-right">
+            <a href="" class="close" clstag="pageclick|keycount|201708142|26">&times;</a>
+        </div>
+    </div>
+    <div class="bd">
+        <ul class="notice-lst" id="noticeList" clstag="pageclick|keycount|201708142|27">
+        </ul>
+    </div>
+</div>
+
+<div class="notice-fixed-bell"  clstag="pageclick|keycount|201708142|25">
+    <img src="/static/images/bell.png" alt="">
+</div>
+
+<!-- 滚动条css和js -->
+<link rel="stylesheet" href="/static/css/jquery.mCustomScrollbar.min.css?1520946981459">
+<script type="text/javascript" src="/static/js/jquery.mCustomScrollbar.concat.min.js?1520946981459"></script>
+<script>
+    var noticeFixed = $('.notice-fixed'),
+            noticeFixedBell = $('.notice-fixed-bell');
+
+
+        if(checkCookie('showNoticeWindow') && getCookie('showNoticeWindow') == 'false'){
+            noticeFixed.hide();
+            noticeFixedBell.show();
+        }else{
+            getNotice();
+            noticeFixed.show();
+            noticeFixedBell.hide();
+                }
+    $(window).ready(function(){
+        // 公告内容过长时增加滚动条
+        $('.notice-fixed .bd .con').mCustomScrollbar();
+        $('.notice-fixed .bd .notice-lst').mCustomScrollbar();
+        // 公告翻页
+        function initNoticePagination(){
+            $('.notice-fixed .pagination-box .num').html('1 / '+$('.notice-fixed .bd li').length);
+        }
+        // 向前翻页
+        $('.notice-fixed .pagination-box .preBtn').on('click',function(){
+            var txt = $('.notice-fixed .pagination-box .num').html().split('/'),
+                    num = parseInt(txt[0]);
+            if(num == 1){
+                num = $('.notice-fixed .bd li').length;
+                $('.notice-fixed .pagination-box .num').html(num+' / '+$('.notice-fixed .bd li').length);
+            }
+            else{
+                num = num-1;
+                $('.notice-fixed .pagination-box .num').html(num+' / '+$('.notice-fixed .bd li').length);
+            }
+            $('.notice-fixed .bd li:nth-child('+num+')').addClass('on').siblings().removeClass('on');
+        });
+        // 向后翻页
+        $('.notice-fixed .pagination-box .nextBtn').on('click',function(){
+            var txt = $('.notice-fixed .pagination-box .num').html().split('/'),
+                    num = parseInt(txt[0]);
+            if(num == parseInt($('.notice-fixed .bd li').length)){
+                num = 1;
+                $('.notice-fixed .pagination-box .num').html(num+' / '+$('.notice-fixed .bd li').length);
+            }
+            else{
+                num = num+1;
+                $('.notice-fixed .pagination-box .num').html(num+' / '+$('.notice-fixed .bd li').length);
+            }
+            $('.notice-fixed .bd li:nth-child('+num+')').addClass('on').siblings().removeClass('on');
+        });
+        // 公告最小化
+
+        $('.notice-fixed .close').on('click',function(e){
+            e.preventDefault();
+            closeNoticeWin();
+        });
+
+        noticeFixedBell.on('click',function(e){
+            e.preventDefault();
+            getNotice();
+            noticeFixed.show();
+            noticeFixedBell.hide();
+            setCookie('showNoticeWindow',true);
+        });
+        // 页面加载时初始化翻页
+        initNoticePagination();
+    });
+
+        function getNotice(){
+        $.ajax({
+            type: "GET",
+            url: "/getIndexNoticeList",
+            cache:false,
+            success: function(data) {
+                var advWindow = $("#noticeList");
+                var  href  ="";
+                try{
+                    if(data.code != "1" || data.content.length < 1){
+                        return;
+                    }
+                    $(data.content).each(function(i,v){
+                        var title="";
+                        title = v.title;
+                        href += "<li class='clearfix'><a onclick='closeNoticeWin()' target='_blank' href=\"/notice/info/"+v.noticeId+"\">";
+                        href += "<span class='name'>"+title+"</span>";
+                        href += "<span class='time'>"+v.releaseTime+"</span>";
+                        href +=  "</a></li>";
+
+                    });
+
+
+                }catch(e){
+
+                }
+                advWindow.empty();
+                advWindow.html(href);
+            },
+            error:function( ){
+
+            }
+        });
+        }
+
+        function closeNoticeWin(){
+        noticeFixed.hide();
+        noticeFixedBell.show();
+        setCookie('showNoticeWindow',false);
+        }
+
+</script>
+</body>
+</html>

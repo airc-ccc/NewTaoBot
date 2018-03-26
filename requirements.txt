@@ -1,0 +1,4 @@
+requests
+Selenium
+BeautifulSoup
+itchat
