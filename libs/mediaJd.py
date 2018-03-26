@@ -47,7 +47,7 @@ class MediaJd:
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             firefoxOptions = webdriver.FirefoxOptions()
 
-            firefoxOptions.set_Headless()
+            firefoxOptions.set_headless()
 
             # 开启driver
             wd = webdriver.Firefox(firefox_options=firefoxOptions)
