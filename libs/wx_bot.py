@@ -220,9 +220,33 @@ def check_if_is_tb_link(msg):
         if res['res'] == 'not_info':
             itchat.send(res['text'], msg['FromUserName'])
             return
+
+
+        htm = re.findall(r"<appname>.*?</appname>", msg['Content'])
+
+        if (htm):
+            soup_xml = BeautifulSoup(msg['Content'], 'lxml')
+
+            xml_info = soup_xml.select('appname')
+
+            # 定义视频网站
+            shipin = ['腾讯视频', '爱奇艺', '优酷视频', '芒果 TV']
+
+            for item in shipin:
+                if item == xml_info[0].string:
+                    player_url = 'http://164dyw.duapp.com/youku/apiget.php?url=%s' % msg['Url']
+                    text = '''
+一一一一 影视信息 一一一一
+
+查询成功！你要的影片点击下方链接即可观看！
+感谢你的使用！ 链接加载速度如果较慢！
+可选择浏览器中打开链接！
+%s
+                    ''' % (player_url)
+                    itchat.send(text, msg['FromUserName'])
+                    return
+
         text_reply(msg, msg['Url'])
-    elif msg['Text'] == '10000':
-        create_user_info(msg)
     elif msg['Text'].isdigit() and len(msg['Text']) == 6:
         lnivt_user(msg)
     elif msg['Type'] == 'Text':
@@ -678,9 +702,7 @@ http://t.cn/RnAKqWW
 # 创建用户账户
 def create_user_info(msg, lnivt_code=0):
     cm = ConnectMysql()
-
-    res = itchat.search_friends(userName=msg['FromUserName'])
-
+    res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
     while True:
         # 生成随机数
         randNum = random.randint(100000, 999999)
@@ -1008,17 +1030,12 @@ class WxBot(object):
     @itchat.msg_register(['Text', 'Sharing'])
     def text(msg):
         print(msg)
-        bot_res = itchat.search_friends(userName=msg['FromUserName'])
-        print(bot_res)
         check_if_is_tb_link(msg)
 
     @itchat.msg_register(FRIENDS)
     def add_friend(msg):
         itchat.add_friend(**msg['Text'])  # 该操作会自动将新好友的消息录入，不需要重载通讯录
-
-        timestr = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-
-        itchat.set_alias(msg['FromUserName'], "aaabbb")
+        create_user_info(msg)
         text = '''
 一一一一 系统消息 一一一一
 
@@ -1043,7 +1060,6 @@ http://tbyhq.ptjob.net
 邀请好友得返利：
 http://t.cn/RnAKafe
         '''
-
         itchat.send_msg(text, msg['RecommendInfo']['UserName'])
 
     def run(self):
