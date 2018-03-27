@@ -706,11 +706,10 @@ http://t.cn/RnAKqWW
 def create_user_info(msg, lnivt_code=0, tool=False):
     cm = ConnectMysql()
 
-    # res = []
-    # if tool==False:
-    res = itchat.search_friends(userName=msg['FromUserName'])
-    # else:
-    #     res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
+    if tool==False:
+        res = itchat.search_friends(userName=msg['FromUserName'])
+    else:
+        res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
 
     print(res)
 
@@ -1046,7 +1045,7 @@ class WxBot(object):
     @itchat.msg_register(FRIENDS)
     def add_friend(msg):
         itchat.add_friend(**msg['Text'])  # 该操作会自动将新好友的消息录入，不需要重载通讯录
-        create_user_info(msg)
+        create_user_info(msg, 0, tool=True)
         text = '''
 一一一一 系统消息 一一一一
 
