@@ -703,7 +703,7 @@ http://t.cn/RnAKqWW
 
 
 # 创建用户账户
-def create_user_info(msg, lnivt_code=0, tool):
+def create_user_info(msg, lnivt_code=0, tool=False):
     cm = ConnectMysql()
 
     res = []
