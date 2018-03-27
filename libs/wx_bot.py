@@ -712,6 +712,8 @@ def create_user_info(msg, lnivt_code=0, tool=True):
     else:
         res = itchat.search_friends(userName=msg['FromUserName'])
 
+    print(res)
+
     while True:
         # 生成随机数
         randNum = random.randint(100000, 999999)
