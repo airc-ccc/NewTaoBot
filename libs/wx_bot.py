@@ -718,7 +718,7 @@ def create_user_info(msg, lnivt_code=0):
             break
 
     # 定义SQL语句 查询数据是否已经存在
-    select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['UserName'] + "';"
+    select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
     select_user_res = cm.ExecQuery(select_user_sql)
     if len(select_user_res) > 0:
         cm.Close()
