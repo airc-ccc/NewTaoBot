@@ -251,7 +251,7 @@ def check_if_is_tb_link(msg):
         lnivt_user(msg)
     elif msg['Text'] == '10000':
         tool = False
-        create_user_info(msg, tool)
+        create_user_info(msg, 0, tool)
     elif msg['Type'] == 'Text':
 
         patternURL = re.compile('^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+')
