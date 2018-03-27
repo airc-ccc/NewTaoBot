@@ -703,14 +703,14 @@ http://t.cn/RnAKqWW
 
 
 # 创建用户账户
-def create_user_info(msg, lnivt_code=0, tool=True):
+def create_user_info(msg, lnivt_code=0, tool):
     cm = ConnectMysql()
 
     res = []
-    if tool==True:
-        res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
-    else:
+    if tool==False:
         res = itchat.search_friends(userName=msg['FromUserName'])
+    else:
+        res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
 
     print(res)
 
