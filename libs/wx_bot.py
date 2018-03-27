@@ -706,7 +706,8 @@ http://t.cn/RnAKqWW
 def create_user_info(msg, lnivt_code=0, tool=True):
     cm = ConnectMysql()
 
-    if tool:
+    res = []
+    if tool==True:
         res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
     else:
         res = itchat.search_friends(userName=msg['FromUserName'])
