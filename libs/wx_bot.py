@@ -250,7 +250,8 @@ def check_if_is_tb_link(msg):
     elif msg['Text'].isdigit() and len(msg['Text']) == 6:
         lnivt_user(msg)
     elif msg['Text'] == '10000':
-        create_user_info(msg)
+        tool = False
+        create_user_info(msg, tool)
     elif msg['Type'] == 'Text':
 
         patternURL = re.compile('^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+')
@@ -702,9 +703,14 @@ http://t.cn/RnAKqWW
 
 
 # 创建用户账户
-def create_user_info(msg, lnivt_code=0):
+def create_user_info(msg, lnivt_code=0, tool=True):
     cm = ConnectMysql()
-    res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
+
+    if tool:
+        res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
+    else:
+        res = itchat.search_friends(userName=msg['FromUserName'])
+
     while True:
         # 生成随机数
         randNum = random.randint(100000, 999999)
