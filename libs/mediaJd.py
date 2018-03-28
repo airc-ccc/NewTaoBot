@@ -175,14 +175,13 @@ class MediaJd:
         good_text = json.loads(good_link.text)
         good_text['logTitle'] = dict_str['logTitle']
         good_text['logUnitPrice'] = dict_str['logUnitPrice']
-
+        rebate = float(dict_str['pcComm']) / 100
         if coupon != None:
             good_text['coupon_price'] = round(float(good_text['logUnitPrice']) - int(coupon_price), 2)
             good_text['youhuiquan_price'] = coupon_price
-
-        rebate = float(dict_str['pcComm']) / 100
-
-        good_text['rebate'] = round(float(good_text['logUnitPrice']) * rebate * 0.3, 2)
+            good_text['rebate'] = round(float(good_text['coupon_price']) * rebate * 0.3, 2)
+        else:
+            good_text['rebate'] = round(float(good_text['logUnitPrice']) * rebate * 0.3, 2)
 
         good_text['coupon_price2'] = coupon_price
 
@@ -319,10 +318,25 @@ class MediaJd:
                             ''' % (check_user_res[0][3], add_parent_balance)
 
                     user_text = '''
-一一一一 订单消息 一一一一
+一一一一系统消息一一一一
 
-订单【%s】标记成功，返利金%s已发放到您的账户
-回复【个人信息】 查看订单及返利信息
+订单【%s】已完成！
+返利金%s元已发放到您的个人账户！
+
+回复【提现】可申请账户余额提现
+回复【个人信息】可看个当前账户信息
+
+分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【VIP视频链接】免费查看高清VIP视频！
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+京东优惠券网站：
+http://jdyhq.ptjob.net
+淘宝优惠券网站：
+http://tbyhq.ptjob.net
+邀请好友得返利：
+http://t.cn/RnAKafe
                             ''' % (order_id, add_balance)
                     cm.Close()
                     return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success',
