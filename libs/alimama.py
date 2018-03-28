@@ -425,16 +425,16 @@ class Alimama:
     def __get_tk_link_s1(self, auctionid, tb_token, pvid):
         url = 'http://pub.alimama.com/common/adzone/newSelfAdzone2.json?tag=29&itemId=%s&blockId=&t=%s&_tb_token_=%s&pvid=%s' % (
             auctionid, int(time.time() * 1000), tb_token, pvid)
-        headers = {
-            'Host': 'pub.alimama.com',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-            'Referer': 'http://pub.alimama.com/promo/search/index.htm',
-            'Accept-Encoding': 'gzip, deflate, sdch',
-            'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
-        }
-        res = self.get_url(url, headers)
+        # headers = {
+        #     'Host': 'pub.alimama.com',
+        #     'Accept': 'application/json, text/javascript, */*; q=0.01',
+        #     'X-Requested-With': 'XMLHttpRequest',
+        #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+        #     'Referer': 'http://pub.alimama.com/promo/search/index.htm',
+        #     'Accept-Encoding': 'gzip, deflate, sdch',
+        #     'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
+        # }
+        res = self.se.get(url)
         # self.logger.debug(res.text)
         rj = res.json()
         gcid = rj['data']['otherList'][0]['gcid']
@@ -455,36 +455,36 @@ class Alimama:
             '_tb_token_': tb_token,
             'pvid': pvid,
         }
-        headers = {
-            'Host': 'pub.alimama.com',
-            'Content-Length': str(len(json.dumps(data))),
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'Origin': 'http://pub.alimama.com',
-            'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Referer': 'http://pub.alimama.com/promo/search/index.htm',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
-        }
+        # headers = {
+        #     'Host': 'pub.alimama.com',
+        #     'Content-Length': str(len(json.dumps(data))),
+        #     'Accept': 'application/json, text/javascript, */*; q=0.01',
+        #     'Origin': 'http://pub.alimama.com',
+        #     'X-Requested-With': 'XMLHttpRequest',
+        #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+        #     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        #     'Referer': 'http://pub.alimama.com/promo/search/index.htm',
+        #     'Accept-Encoding': 'gzip, deflate',
+        #     'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
+        # }
 
-        res = self.post_url(url, headers, data)
+        res = self.se.post(url, data)
         return res
 
     # 获取口令
     def __get_tk_link_s3(self, auctionid, adzoneid, siteid, tb_token, pvid):
         url = 'http://pub.alimama.com/common/code/getAuctionCode.json?auctionid=%s&adzoneid=%s&siteid=%s&scenes=1&t=%s&_tb_token_=%s&pvid=%s' % (
             auctionid, adzoneid, siteid, int(time.time() * 1000), tb_token, pvid)
-        headers = {
-            'Host': 'pub.alimama.com',
-            'Accept': 'application/json, text/javascript, */*; q=0.01',
-            'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-            'Referer': 'http://pub.alimama.com/promo/search/index.htm',
-            'Accept-Encoding': 'gzip, deflate, sdch',
-            'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
-        }
-        res = self.get_url(url, headers)
+        # headers = {
+        #     'Host': 'pub.alimama.com',
+        #     'Accept': 'application/json, text/javascript, */*; q=0.01',
+        #     'X-Requested-With': 'XMLHttpRequest',
+        #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+        #     'Referer': 'http://pub.alimama.com/promo/search/index.htm',
+        #     'Accept-Encoding': 'gzip, deflate, sdch',
+        #     'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
+        # }
+        res = self.se.get(url)
         rj = json.loads(res.text)
         return rj['data']
 
