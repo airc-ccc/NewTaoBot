@@ -160,7 +160,7 @@ def check_if_is_tb_link(msg):
             tk_rate = res['tkRate']
             price = res['zkPrice']
             fx2 = round(float(res['tkCommonFee']) * 0.3, 2)
-            real_price = price - coupon_amount
+            real_price = round(price - coupon_amount, 2)
             # # get tk link
             res1 = al.get_tk_link(auctionid)
 

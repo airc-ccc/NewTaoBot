@@ -55,7 +55,7 @@ class Alimama:
             'path': '/common/getUnionPubContextInfo.json',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'Referer': 'http://pub.alimama.com/',
             'Accept-Encoding': 'gzip, deflate, sdch',
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -91,7 +91,7 @@ class Alimama:
                 'path': '/items/search.json?%s' % url.split('search.json?')[-1],
                 'accept': 'application/json, text/javascript, */*; q=0.01',
                 'x-requested-with': 'XMLHttpRequest',
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
                 'referer': 'https://pub.alimama.com',
                 'accept-encoding': 'gzip, deflate, sdch, br',
                 'accept-language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -139,7 +139,7 @@ class Alimama:
             'path': '/common/getUnionPubContextInfo.json',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'Referer': 'http://pub.alimama.com/',
             'Accept-Encoding': 'gzip, deflate, sdch',
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -157,7 +157,7 @@ class Alimama:
             'path': '/member/loginByIm.do?%s' % url.split('loginByIm.do?')[-1],
             'Accept': 'application/json, text/javascript, */*; q=0.01',
             'X-Requested-With': 'XMLHttpRequest',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'Referer': 'http://pub.alimama.com/',
             'Accept-Encoding': 'gzip, deflate, sdch',
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -174,7 +174,7 @@ class Alimama:
             'authority': 'qrlogin.taobao.com',
             'scheme': 'https',
             'path': '/qrcodelogin/qrcodeLoginCheck.do?%s' % url.split('qrcodeLoginCheck.do?')[-1],
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'accept': '*/*',
             'referer': 'https://login.taobao.com/member/login.jhtml?style=mini&newMini2=true&from=alimama&redirectURL=http%3A%2F%2Flogin.taobao.com%2Fmember%2Ftaobaoke%2Flogin.htm%3Fis_login%3d1&full_redirect=true&disableQuickLogin=true',
             'accept-encoding': 'gzip, deflate, sdch, br',
@@ -195,7 +195,7 @@ class Alimama:
             'authority': 'qrlogin.taobao.com',
             'scheme': 'https',
             'path': '/qrcodelogin/generateQRCode4Login.do?%s' % url.split('generateQRCode4Login.do?')[-1],
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'accept': '*/*',
             'referer': 'https://login.taobao.com/member/login.jhtml?style=mini&newMini2=true&from=alimama&redirectURL=http%3A%2F%2Flogin.taobao.com%2Fmember%2Ftaobaoke%2Flogin.htm%3Fis_login%3d1&full_redirect=true&disableQuickLogin=true',
             'accept-encoding': 'gzip, deflate, sdch, br',
@@ -212,7 +212,7 @@ class Alimama:
             'authority': 'img.alicdn.com',
             'scheme': 'https',
             'path': '/tfscom/%s' % url.split('tfscom/')[-1],
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'accept': 'image/webp,image/*,*/*;q=0.8',
             'referer': 'https://login.taobao.com/member/login.jhtml?style=mini&newMini2=true&from=alimama&redirectURL=http%3A%2F%2Flogin.taobao.com%2Fmember%2Ftaobaoke%2Flogin.htm%3Fis_login%3d1&full_redirect=true&disableQuickLogin=true',
             'accept-encoding': 'gzip, deflate, sdch, br',
@@ -251,10 +251,10 @@ class Alimama:
             'authority': 'qrlogin.taobao.com',
             'scheme': 'https',
             'path': '/qrcodelogin/generateQRCode4Login.do?%s' % url.split('generateQRCode4Login.do?')[-1],
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'accept': '*/*',
             'referer': 'https://login.taobao.com/member/login.jhtml?style=mini&newMini2=true&from=alimama&redirectURL=http%3A%2F%2Flogin.taobao.com%2Fmember%2Ftaobaoke%2Flogin.htm%3Fis_login%3d1&full_redirect=true&disableQuickLogin=true',
-            'accept-encoding': 'gzip, deflate, sdch, br',
+            'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'zh-CN,zh;q=0.8',
         }
 
@@ -268,10 +268,10 @@ class Alimama:
             'authority': 'img.alicdn.com',
             'scheme': 'https',
             'path': '/tfscom/%s' % url.split('tfscom/')[-1],
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'accept': 'image/webp,image/*,*/*;q=0.8',
             'referer': 'https://login.taobao.com/member/login.jhtml?style=mini&newMini2=true&from=alimama&redirectURL=http%3A%2F%2Flogin.taobao.com%2Fmember%2Ftaobaoke%2Flogin.htm%3Fis_login%3d1&full_redirect=true&disableQuickLogin=true',
-            'accept-encoding': 'gzip, deflate, sdch, br',
+            'accept-encoding': 'gzip, deflate, br',
             'accept-language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
         }
         res = self.get_url(url, headers=headers)
@@ -388,10 +388,10 @@ class Alimama:
                 'path': '/items/search.json?%s' % url.split('search.json?')[-1],
                 'accept': 'application/json, text/javascript, */*; q=0.01',
                 'x-requested-with': 'XMLHttpRequest',
-                'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
                 'referer': 'https://pub.alimama.com',
-                'accept-encoding': 'gzip, deflate, sdch, br',
-                'accept-language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'en-US,en;q=0.5',
             }
             res = self.get_url(url, headers)
             # print(res.text)
@@ -425,16 +425,16 @@ class Alimama:
     def __get_tk_link_s1(self, auctionid, tb_token, pvid):
         url = 'http://pub.alimama.com/common/adzone/newSelfAdzone2.json?tag=29&itemId=%s&blockId=&t=%s&_tb_token_=%s&pvid=%s' % (
             auctionid, int(time.time() * 1000), tb_token, pvid)
-        # headers = {
-        #     'Host': 'pub.alimama.com',
-        #     'Accept': 'application/json, text/javascript, */*; q=0.01',
-        #     'X-Requested-With': 'XMLHttpRequest',
-        #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-        #     'Referer': 'http://pub.alimama.com/promo/search/index.htm',
-        #     'Accept-Encoding': 'gzip, deflate, sdch',
-        #     'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
-        # }
-        res = self.se.get(url)
+        headers = {
+            'Host': 'pub.alimama.com',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
+            'Referer': 'http://pub.alimama.com/promo/search/index.htm',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
+        }
+        res = self.get_url(url, headers)
         # self.logger.debug(res.text)
         rj = res.json()
         gcid = rj['data']['otherList'][0]['gcid']
@@ -455,36 +455,36 @@ class Alimama:
             '_tb_token_': tb_token,
             'pvid': pvid,
         }
-        # headers = {
-        #     'Host': 'pub.alimama.com',
-        #     'Content-Length': str(len(json.dumps(data))),
-        #     'Accept': 'application/json, text/javascript, */*; q=0.01',
-        #     'Origin': 'http://pub.alimama.com',
-        #     'X-Requested-With': 'XMLHttpRequest',
-        #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-        #     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        #     'Referer': 'http://pub.alimama.com/promo/search/index.htm',
-        #     'Accept-Encoding': 'gzip, deflate',
-        #     'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
-        # }
+        headers = {
+            'Host': 'pub.alimama.com',
+            'Content-Length': str(len(json.dumps(data))),
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'Origin': 'http://pub.alimama.com',
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Referer': 'http://pub.alimama.com/promo/search/index.htm',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
+        }
 
-        res = self.se.post(url, data)
+        res = self.post_url(url, headers, data)
         return res
 
     # 获取口令
     def __get_tk_link_s3(self, auctionid, adzoneid, siteid, tb_token, pvid):
         url = 'http://pub.alimama.com/common/code/getAuctionCode.json?auctionid=%s&adzoneid=%s&siteid=%s&scenes=1&t=%s&_tb_token_=%s&pvid=%s' % (
             auctionid, adzoneid, siteid, int(time.time() * 1000), tb_token, pvid)
-        # headers = {
-        #     'Host': 'pub.alimama.com',
-        #     'Accept': 'application/json, text/javascript, */*; q=0.01',
-        #     'X-Requested-With': 'XMLHttpRequest',
-        #     'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
-        #     'Referer': 'http://pub.alimama.com/promo/search/index.htm',
-        #     'Accept-Encoding': 'gzip, deflate, sdch',
-        #     'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
-        # }
-        res = self.se.get(url)
+        headers = {
+            'Host': 'pub.alimama.com',
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With': 'XMLHttpRequest',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
+            'Referer': 'http://pub.alimama.com/promo/search/index.htm',
+            'Accept-Encoding': 'gzip, deflate, sdch',
+            'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
+        }
+        res = self.get_url(url, headers)
         rj = json.loads(res.text)
         return rj['data']
 
@@ -494,7 +494,7 @@ class Alimama:
             headers = {
                 'Host': url.split('http://')[-1].split('/')[0],
                 'Upgrade-Insecure-Requests': '1',
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                 'Accept-Encoding': 'gzip, deflate, sdch',
                 'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -518,7 +518,7 @@ class Alimama:
                     headers1 = {
                         'Host': r_url.split('http://')[-1].split('/')[0],
                         'Upgrade-Insecure-Requests': '1',
-                        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
                         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
                         'Accept-Encoding': 'gzip, deflate, sdch',
                         'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -541,7 +541,7 @@ class Alimama:
             'scheme': 'https',
             'path': '/t?%s' % url.split('/t?')[-1],
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, sdch',
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -558,7 +558,7 @@ class Alimama:
             'scheme': 'https',
             'path': '/t?%s' % url2.split('/t?')[-1],
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, sdch',
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -575,7 +575,7 @@ class Alimama:
             'scheme': 'https',
             'path': '/t?%s' % url3.split('/t?')[-1],
             'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
             'Accept-Encoding': 'gzip, deflate, sdch',
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
@@ -627,7 +627,7 @@ class Alimama:
                 "Host": "pub.alimama.com",
                 "Pragma": "no-cache",
                 "Referer": "http://pub.alimama.com/myunion.htm?spm=a219t.7900221/1.a214tr8.2.3d7c75a560ieiE",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3325.162 Safari/537.36",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0",
                 "X-Requested-With": "XMLHttpRequest"
             }
 
