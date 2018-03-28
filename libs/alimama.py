@@ -19,6 +19,7 @@ from io import BytesIO
 from threading import Thread
 from dateutil.relativedelta import relativedelta
 from libs.mysql import ConnectMysql
+from selenium import webdriver
 
 import pyqrcode
 import requests
@@ -291,7 +292,7 @@ class Alimama:
             if 'url' in rj:
                 self.visit_login_rediret_url(rj['url'])
                 self.logger.debug('login success')
-                # self.logger.debug(self.se.cookies.items())
+                # self.logger.debug(self.se.cookies)
                 with open(cookie_fname, 'w') as f:
                     f.write(json.dumps(self.se.cookies.items()))
                 return 'login success'
@@ -309,7 +310,7 @@ class Alimama:
                 self.logger.debug(u"淘宝已经登录 不需要再次登录")
                 return 'login success'
             else:
-                dlr = self.do_login()
+                dlr = self.open_do_login()
                 if dlr is None:
                     return 'login failed'
                 else:
@@ -318,6 +319,50 @@ class Alimama:
             trace = traceback.format_exc()
             self.logger.warning("{},{}".format(str(e), trace))
             return 'login failed'
+
+    def open_do_login(self):
+        # loginname = input('请输入淘宝联盟账号:')
+        # nloginpwd = input('请输入淘宝联盟密码:')
+
+        if (sysstr == "Linux") or (sysstr == "Darwin"):
+            firefoxOptions = webdriver.FirefoxOptions()
+
+            firefoxOptions.set_headless()
+
+            # 开启driver
+            wd = webdriver.Firefox(firefox_options=firefoxOptions)
+        else:
+            wd = webdriver.Firefox()
+
+        wd.get('https://login.taobao.com/member/login.jhtml?style=mini&newMini2=true&from=alimama&redirectURL=http://login.taobao.com/member/taobaoke/login.htm?is_login=1&full_redirect=true&disableQuickLogin=true')
+
+        time.sleep(10)
+
+        js = "var pass = document.getElementById(\"TPL_password_1\").setAttribute(\"autocomplete\", \"on\")"
+
+        wd.execute_script(js)
+        time.sleep(3)
+        wd.find_element_by_class_name('login-switch').click()
+        time.sleep(3)
+        # 输入账号密码
+        wd.find_element_by_id('TPL_username_1').send_keys('15399888412')
+        # 休息3秒
+        time.sleep(3)
+        # 输入密码
+        wd.find_element_by_id('TPL_password_1').send_keys('smile007')
+        # 点击登录按钮
+        time.sleep(5)
+        wd.find_element_by_id('J_SubmitStatic').click()
+
+        self.logger.debug('login success')
+        with open(cookie_fname, 'w') as f:
+            cookies_arr = []
+            for item in wd.get_cookies():
+                cookies_arr.append([item['name'], item['value']])
+            
+            f.write(json.dumps(cookies_arr))
+
+        return 'login success'
 
     def get_tb_token(self):
         tb_token = None
