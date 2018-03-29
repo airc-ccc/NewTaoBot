@@ -937,6 +937,8 @@ http://t.cn/RnAKafe
                 ''' % (user_info[0][4])
 
             cm.Close()
+            if tool==False:
+                return
             itchat.send(text, msg['FromUserName'])
             return
     else:
