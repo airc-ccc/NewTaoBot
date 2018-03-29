@@ -471,7 +471,7 @@ http://t.cn/RnAKafe
 
 提现条件：
 1，必须拥有个人账户，回复【10000】或者【邀请码】可创建个人账户并领取微信红包！
-2，提现金额必须 >= 1元
+2，提现金额必须 > 0元
 
 把【淘口令】【京东商品链接】分享给我查询优惠券和返利！
 使用教程：http://t.cn/RnAKqWW
@@ -820,6 +820,302 @@ http://t.cn/RnAKafe
             if res2['res'] == 'not_info':
                 create_user_info(msg, 0, tool=False)
 
+            text_reply(msg, msg['Text'])
+
+# 检查是否是淘宝链接
+def check_if_is_group(msg):
+    cm = ConnectMysql()
+
+    if re.search(r'【.*】', msg['Text']) and (
+            u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
+        try:
+            q = re.search(r'【.*】', msg['Text']).group().replace(u'【', '').replace(u'】', '')
+            if u'打开👉天猫APP👈' in msg['Text']:
+                try:
+                    url = re.search(r'http://.* \)', msg['Text']).group().replace(u' )', '')
+                except:
+                    url = None
+
+            else:
+                try:
+                    url = re.search(r'http://.* ，', msg['Text']).group().replace(u' ，', '')
+                except:
+                    url = None
+
+            if url is None:
+                taokoulingurl = 'http://www.taokouling.com/index.php?m=api&a=taokoulingjm'
+                taokouling = re.search(r'￥.*?￥', msg['Text']).group()
+                parms = {'username': 'wx_tb_fanli', 'password': 'wx_tb_fanli', 'text': taokouling}
+                res = requests.post(taokoulingurl, data=parms)
+                url = res.json()['url'].replace('https://', 'http://')
+                info = "tkl url: {}".format(url)
+                # logger.debug(info)
+
+            # get real url
+            real_url = al.get_real_url(url)
+            info = "real_url: {}".format(real_url)
+            # logger.debug(info)
+
+            # get detail
+            res = al.get_detail(real_url, msg)
+            if res == 'no match item':
+                text = '''
+一一一一 返利信息 一一一一
+
+返利失败，改商品暂未查询到优惠券及返利信息！
+
+回复【买+商品名称】
+回复【找+商品名称】
+回复【搜+商品名称】
+查看商品优惠券合集
+
+分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+京东优惠券网站：
+http://jdyhq.ptjob.net
+淘宝优惠券网站：
+http://tbyhq.ptjob.net
+邀请好友得返利：
+http://t.cn/RnAKafe            
+                        '''
+                itchat.send(text, msg['FromUserName'])
+                return
+
+            # logger.debug(res)
+            auctionid = res['auctionId']
+            coupon_amount = res['couponAmount']
+            tk_rate = res['tkRate']
+            price = res['zkPrice']
+            fx2 = round(float(res['tkCommonFee']) * 0.3, 2)
+            real_price = round(price - coupon_amount, 2)
+            # # get tk link
+            res1 = al.get_tk_link(auctionid)
+
+            # 判斷數據是否為樓
+            if res1 == None:
+                img = al.get_qr_image()
+                itchat.send(img, msg['FromUserName'])
+                return
+
+            # logger.debug(res1)
+            tao_token = res1['taoToken']
+            short_link = res1['shortLinkUrl']
+            coupon_link = res1['couponLink']
+            if coupon_link != "":
+                coupon_token = res1['couponLinkTaoToken']
+                res_text = '''
+一一一一返利信息一一一一
+
+【商品名】%s元
+
+【淘宝价】%s元
+【优惠券】%s元
+【券后价】%s元
+【返红包】%.2f元
+【淘口令】%s
+
+请复制本条消息，打开淘宝APP领取优惠券下单！
+订单完成后，请将订单完成日期和订单号发给我哦！
+例如：2018-01-01,123456789987654321
+
+                ''' % (q, price, coupon_amount, real_price, fx2, coupon_token)
+            else:
+                res_text = '''
+一一一一返利信息一一一一
+
+【商品名】%s
+【淘宝价】%s元
+【返红包】%.2f元
+【淘口令】%s
+
+请复制本条消息，打开淘宝APP下单后才能领取红包哦！
+订单完成后，请将订单完成日期和订单号发给我哦！
+例如：2018-01-01,123456789987654321
+                                ''' % (q, price, fx2, tao_token)
+
+            itchat.send(res_text, msg['FromUserName'])
+        except Exception as e:
+            trace = traceback.format_exc()
+            logger.warning("error:{},trace:{}".format(str(e), trace))
+            info = '''
+一一一一 返利信息 一一一一
+
+返利失败，改商品暂未查询到优惠券及返利信息！
+
+回复【买+商品名称】
+回复【找+商品名称】
+回复【搜+商品名称】
+查看商品优惠券合集
+
+分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+京东优惠券网站：
+http://jdyhq.ptjob.net
+淘宝优惠券网站：
+http://tbyhq.ptjob.net
+邀请好友得返利：
+http://t.cn/RnAKafe
+            '''
+            return info
+
+    elif msg['Type'] == 'Sharing':
+
+        htm = re.findall(r"<appname>.*?</appname>", msg['Content'])
+
+        if (htm):
+            soup_xml = BeautifulSoup(msg['Content'], 'lxml')
+
+            xml_info = soup_xml.select('appname')
+
+            # 定义视频网站
+            shipin = ['腾讯视频', '爱奇艺', '优酷视频', '芒果 TV']
+
+            for item in shipin:
+                if item == xml_info[0].string:
+                    player_url = 'http://164dyw.duapp.com/youku/apiget.php?url=%s' % msg['Url']
+                    text = '''
+一一一一 视频信息 一一一一
+
+微信昵称你好！已为您找到【电影名称】
+播放链接：%s
+
+欢迎使用跑堂优惠券！
+
+回复【买+商品名称】
+回复【找+商品名称】
+回复【搜+商品名称】
+查看商品优惠券合集
+
+分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+京东优惠券网站：
+http://jdyhq.ptjob.net
+淘宝优惠券网站：
+http://tbyhq.ptjob.net
+邀请好友得返利：
+http://t.cn/RnAKafe
+                    ''' % (player_url)
+                    itchat.send(text, msg['FromUserName'])
+                    return
+
+        text_reply(msg, msg['Url'])
+    elif msg['Type'] == 'Text':
+
+        patternURL = re.compile('^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+')
+
+        pattern_bz = re.compile('^帮助$')
+        pattern_profile = re.compile('^个人信息$')
+        pattern_tixian = re.compile('^提现$')
+        pattern_tuig = re.compile('^推广$')
+        pattern_proxy = re.compile('^代理$')
+        pattern_movie = re.compile('^找电影')
+
+        # 判断是否是URL链接
+        if patternURL.search(msg['Text']) == None:
+
+            pattern_s = re.compile('^搜')
+            pattern_z = re.compile('^找')
+            pattern_m = re.compile('^买')
+            if (pattern_s.search(msg['Text']) != None) | (pattern_z.search(msg['Text']) != None) | (
+                    pattern_m.search(msg['Text']) != None):
+
+                jdurl = quote("http://jdyhq.ptjob.net/?r=search?kw=" + msg['Text'][1:], safe='/:?=&')
+
+                tbyhq = requests.get('http://tbyhq.ptjob.net')
+
+                # 使用BeautifulSoup解析HTML，并提取淘宝优惠券页面token
+                soup = BeautifulSoup(tbyhq.text, 'lxml')
+
+                token = soup.find(attrs={'name': 'token'})
+
+                tburl = quote('http://tbyhq.ptjob.net/?r=find?kw=' + msg['Text'][1:] + '&token=' + token.get('value'),
+                              safe='/:?=&')
+                text = '''
+一一一一优惠券集合一一一一
+
+【京东 淘宝 领券直降】
+
+亲，以为您找到所有【%s】优惠券,快快点击领取吧！
+
+京东优惠券集合：%s
+淘宝优惠券集合：%s
+                        ''' % (msg['Text'][1:], jdurl, tburl)
+                itchat.send(text, msg['FromUserName'])
+
+            elif pattern_bz.search(msg['Text']) != None:
+                # 帮助操作
+                text = '''
+一一一一 系统信息 一一一一
+
+回复【帮助】可查询指信息
+回复【提现】可申请账户余额提现
+回复【推广】可申请机器人代理
+回复【个人信息】可看个当前账户信息
+
+回复【买+商品名称】
+回复【找+商品名称】
+回复【搜+商品名称】查看商品优惠券合集
+
+分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【VIP视频链接】免费查看高清VIP视频！
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+跑堂优惠券常见问题：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
+京东优惠券商城：
+http://jdyhq.ptjob.net
+淘宝优惠券商城：
+http://tbyhq.ptjob.net
+邀请好友得返利说明：
+http://t.cn/RnAKafe
+                '''
+                itchat.send(text, msg['FromUserName'])
+            elif pattern_proxy.search(msg['Text']) != None:
+
+                bot_res = itchat.search_friends(userName=msg['ToUserName'])
+                user_res = itchat.search_friends(userName=msg['FromUserName'])
+
+                to_admin_text = '''
+一一一一 申请代理通知 一一一一
+
+机器人：%s
+申请人：%s
+申请代理时间：%s
+                            ''' % (
+                bot_res['NickName'], user_res['NickName'], time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                text = '''
+一一一一系统消息一一一一
+
+您好！
+点击链接：http://t.cn/Rf0LUP0
+添加好友备注：跑堂优惠券代理
+
+客服人员将尽快和您取得联系，请耐心等待！
+
+分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【VIP视频链接】免费查看高清VIP视频！
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+京东优惠券网站：
+http://jdyhq.ptjob.net
+淘宝优惠券网站：
+http://tbyhq.ptjob.net
+邀请好友得返利：
+http://t.cn/RnAKafe
+                        '''
+                itchat.send(text, msg['FromUserName'])
+                itchat.send(to_admin_text, '@2270c9a6e8ce6bef9305c511a1ff49ea478544d6fe9430085f50c24fbe4ae6f1')
+        else:
             text_reply(msg, msg['Text'])
 
 
@@ -1216,6 +1512,12 @@ class WxBot(object):
     def text(msg):
         print(msg)
         check_if_is_tb_link(msg)
+
+        # 消息回复(文本类型和分享类型消息)
+    @itchat.msg_register(['Text', 'Sharing'], isGroupChat=True)
+    def text(msg):
+        print(msg)
+        check_if_is_group(msg)
 
     @itchat.msg_register(FRIENDS)
     def add_friend(msg):

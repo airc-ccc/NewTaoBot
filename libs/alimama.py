@@ -310,7 +310,7 @@ class Alimama:
                 self.logger.debug(u"淘宝已经登录 不需要再次登录")
                 return 'login success'
             else:
-                dlr = self.open_do_login()
+                dlr = self.do_login()
                 if dlr is None:
                     return 'login failed'
                 else:
