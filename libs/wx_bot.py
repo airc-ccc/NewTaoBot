@@ -119,8 +119,7 @@ def check_if_is_tb_link(msg):
             res = ishaveuserinfo(msg)
 
             if res['res'] == 'not_info':
-                create_user_info(msg, 0, tool=True)
-                return
+                create_user_info(msg, 0, tool=False)
 
             # print('line_38', msg['Text'])
             q = re.search(r'【.*】', msg['Text']).group().replace(u'【', '').replace(u'】', '')
@@ -260,8 +259,7 @@ http://t.cn/RnAKafe
         res = ishaveuserinfo(msg)
 
         if res['res'] == 'not_info':
-            create_user_info(msg, 0, tool=True)
-            return
+            create_user_info(msg, 0, tool=False)
 
 
         htm = re.findall(r"<appname>.*?</appname>", msg['Content'])
@@ -333,8 +331,7 @@ http://t.cn/RnAKafe
                 res = ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 jdurl = quote("http://jdyhq.ptjob.net/?r=search?kw=" + msg['Text'][1:], safe='/:?=&')
 
@@ -363,8 +360,7 @@ http://t.cn/RnAKafe
                 res = ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 # 帮助操作
                 text = '''
@@ -400,8 +396,7 @@ http://t.cn/RnAKafe
                 res = ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
                 select_user_res = cm.ExecQuery(select_user_sql)
@@ -495,8 +490,7 @@ tips：邀请好友也有返利哦亲！
                 res = ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
 
@@ -561,8 +555,7 @@ http://t.cn/RnAKqWW
                 res = ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
 
@@ -585,8 +578,7 @@ http://t.cn/RnAKqWW
                 res = ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 bot_res = itchat.search_friends(userName=msg['ToUserName'])
                 user_res = itchat.search_friends(userName=msg['FromUserName'])
@@ -626,8 +618,7 @@ http://t.cn/RnAKafe
                 res2 = ishaveuserinfo(msg)
 
                 if res2['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 res = mjd.get_jd_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1])
 
@@ -664,8 +655,7 @@ http://t.cn/RnAKafe
                 res2 = ishaveuserinfo(msg)
 
                 if res2['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 res = mjd.get_jd_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1])
 
@@ -702,8 +692,7 @@ http://t.cn/RnAKafe
                 res2 = ishaveuserinfo(msg)
 
                 if res2['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 res = al.get_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1])
 
@@ -740,8 +729,7 @@ http://t.cn/RnAKafe
                 res2 = ishaveuserinfo(msg)
 
                 if res2['res'] == 'not_info':
-                    create_user_info(msg, 0, tool=True)
-                    return
+                    create_user_info(msg, 0, tool=False)
 
                 res = al.get_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1])
 
@@ -830,8 +818,7 @@ http://t.cn/RnAKafe
             res2 = ishaveuserinfo(msg)
 
             if res2['res'] == 'not_info':
-                create_user_info(msg, 0, tool=True)
-                return
+                create_user_info(msg, 0, tool=False)
 
             text_reply(msg, msg['Text'])
 
@@ -864,7 +851,7 @@ def create_user_info(msg, lnivt_code=0, tool=False):
 
         if len(select_res) == 0:
             break
-
+    print()
     # 定义SQL语句 查询数据是否已经存在
     select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
     select_user_res = cm.ExecQuery(select_user_sql)
@@ -1200,10 +1187,8 @@ http://t.cn/RnAKafe
 # 判断用户是否有个人账户
 def ishaveuserinfo(msg):
     cm = ConnectMysql()
-
     check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(msg['FromUserName']) + "';"
     check_user_res = cm.ExecQuery(check_user_sql)
-
     # 判断是否已经有个人账户，没有去创建
     if len(check_user_res) < 1:
         cm.Close()
