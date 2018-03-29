@@ -383,7 +383,7 @@ http://t.cn/RnAKqWW
 跑堂优惠券常见问题：
 http://t.cn/RnAK1w0
 免费看电影方法：
-http://t.cn/RWnex0F
+http://t.cn/RnAKMul
 京东优惠券商城：
 http://jdyhq.ptjob.net
 淘宝优惠券商城：
@@ -926,8 +926,8 @@ http://tbyhq.ptjob.net
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-VIP电影免费看教程：
-http://mp.weixin.qq.com/s/efqN7IzLTEloNhmM1PK0UA
+免费看电影方法：
+http://t.cn/RnAKMul
 京东优惠券网站：
 http://jdyhq.ptjob.net
 淘宝优惠券网站：
