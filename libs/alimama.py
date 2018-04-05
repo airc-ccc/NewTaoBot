@@ -7,6 +7,7 @@ import re
 import sys
 import time
 import traceback
+import itchat
 import requests
 import datetime
 
@@ -375,6 +376,9 @@ class Alimama:
     # 获取商品详情
     def get_detail(self, q, msg):
         cm = ConnectMysql()
+
+        userInfo = itchat.search_friends(userName=msg['FromUserName'])
+
         try:
             t = int(time.time() * 1000)
             tb_token = self.se.cookies.get('_tb_token_', domain="pub.alimama.com")
@@ -397,7 +401,7 @@ class Alimama:
             # print(res.text)
             rj = res.json()
             if rj['data']['pageList'] != None:
-                insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + msg['FromUserName'] + "', '" + str(time.time()) + "')"
+                insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + userInfo['NickName'] + "', '" + str(time.time()) + "')"
                 cm.ExecNonQuery(insert_sql)
                 cm.Close()
                 return rj['data']['pageList'][0]
@@ -586,7 +590,7 @@ class Alimama:
 
         return r_url
 
-    def get_order(self, msg, times, orderId):
+    def get_order(self, msg, times, orderId, userInfo):
 
         timestr = re.sub('-', '', times)
         order_id = int(orderId)
@@ -638,7 +642,7 @@ class Alimama:
 
             for item in res_dict['data']['paymentList']:
                 if int(order_id) == int(item['taobaoTradeParentId']):
-                    res = self.changeInfo(msg, item, order_id)
+                    res = self.changeInfo(msg, item, order_id, userInfo)
                     return res
 
             user_text = '''
@@ -662,12 +666,12 @@ class Alimama:
             return {"info":"feild"}
 
 
-    def changeInfo(self, msg, info, order_id):
+    def changeInfo(self, msg, info, order_id, userInfo):
         try:
             cm = ConnectMysql()
 
             # 查询用户是否有上线
-            check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(msg['FromUserName']) + "';"
+            check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "';"
             check_user_res = cm.ExecQuery(check_user_sql)
 
             # 判断是否已经有个人账户，没有返回信息
@@ -700,10 +704,10 @@ class Alimama:
                     friends_rebatr = float(get_parent_info[0][18]) + float(add_balance)
                     withdrawals_amount2 = round(float(get_parent_info[0][8]) + float(add_balance) * 0.1, 2)
 
-                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='"+ str(save_money) +"', taobao_rebate_amount='"+ str(taobao_rebate_amount) +"', total_rebate_amount='"+ str(total_rebate_amount) +"', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='"+str(time.time())+"' WHERE wx_number='" + str(msg['FromUserName']) + "';")
+                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='"+ str(save_money) +"', taobao_rebate_amount='"+ str(taobao_rebate_amount) +"', total_rebate_amount='"+ str(total_rebate_amount) +"', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='"+str(time.time())+"' WHERE wx_number='" + str(userInfo['NickName']) + "';")
                     cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', friends_rebate='"+str(friends_rebatr)+"', update_time='"+str(time.time())+"' WHERE lnivt_code='" + str(check_user_res[0][16]) + "';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('"+str(msg['FromUserName'])+"', '"+str(order_id)+"', '2')")
+                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
 
                     args = {
                         'username': check_user_res[0][1],
@@ -770,9 +774,9 @@ http://t.cn/RnAKafe
                         withdrawals_amount) + "', save_money='" + str(save_money) + "', taobao_rebate_amount='" + str(
                         taobao_rebate_amount) + "', total_rebate_amount='" + str(
                         total_rebate_amount) + "', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(
-                        msg['FromUserName']) + "';")
+                        userInfo['NickName']) + "';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('"+str(msg['FromUserName'])+"', '"+str(order_id)+"', '2')")
+                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
 
                     args = {
                         'username': check_user_res[0][1],
