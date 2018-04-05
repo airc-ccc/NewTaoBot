@@ -7,11 +7,13 @@ import time
 import json
 import platform
 import re
-import os.path
+import os
+import webbrowser
 from selenium import webdriver
 from bs4 import BeautifulSoup
 from time import strftime,gmtime
 from libs.mysql import ConnectMysql
+from bottle import template
 
 cookie_fname = 'cookies_jd.txt'
 sysstr = platform.system()
@@ -99,9 +101,9 @@ class MediaJd:
 
     def get_good_link(self, good_name):
         self.load_cookies()
+        uu = "https://media.jd.com/gotoadv/goods?searchId=2011016742%23%23%23st1%23%23%23kt1%23%23%23598e10defb7f41debe6af038e875b61c&pageIndex=&pageSize=50&property=&sort=&goodsView=&adownerType=&pcRate=&wlRate=&category1=&category=&category3=&condition=0&fromPrice=&toPrice=&dataFlag=0&keyword='" + good_name + "'&input_keyword='" + good_name + "'&price=PC"
         # 搜索商品
-        res = self.se.get(
-            'https://media.jd.com/gotoadv/goods?searchId=2011016742%23%23%23st1%23%23%23kt1%23%23%23598e10defb7f41debe6af038e875b61c&pageIndex=&pageSize=50&property=&sort=&goodsView=&adownerType=&pcRate=&wlRate=&category1=&category=&category3=&condition=0&fromPrice=&toPrice=&dataFlag=0&keyword=' + good_name + '&input_keyword=' + good_name + '&price=PC')
+        res = self.se.get(uu)
 
         # 使用BeautifulSoup解析HTML，并提取属性数据
         soup = BeautifulSoup(res.text, 'lxml')
@@ -175,6 +177,7 @@ class MediaJd:
         good_text = json.loads(good_link.text)
         good_text['logTitle'] = dict_str['logTitle']
         good_text['logUnitPrice'] = dict_str['logUnitPrice']
+        good_text['imgUrl'] = dict_str['imgUrl']
         rebate = float(dict_str['pcComm']) / 100
         if coupon != None:
             good_text['coupon_price'] = round(float(good_text['logUnitPrice']) - int(coupon_price), 2)
@@ -184,10 +187,109 @@ class MediaJd:
             good_text['rebate'] = round(float(good_text['logUnitPrice']) * rebate * 0.3, 2)
 
         good_text['coupon_price2'] = coupon_price
-
         return good_text
 
-    def get_jd_order(self, msg, times, orderId):
+
+    # 随机获取商品信息
+    def get_good_info(self):
+        cm = ConnectMysql()
+        self.load_cookies()
+        page = 1
+        sku_num = 0
+        while sku_num < 20:
+            url = "https://media.jd.com/gotoadv/goods?searchId=2011005331%23%23%23st3%23%23%23kt0%23%23%2378dc30b6-fa14-4c67-900c-235b129ab4bb&pageIndex="+str(page)+"&pageSize=50&property=&sort=&goodsView=&adownerType=&pcRate=&wlRate=&category1=&category=&category3=&condition=1&fromPrice=&toPrice=&dataFlag=0&keyword=&input_keyword=&hasCoupon=1&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC&price=PC"
+            page += 1
+            print(page)
+            res = self.se.get(url)
+            soup = BeautifulSoup(res.text, 'lxml')
+            skuList = []
+            for li in soup.find_all('li', skuid = re.compile('^[0-9]+$')):
+                sku = li.get('skuid')
+
+                exists_sql = "SELECT * FROM taojin_good_info WHERE skuid='"+str(sku)+"';"
+                is_exists = cm.ExecQuery(exists_sql)
+                if len(is_exists) != 0:
+                    print('0....')
+                    continue
+
+                sku_num += 1
+                skuList.append(sku)
+
+            if skuList == []:
+                print('[]....')
+                continue
+
+            for item in skuList:
+                link_info = self.get_good_link(str(item))
+                item_image = link_info['data']['qRcode']
+                # 请求图片
+                res_img = requests.get(item_image)
+                img_name = item_image.split('/')
+                # 拼接图片名
+                file_name = "images/" + img_name[-1]
+                fp = open(file_name, 'wb')
+                # 写入图片
+                fp.write(res_img.content)
+                fp.close()
+                if link_info['data']['shotCouponUrl'] == '':
+                    sql = "INSERT INTO taojin_good_info(skuid, title , image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('" + str(
+                        item) + "', '" + str(link_info['logTitle']) + "', '" + str(item_image) + "', '" + str(
+                        link_info['logUnitPrice']) + "', '" + str(link_info['rebate']) + "', '0', '0', '" + str(
+                        link_info['data']['shotUrl']) + "', '0', '1', '" + str(time.time()) + "')"
+                else:
+                    sql = "INSERT INTO taojin_good_info(skuid, title, image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('" + str(
+                        item) + "', '" + str(link_info['logTitle']) + "', '" + str(item_image) + "', '" + str(
+                        link_info['logUnitPrice']) + "', '" + str(link_info['rebate']) + "', '" + str(
+                        link_info['youhuiquan_price']) + "', '" + str(link_info['coupon_price']) + "', '" + str(
+                        link_info['data']['shotUrl']) + "', '" + str(
+                        link_info['data']['shotCouponUrl']) + "', '1', '" + str(time.time()) + "')"
+
+                cm.ExecNonQuery(sql)
+        # while state:
+        #
+        #     url = "https://media.jd.com/gotoadv/queryRecsysGoods?policy=als&property=sellCount&sort=asc&pageIndex="+str(page)+"&pageSize=50&goodsView=-1&adownerType=-1&category1=-1"
+        #
+        #     page += 1
+        #
+        #     print(page)
+        #     res1 = self.se.get(url)
+        #
+        #     res = res1.json()
+        #
+        #     if res and res['data']['skuList'] == []:
+        #         state = False
+        #         return
+        #
+        #     for item in res['data']['skuList']:
+        #         link_info = self.get_good_link(str(item['skuId']))
+        #         item_image = item['mainimgUrl']
+        #
+        #         # 请求图片
+        #         res_img = requests.get("http://img14.360buyimg.com/n1/"+item_image)
+        #
+        #         img_name = item_image.split('/')
+        #
+        #         # 拼接图片名
+        #         file_name = "images/" + img_name[-1]
+        #
+        #         fp = open(file_name, 'wb')
+        #
+        #         # 写入图片
+        #         fp.write(res_img.content)
+        #
+        #         fp.close()
+        #
+        #         if link_info['data']['shotCouponUrl'] == '':
+        #             sql = "INSERT INTO taojin_good_info(skuid, title , image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('"+str(item['skuId'])+"', '"+str(link_info['logTitle'])+"', '"+str(item_image)+"', '"+str(link_info['logUnitPrice'])+"', '"+str(link_info['rebate'])+"', '0', '0', '"+str(link_info['data']['shotUrl'])+"', '0', '1', '"+str(time.time())+"')"
+        #         else:
+        #             sql = "INSERT INTO taojin_good_info(skuid, title, image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('"+str(item['skuId'])+"', '"+str(link_info['logTitle'])+"', '"+str(item_image)+"', '"+str(link_info['logUnitPrice'])+"', '"+str(link_info['rebate'])+"', '"+str(link_info['youhuiquan_price'])+"', '"+str(link_info['coupon_price'])+"', '"+str(link_info['data']['shotUrl'])+"', '"+str(link_info['data']['shotCouponUrl'])+"', '1', '"+str(time.time())+"')"
+        #
+        #         cm.ExecNonQuery(sql)
+
+        print("insert success!")
+
+
+    def get_jd_order(self, msg, times, orderId, userInfo):
         try:
 
             timestr = re.sub('-', '', times)
@@ -223,7 +325,7 @@ class MediaJd:
 
             for item in data['data']:
                 if order_id == item['orderId']:
-                    res = self.changeInfo(msg, item, order_id)
+                    res = self.changeInfo(msg, item, order_id, userInfo)
                     return res
 
             user_text = '''
@@ -246,13 +348,13 @@ class MediaJd:
             print(e)
             return {'info': 'feild'}
 
-    def changeInfo(self, msg, info, order_id):
+    def changeInfo(self, msg, info, order_id, userInfo):
 
         cm = ConnectMysql()
         try:
 
             # 查询用户是否有上线
-            check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(msg['FromUserName']) + "';"
+            check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "';"
             check_user_res = cm.ExecQuery(check_user_sql)
 
             # 判断是否已经有个人账户，没有返回信息
@@ -283,10 +385,10 @@ class MediaJd:
                     add_parent_balance = round(float(info['skuList'][0]['actualFee']) * 0.1, 2)
                     withdrawals_amount2 = round(float(get_parent_info[0][8]) + float(add_balance) * 0.1, 2)
 
-                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', jd_rebate_amount='" + str(jd) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(msg['FromUserName']) + "';")
+                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', jd_rebate_amount='" + str(jd) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';")
                     cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', update_time='" + str(time.time()) + "' WHERE lnivt_code='" + str(check_user_res[0][16]) + "';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(msg['FromUserName']) + "', '" + str(order_id) + "', '1')")
+                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '1')")
 
                     args = {
                         'username': check_user_res[0][1],
@@ -349,10 +451,10 @@ http://t.cn/RnAKafe
                     save_money = round(check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['skuList'][0]['payPrice'])), 2)
 
 
-                    up_sql = "UPDATE taojin_user_info SET jd_rebate_amount='" + str(jd) + "', withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(msg['FromUserName']) + "';"
+                    up_sql = "UPDATE taojin_user_info SET jd_rebate_amount='" + str(jd) + "', withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';"
                     cm.ExecNonQuery(up_sql)
                     # cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "' WHERE wx_number='" + str(msg['FromUserName']) + "';")
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(msg['FromUserName']) + "', '" + str(order_id) + "', '2')")
+                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '2')")
 
                     args = {
                         'username': check_user_res[0][1],

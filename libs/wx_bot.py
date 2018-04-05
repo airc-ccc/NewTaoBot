@@ -10,27 +10,31 @@ import requests
 import threading
 import traceback
 import random
+import webbrowser
 from libs import utils
 from urllib.parse import quote
 from itchat.content import *
 from libs.mediaJd import MediaJd
+from threading import Thread
 from libs.alimama import Alimama
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
+from bottle import template
+from libs.groupMessage import FormData
+
 
 logger = utils.init_logger()
 
 mjd = MediaJd()
 mjd.login()
-al = Alimama(logger)
-al.login()
+# al = Alimama(logger)
+# al.login()
 
 
 def getTulingText(url):
     page = requests.get(url)
     text = page.text
     return text
-
 
 def tuling(msg):
     print('圖靈')
@@ -43,7 +47,6 @@ def tuling(msg):
     response = getTulingText(request)
     dic_json = json.loads(response)
     return dic_json['text']
-
 
 def text_reply(msg, good_url):
     cm = ConnectMysql()
@@ -107,7 +110,6 @@ def text_reply(msg, good_url):
 
         itchat.send(text, msg['FromUserName'])
         return
-
 
 # 检查是否是淘宝链接
 def check_if_is_tb_link(msg):
@@ -305,9 +307,9 @@ http://t.cn/RnAKafe
         text_reply(msg, msg['Url'])
     elif msg['Text'].isdigit() and len(msg['Text']) == 6:
         lnivt_user(msg)
-    elif msg['Text'] == '10000':
-        tool = False
-        create_user_info(msg, 0, tool)
+    # elif msg['Text'] == '10000':
+    #     tool = False
+    #     create_user_info(msg, 0, tool)
     elif msg['Type'] == 'Text':
 
         patternURL = re.compile('^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+')
@@ -470,7 +472,7 @@ http://t.cn/RnAKafe
 提现申请失败！
 
 提现条件：
-1，必须拥有个人账户，回复【10000】或者【邀请码】可创建个人账户并领取微信红包！
+1，必须拥有个人账户，回复【邀请码】可创建个人账户并领取微信红包！
 2，提现金额必须 > 0元
 
 把【淘口令】【京东商品链接】分享给我查询优惠券和返利！
@@ -502,7 +504,7 @@ tips：邀请好友也有返利哦亲！
 
 你还没创建个人账户哦！
 
-回复【邀请码】或【10000】创建个人账户哦!
+回复【邀请码】创建个人账户哦!
 还可以领取现金红包哦！
 
 淘京机器人使用说明：
@@ -615,12 +617,15 @@ http://t.cn/RnAKafe
                 itchat.send(text, msg['FromUserName'])
                 itchat.send(to_admin_text, '@2270c9a6e8ce6bef9305c511a1ff49ea478544d6fe9430085f50c24fbe4ae6f1')
             elif (',' in msg['Text']) and (msg['Text'].split(',')[1].isdigit()) and (len(msg['Text'].split(',')[1]) == 11):
+
+                userInfo = itchat.search_friends(userName=msg['FromUserName'])
+
                 res2 = ishaveuserinfo(msg)
 
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                res = mjd.get_jd_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1])
+                res = mjd.get_jd_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1], userInfo)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -632,7 +637,7 @@ http://t.cn/RnAKafe
                 elif res['info'] == 'not_parent_and_success':
                     itchat.send(res['user_text'], msg['FromUserName'])
                 elif res['info'] == 'not_info':
-                    itchat.send('你当前没有个人账户请发送10000或邀请人的邀请码注册个人账户！', msg['FromUserName'])
+                    itchat.send('你当前没有个人账户请发送邀请人的邀请码注册个人账户！', msg['FromUserName'])
                 elif res['info'] == 'feild':
 
                     user_text = '''
@@ -657,7 +662,9 @@ http://t.cn/RnAKafe
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                res = mjd.get_jd_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1])
+                userInfo = itchat.search_friends(userName=msg['FromUserName'])
+
+                res = mjd.get_jd_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1], userInfo)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -669,7 +676,7 @@ http://t.cn/RnAKafe
                 elif res['info'] == 'not_parent_and_success':
                     itchat.send(res['user_text'], msg['FromUserName'])
                 elif res['info'] == 'not_info':
-                    itchat.send('你当前没有个人账户请发送10000或邀请人的邀请码注册个人账户！', msg['FromUserName'])
+                    itchat.send('你当前没有个人账户请发送邀请人的邀请码注册个人账户！', msg['FromUserName'])
                 elif res['info'] == 'feild':
 
                     user_text = '''
@@ -694,7 +701,9 @@ http://t.cn/RnAKafe
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                res = al.get_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1])
+                userInfo = itchat.search_friends(userName=msg['FromUserName'])
+
+                res = al.get_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1], userInfo)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -707,7 +716,7 @@ http://t.cn/RnAKafe
                 elif res['info'] == 'not_parent_and_success':
                     itchat.send(res['user_text'], msg['FromUserName'])
                 elif res['info'] == 'not_info':
-                    itchat.send('你当前没有个人账户请发送10000或邀请人的邀请码注册个人账户！', msg['FromUserName'])
+                    itchat.send('你当前没有个人账户请发送邀请人的邀请码注册个人账户！', msg['FromUserName'])
                 elif res['info'] == 'feild':
                     user_text = '''
 一一一一订单信息一一一一
@@ -731,7 +740,9 @@ http://t.cn/RnAKafe
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                res = al.get_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1])
+                userInfo = itchat.search_friends(userName=msg['FromUserName'])
+
+                res = al.get_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1], userInfo)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -744,7 +755,7 @@ http://t.cn/RnAKafe
                 elif res['info'] == 'not_parent_and_success':
                     itchat.send(res['user_text'], msg['FromUserName'])
                 elif res['info'] == 'not_info':
-                    itchat.send('你当前没有个人账户请发送10000或邀请人的邀请码注册个人账户！', msg['FromUserName'])
+                    itchat.send('你当前没有个人账户请发送邀请人的邀请码注册个人账户！', msg['FromUserName'])
                 elif res['info'] == 'feild':
                     user_text = '''
 一一一一订单信息一一一一
@@ -1118,7 +1129,6 @@ http://t.cn/RnAKafe
         else:
             text_reply(msg, msg['Text'])
 
-
 def is_valid_date(str):
     '''判断是否是一个有效的日期字符串'''
     try:
@@ -1147,9 +1157,8 @@ def create_user_info(msg, lnivt_code=0, tool=False):
 
         if len(select_res) == 0:
             break
-    print()
     # 定义SQL语句 查询数据是否已经存在
-    select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
+    select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
     select_user_res = cm.ExecQuery(select_user_sql)
     if len(select_user_res) > 0:
         cm.Close()
@@ -1175,22 +1184,22 @@ http://tbyhq.ptjob.net
 
     if lnivt_code == 0:
         sql = "INSERT INTO taojin_user_info(wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('" + \
-              res['UserName'] + "', '" + str(res['Sex']) + "', '" + res['NickName'] + "', '" + str(
+              res['NickName'] + "', '" + str(res['Sex']) + "', '" + res['NickName'] + "', '" + str(
             randNum) + "', '0.3', '" + str(lnivt_code) + "', '" + str(round(time.time())) + "');"
 
         insert_res = cm.ExecNonQuery(sql)
 
         if (insert_res):
 
-            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['UserName'] + "' LIMIT 1;"
+            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
 
-            current = "SELECT sum(amount) FROM taojin_current_log WHERE username=" + res['UserName'] + ";"
+            current = "SELECT sum(amount) FROM taojin_current_log WHERE username=" + res['NickName'] + ";"
 
             user_info = cm.ExecQuery(user_sql)
 
             # 日志参数
             args = {
-                'username': res['UserName'],
+                'username': res['NickName'],
                 'rebate_amount': 0.3,
                 'type': 1,
                 'create_time': time.time()
@@ -1201,7 +1210,7 @@ http://tbyhq.ptjob.net
 
             current_info = cm.ExecQuery(current)
 
-            if current_info[0][0] == None:
+            if current_info == None:
                 current_info = 0
             else:
                 current_info = current_info[0][0]
@@ -1254,7 +1263,7 @@ http://t.cn/RnAKafe
 
         # 有邀请人时，插入用户信息，并奖励邀请人
         sql = "INSERT INTO taojin_user_info(wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('" + \
-              res['UserName'] + "', '" + str(res['Sex']) + "', '" + res['NickName'] + "', '" + str(
+              res['NickName'] + "', '" + str(res['Sex']) + "', '" + res['NickName'] + "', '" + str(
             randNum) + "', '0.3', '" + str(lnivt_code) + "', '" + str(round(time.time())) + "');"
 
         # 给邀请人余额加0.3元奖励
@@ -1269,7 +1278,7 @@ http://t.cn/RnAKafe
 
         # 日志参数
         args = {
-            'username': res['UserName'],
+            'username': res['NickName'],
             'rebate_amount': 0.3,
             'type': 1,
             'create_time': time.time()
@@ -1288,9 +1297,9 @@ http://t.cn/RnAKafe
 
         if (insert_res):
 
-            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['UserName'] + "' LIMIT 1;"
+            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
 
-            current = "SELECT sum(amount) FROM taojin_current_log WHERE username=" + res['UserName'] + ";"
+            current = "SELECT sum(amount) FROM taojin_current_log WHERE username=" + res['NickName'] + ";"
 
             user_info = cm.ExecQuery(user_sql)
 
@@ -1345,12 +1354,13 @@ http://t.cn/RnAKafe
             itchat.send(text, msg['FromUserName'])
             itchat.send(lnivt_text, lnivt_info[0][1])
 
-
 # 使用邀请码创建账户, 或绑定邀请人
 def lnivt_user(msg):
     cm = ConnectMysql()
 
-    check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(msg['FromUserName']) + "';"
+    res = itchat.search_friends(userName=msg['FromUserName'])
+
+    check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(res['NickName']) + "';"
     check_user_res = cm.ExecQuery(check_user_sql)
 
     # 判断是否已经有个人账户，没有去创建
@@ -1421,8 +1431,7 @@ http://t.cn/RnAKafe
             return
 
         # 绑定邀请人
-        add_lnivt_sql = "UPDATE taojin_user_info SET lnivter='" + str(msg['Text']) + "' WHERE wx_number='" + msg[
-            'FromUserName'] + "';"
+        add_lnivt_sql = "UPDATE taojin_user_info SET lnivter='" + str(msg['Text']) + "' WHERE wx_number='" + res['NickName'] + "';"
 
         add_res = cm.ExecNonQuery(add_lnivt_sql)
 
@@ -1481,11 +1490,12 @@ http://t.cn/RnAKafe
             cm.Close()
             itchat.send('添加邀请人失败！请重试！', msg['FromUserName'])
 
-
 # 判断用户是否有个人账户
 def ishaveuserinfo(msg):
     cm = ConnectMysql()
-    check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(msg['FromUserName']) + "';"
+
+    res = itchat.search_friends(userName=msg['FromUserName'])
+    check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(res['NickName']) + "';"
     check_user_res = cm.ExecQuery(check_user_sql)
     # 判断是否已经有个人账户，没有去创建
     if len(check_user_res) < 1:
@@ -1495,7 +1505,7 @@ def ishaveuserinfo(msg):
 
 你还没创建个人账户哦！
 
-回复【邀请码】或【10000】创建个人账户哦!
+回复【邀请码】创建个人账户哦!
 还可以领取现金红包哦！
 
 淘京机器人使用说明：
@@ -1505,18 +1515,135 @@ http://t.cn/RnAKqWW
 
     return {"res": "have_info"}
 
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target = f, args = args, kwargs = kwargs)
+        thr.start()
+    return wrapper
+
+# 获取群
+@async
+def groupMessages():
+    time.sleep(20)
+    print('start.....')
+    cm = ConnectMysql()
+
+    res = itchat.web_init()
+
+    select_sql = "DELETE FROM taojin_group_message WHERE username='"+str(res['User']['NickName'])+"';"
+    cm.ExecNonQuery(select_sql)
+
+    group = itchat.get_chatrooms(update=True, contactOnly=False)
+
+    template_demo = """
+    <!DOCTPE html>
+    <html>
+        <head>
+            <meta charset="utf-8"/>
+            <title>选择群聊</title>
+        </head>
+        <body>
+            <div>
+                <form action='/formdata'  method='post'>
+                    <input type="hidden" name="username" value="{{ res['User']['NickName'] }}" />
+                    % for item in items:
+                    <input type="checkbox" name="{{ item['UserName'] }}" value="{{ item['NickName'] }}" />{{ item['NickName'] }}
+                    %end
+                    <input type='submit' value='提交' />
+                </form>
+            </div>
+        </body>
+    </html>
+    """
+
+    html = template(template_demo, items=group, res=res)
+
+    with open('form.html', 'w', encoding='utf-8') as f:
+        f.write(html)
+
+    fd = FormData()
+    fd.run()
+
+# 群发消息
+def send_group_meg():
+    cm = ConnectMysql()
+
+    res = itchat.web_init()
+
+    select_sql = "SELECT * FROM taojin_group_message WHERE username='"+str(res['User']['NickName'])+"';"
+
+    group_info = cm.ExecQuery(select_sql)
+
+    while True:
+
+        time.sleep(180)
+
+        data_sql = "SELECT * FROM taojin_good_info WHERE status=1 LIMIT 1"
+
+        data1 = cm.ExecQuery(data_sql)
+        if data1 == ():
+            mjd.get_good_info()
+            cm.Close()
+        cm2 = ConnectMysql()
+        data = cm2.ExecQuery(data_sql)
+        if data[0][9].isdigit() and (int(data[0][9]) == 0):
+            text = '''
+一一一一返利信息一一一一
+
+【商品名】%s
+【京东价】%s元
+购买链接:%s
+
+请点击链接，下单购买！
+            ''' % (data[0][2], data[0][4], data[0][8])
+        else:
+            text = '''
+一一一一返利信息一一一一
+
+【商品名】%s
+【京东价】%s元
+【优惠券】%s元
+【券后价】%s元
+领券链接:%s
+
+请点击链接领取优惠券，下单购买！
+            ''' % (data[0][2], data[0][4], data[0][6], data[0][7], data[0][9])
+
+        delete_sql = "UPDATE taojin_good_info SET status='2' WHERE id='"+str(data[0][0])+"'"
+        cm.ExecNonQuery(delete_sql)
+
+        img_name = data[0][3].split('/')
+
+        img_path = "images/" + img_name[-1]
+        for item in group_info:
+            itchat.send_image(img_path, item[2])
+            itchat.send(text, item[2])
+
+
+# 启动一个线程，定时发送商品信息
+def start_send_msg_thread():
+    t = Thread(target=send_group_meg, args=())
+    t.setDaemon(True)
+    t.start()
+
 
 class WxBot(object):
+    def __init__(self):
+        groupMessages()
+        print('run.....')
+        self.run()
+
     # 消息回复(文本类型和分享类型消息)
     @itchat.msg_register(['Text', 'Sharing'])
     def text(msg):
         print(msg)
         check_if_is_tb_link(msg)
 
-        # 消息回复(文本类型和分享类型消息)
+    # 消息回复(文本类型和分享类型消息) 群聊
     @itchat.msg_register(['Text', 'Sharing'], isGroupChat=True)
     def text(msg):
         print(msg)
+        # mjd.get_good_info()
         check_if_is_group(msg)
 
     @itchat.msg_register(FRIENDS)
@@ -1529,7 +1656,7 @@ class WxBot(object):
 你好！欢迎使用跑堂优惠券！
 先领券，再购物，更省钱！有返利！
 
-回复【邀请码】或【10000】领取新人红包
+回复【邀请码】领取新人红包
 
 回复【买+商品名称】
 回复【找+商品名称】
@@ -1546,7 +1673,7 @@ http://jdyhq.ptjob.net
 http://tbyhq.ptjob.net
 邀请好友得返利：
 http://t.cn/RnAKafe
-        '''
+                '''
         itchat.send_msg(text, msg['RecommendInfo']['UserName'])
 
     def run(self):
@@ -1557,6 +1684,7 @@ http://t.cn/RnAKafe
         else:
             itchat.auto_login(True)
         itchat.run()
+
 
 
 if __name__ == '__main__':
