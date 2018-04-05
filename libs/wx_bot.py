@@ -1459,7 +1459,7 @@ def send_group_meg():
 
     while True:
 
-        time.sleep(180)
+        time.sleep(60)
 
         data_sql = "SELECT * FROM taojin_good_info WHERE status=1 LIMIT 1"
 
@@ -1498,10 +1498,9 @@ def send_group_meg():
         img_name = data[0][3].split('/')
 
         img_path = "images/" + img_name[-1]
-        print(img_path)
         for item in group_info:
             itchat.send_image(img_path, item[2])
-            # itchat.send(text, item[2])
+            itchat.send(text, item[2])
 
 
 # 启动一个线程，定时发送商品信息
@@ -1538,7 +1537,6 @@ class WxBot(object):
         text = '''
 一一一一 系统消息 一一一一
 
-<<<<<<< HEAD
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
 
