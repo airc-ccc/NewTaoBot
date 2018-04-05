@@ -33,17 +33,15 @@ def getTulingText(url):
 
 
 def tuling(msg):
-    print('圖靈')
+    print('图灵')
     # 图灵Key
     key = '069f41c6c6924260b9d1bbdc24affd07'
     api = 'http://www.tuling123.com/openapi/api?key=' + key + '&info='
 
     request = api + msg['Text']
-
     response = getTulingText(request)
     dic_json = json.loads(response)
     return dic_json['text']
-
 
 def text_reply(msg, good_url):
     cm = ConnectMysql()
@@ -69,11 +67,13 @@ def text_reply(msg, good_url):
 
 【京东价】%s元
 【返红包】%s元
-返利链接:%s
+ 返利链接:%s
 
-请点击链接，下单购买领取返利红包！
-订单完成后，请将订单完成日期和订单号发给我哦！
-例如：2018-01-01,12345678901
+省钱步骤：
+1,点击链接，进入下单
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
         ''' % (res['logTitle'], res['logUnitPrice'], res['rebate'], res['data']['shotUrl'])
         itchat.send(text, msg['FromUserName'])
 
@@ -92,11 +92,13 @@ def text_reply(msg, good_url):
 【优惠券】%s元
 【券后价】%s元
 【返红包】%s元
-领券链接:%s
+ 领券链接:%s
 
-请点击链接领取优惠券，下单购买领取返利红包！
-订单完成后，请将订单完成日期和订单号发给我哦！
-例如：2018-01-01,12345678901
+省钱步骤：
+1,点击链接领取优惠券，正常下单购买！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
         ''' % (res['logTitle'], res['logUnitPrice'], res['youhuiquan_price'], res['coupon_price'], res['rebate'],
                res['data']['shotCouponUrl'])
 
@@ -108,11 +110,9 @@ def text_reply(msg, good_url):
         itchat.send(text, msg['FromUserName'])
         return
 
-
 # 检查是否是淘宝链接
 def check_if_is_tb_link(msg):
     cm = ConnectMysql()
-
     if re.search(r'【.*】', msg['Text']) and (
             u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
         try:
@@ -121,7 +121,6 @@ def check_if_is_tb_link(msg):
             if res['res'] == 'not_info':
                 create_user_info(msg, 0, tool=False)
 
-            # print('line_38', msg['Text'])
             q = re.search(r'【.*】', msg['Text']).group().replace(u'【', '').replace(u'】', '')
             if u'打开👉天猫APP👈' in msg['Text']:
                 try:
@@ -142,57 +141,44 @@ def check_if_is_tb_link(msg):
                 res = requests.post(taokoulingurl, data=parms)
                 url = res.json()['url'].replace('https://', 'http://')
                 info = "tkl url: {}".format(url)
-                # logger.debug(info)
 
-            # get real url
             real_url = al.get_real_url(url)
             info = "real_url: {}".format(real_url)
-            # logger.debug(info)
 
-            # get detail
             res = al.get_detail(real_url, msg)
             if res == 'no match item':
                 text = '''
 一一一一 返利信息 一一一一
 
-返利失败，改商品暂未查询到优惠券及返利信息！
+返利失败，该商品暂无优惠券信息！
 
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
-http://t.cn/RnAKafe            
+http://t.cn/RnAKafe
                         '''
                 itchat.send(text, msg['FromUserName'])
                 return
 
-            # logger.debug(res)
             auctionid = res['auctionId']
             coupon_amount = res['couponAmount']
             tk_rate = res['tkRate']
             price = res['zkPrice']
             fx2 = round(float(res['tkCommonFee']) * 0.3, 2)
             real_price = round(price - coupon_amount, 2)
-            # # get tk link
             res1 = al.get_tk_link(auctionid)
 
-            # 判斷數據是否為樓
             if res1 == None:
                 img = al.get_qr_image()
                 itchat.send(img, msg['FromUserName'])
                 return
-
-            # logger.debug(res1)
             tao_token = res1['taoToken']
             short_link = res1['shortLinkUrl']
             coupon_link = res1['couponLink']
@@ -209,10 +195,11 @@ http://t.cn/RnAKafe
 【返红包】%.2f元
 【淘口令】%s
 
-请复制本条消息，打开淘宝APP领取优惠券下单！
-订单完成后，请将订单完成日期和订单号发给我哦！
-例如：2018-01-01,123456789987654321
-
+省钱步骤：
+1,复制本条信息打开淘宝App领取优惠券下单！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
                 ''' % (q, price, coupon_amount, real_price, fx2, coupon_token)
             else:
                 res_text = '''
@@ -223,9 +210,11 @@ http://t.cn/RnAKafe
 【返红包】%.2f元
 【淘口令】%s
 
-请复制本条消息，打开淘宝APP下单后才能领取红包哦！
-订单完成后，请将订单完成日期和订单号发给我哦！
-例如：2018-01-01,123456789987654321
+省钱步骤：
+1,复制本条信息打开淘宝App领取优惠券下单！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
                                 ''' % (q, price, fx2, tao_token)
 
             itchat.send(res_text, msg['FromUserName'])
@@ -235,21 +224,17 @@ http://t.cn/RnAKafe
             info = '''
 一一一一 返利信息 一一一一
 
-返利失败，改商品暂未查询到优惠券及返利信息！
+返利失败，该商品暂无优惠券信息！
 
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
             '''
@@ -260,15 +245,11 @@ http://t.cn/RnAKafe
 
         if res['res'] == 'not_info':
             create_user_info(msg, 0, tool=False)
-
-
         htm = re.findall(r"<appname>.*?</appname>", msg['Content'])
 
         if (htm):
             soup_xml = BeautifulSoup(msg['Content'], 'lxml')
-
             xml_info = soup_xml.select('appname')
-
             # 定义视频网站
             shipin = ['腾讯视频', '爱奇艺', '优酷视频', '芒果 TV']
 
@@ -278,24 +259,15 @@ http://t.cn/RnAKafe
                     text = '''
 一一一一 视频信息 一一一一
 
-微信昵称你好！已为您找到【电影名称】
 播放链接：%s
 
-欢迎使用跑堂优惠券！
-
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
                     ''' % (player_url)
@@ -345,14 +317,12 @@ http://t.cn/RnAKafe
                 tburl = quote('http://tbyhq.ptjob.net/?r=find?kw=' + msg['Text'][1:] + '&token=' + token.get('value'),
                               safe='/:?=&')
                 text = '''
-一一一一优惠券集合一一一一
-
-【京东 淘宝 领券直降】
+一一一一系统消息一一一一
 
 亲，以为您找到所有【%s】优惠券,快快点击领取吧！
 
-京东优惠券集合：%s
-淘宝优惠券集合：%s
+京东：%s
+淘宝：%s
                         ''' % (msg['Text'][1:], jdurl, tburl)
                 itchat.send(text, msg['FromUserName'])
 
@@ -375,7 +345,8 @@ http://t.cn/RnAKafe
 回复【找+商品名称】
 回复【搜+商品名称】查看商品优惠券合集
 
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 分享【VIP视频链接】免费查看高清VIP视频！
 
 优惠券使用教程：
@@ -435,17 +406,16 @@ http://t.cn/RnAKafe
 提现成功！
 提现金额将以微信红包的形式发放，请耐心等待！
 
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】查看商品优惠券合集
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-
-分享【VIP视频链接】免费查看高清VIP视频！
+优惠券使用教程：
+http://t.cn/RnAKqWW
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
                                     '''
-
                         itchat.send(to_user_text, msg['FromUserName'])
                         itchat.send(to_admin_text, '@2270c9a6e8ce6bef9305c511a1ff49ea478544d6fe9430085f50c24fbe4ae6f1')
 
@@ -458,7 +428,7 @@ http://t.cn/RnAKafe
                         text = '''
 一一一一 系统信息 一一一一
 
-提现操作失败！已通知管理员，请耐心等待                        
+提现失败，请稍后重试！                        
                         '''
                         print(e)
                         itchat.send(text, msg['FromUserName'])
@@ -467,22 +437,7 @@ http://t.cn/RnAKafe
                     text = '''
 一一一一 提现信息 一一一一
 
-提现申请失败！
-
-提现条件：
-1，必须拥有个人账户，回复【10000】或者【邀请码】可创建个人账户并领取微信红包！
-2，提现金额必须 > 0元
-
-把【淘口令】【京东商品链接】分享给我查询优惠券和返利！
-使用教程：http://t.cn/RnAKqWW
-
-回复【搜+商品名称】
-回复【找+商品名称】
-回复【买+商品名称】
-可直接搜索淘宝京东所有优惠券！
-
-tips：邀请好友也有返利哦亲！
-戳我看详情： http://t.cn/RnAKafe
+提现申请失败，请稍后重试！
                             '''
                     itchat.send(text, msg['FromUserName'])
                     return
@@ -502,14 +457,18 @@ tips：邀请好友也有返利哦亲！
 
 你还没创建个人账户哦！
 
-回复【邀请码】或【10000】创建个人账户哦!
+回复【邀请码】创建个人账户哦!
 还可以领取现金红包哦！
 
-淘京机器人使用说明：
+优惠券使用教程：
 http://t.cn/RnAKqWW
+免费看电影方法：
+http://t.cn/RnAKMul
+邀请好友得返利：
+http://t.cn/RnAKafe
                     '''
                     cm.Close()
-                    itchat.send(text, msg['FromUserName'])
+                    itchat.send(send_text, msg['FromUserName'])
                     return
 
                 current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + msg['FromUserName'] + "';"
@@ -542,12 +501,15 @@ http://t.cn/RnAKqWW
 总好友返利: %s
 总好友个数: %s
 
-您的邀请码是【%s】,赶快邀请好友领取奖励金吧，还有好友返利拿！
-邀请好友得返利说明：http://t.cn/RnAKafe
+优惠券使用教程：
+http://t.cn/RnAKqWW
+免费看电影方法：
+http://t.cn/RnAKMul
+邀请好友得返利：
+http://t.cn/RnAKafe
                                 ''' % (
                     user_info[0][5], user_info[0][6], user_info[0][7], user_info[0][8], current_info, user_info[0][10],
                     user_info[0][11], user_info[0][12], user_info[0][18], friends_count[0][0], user_info[0][4])
-
                 cm.Close()
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -564,14 +526,10 @@ http://t.cn/RnAKqWW
                 text = '''
 一一一一 推广信息 一一一一
 
-1,将机器人名片分享给您的好友
-2,好友添加机器人为好友并回复您的邀请码【%s】
-
-说明:好友添加机器人为好友，并输入您的专属邀请码，
-您将获取0.3元现金红包奖励，并永久享受下级成功购物返利提成。
-
-推广教程：http://t.cn/RnAKafe
-    
+将机器人和您的邀请码【%s】分享给好友
+好友添加机器人为好友，回复您的邀请码
+您和好友都将获取0.3元现金奖励，并永久享受好友返利提成
+邀请好友返利说明：http://t.cn/RnAKafe
                         ''' % (user_info[0][4])
                 itchat.send(text, msg['FromUserName'])
             elif pattern_proxy.search(msg['Text']) != None:
@@ -599,18 +557,6 @@ http://t.cn/RnAKqWW
 添加好友备注：跑堂优惠券代理
 
 客服人员将尽快和您取得联系，请耐心等待！
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
-http://t.cn/RnAKafe
                         '''
                 itchat.send(text, msg['FromUserName'])
                 itchat.send(to_admin_text, '@2270c9a6e8ce6bef9305c511a1ff49ea478544d6fe9430085f50c24fbe4ae6f1')
@@ -642,14 +588,13 @@ http://t.cn/RnAKafe
 
 失败原因：
 【1】未确认收货（打开App确认收货后重新发送）
-【2】，当前商品不是通过机器人购买
-【3】，查询格式不正确(正确格式：2018-03-20,73462222028 )
-【4】，订单完成日期错误，请输入正确的订单查询日期
-【6】，订单号错误，请输入正确的订单号
+【2】当前商品不是通过机器人购买
+【3】查询格式不正确(正确格式：2018-03-20,73462222028 )
+【4】订单完成日期错误，请输入正确的订单查询日期
+【6】订单号错误，请输入正确的订单号
 
 请按照提示进行重新操作！            
                                 '''
-
                     itchat.send(user_text, msg['FromUserName'])
             elif ('，' in msg['Text']) and (msg['Text'].split('，')[1].isdigit()) and (len(msg['Text'].split('，')[1]) == 11):
                 res2 = ishaveuserinfo(msg)
@@ -679,10 +624,10 @@ http://t.cn/RnAKafe
 
 失败原因：
 【1】未确认收货（打开App确认收货后重新发送）
-【2】，当前商品不是通过机器人购买
-【3】，查询格式不正确(正确格式：2018-03-20,73462222028 )
-【4】，订单完成日期错误，请输入正确的订单查询日期
-【6】，订单号错误，请输入正确的订单号
+【2】当前商品不是通过机器人购买
+【3】查询格式不正确(正确格式：2018-03-20,73462222028 )
+【4】订单完成日期错误，请输入正确的订单查询日期
+【6】订单号错误，请输入正确的订单号
 
 请按照提示进行重新操作！            
                                 '''
@@ -716,10 +661,10 @@ http://t.cn/RnAKafe
 
 失败原因：
 【1】未确认收货（打开App确认收货后重新发送）
-【2】，当前商品不是通过机器人购买
-【3】，查询格式不正确(正确格式：2018-03-20,73462222028 )
-【4】，订单完成日期错误，请输入正确的订单查询日期
-【6】，订单号错误，请输入正确的订单号
+【2】当前商品不是通过机器人购买
+【3】查询格式不正确(正确格式：2018-03-20,73462222028 )
+【4】订单完成日期错误，请输入正确的订单查询日期
+【6】订单号错误，请输入正确的订单号
 
 请按照提示进行重新操作！            
                                 '''
@@ -753,10 +698,10 @@ http://t.cn/RnAKafe
 
 失败原因：
 【1】未确认收货（打开App确认收货后重新发送）
-【2】，当前商品不是通过机器人购买
-【3】，查询格式不正确(正确格式：2018-03-20,73462222028 )
-【4】，订单完成日期错误，请输入正确的订单查询日期
-【6】，订单号错误，请输入正确的订单号
+【2】当前商品不是通过机器人购买
+【3】查询格式不正确(正确格式：2018-03-20,73462222028 )
+【4】订单完成日期错误，请输入正确的订单查询日期
+【6】订单号错误，请输入正确的订单号
 
 请按照提示进行重新操作！            
                                 '''
@@ -770,20 +715,10 @@ http://t.cn/RnAKafe
 正确格式如下：
 订单完成时间+逗号+订单号
 (京东订单号长度11位，淘宝订单号长度18位)
-例如：2018-03-03,123456765432
+例如：
+2018-03-03,123456765432
+
 请确认修改后重新发送
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
-http://t.cn/RnAKafe            
                                 '''
                     itchat.send(user_text, msg['FromUserName'])
             elif ('，' in msg['Text']) and (is_valid_date(msg['Text'].split('，')[0])):
@@ -794,20 +729,10 @@ http://t.cn/RnAKafe
 正确格式如下：
 订单完成时间+逗号+订单号
 (京东订单号长度11位，淘宝订单号长度18位)
-例如：2018-03-03,123456765432
+例如：
+2018-03-03,123456765432
+
 请确认修改后重新发送
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
-http://t.cn/RnAKafe            
                                 '''
                     itchat.send(user_text, msg['FromUserName'])
             else:
@@ -862,28 +787,23 @@ def check_if_is_group(msg):
                 text = '''
 一一一一 返利信息 一一一一
 
-返利失败，改商品暂未查询到优惠券及返利信息！
+返利失败，该商品暂无优惠券信息！
 
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
-http://t.cn/RnAKafe            
+http://t.cn/RnAKafe
                         '''
                 itchat.send(text, msg['FromUserName'])
                 return
 
-            # logger.debug(res)
             auctionid = res['auctionId']
             coupon_amount = res['couponAmount']
             tk_rate = res['tkRate']
@@ -916,10 +836,11 @@ http://t.cn/RnAKafe
 【返红包】%.2f元
 【淘口令】%s
 
-请复制本条消息，打开淘宝APP领取优惠券下单！
-订单完成后，请将订单完成日期和订单号发给我哦！
-例如：2018-01-01,123456789987654321
-
+省钱步骤：
+1,点击链接，进入下单
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
                 ''' % (q, price, coupon_amount, real_price, fx2, coupon_token)
             else:
                 res_text = '''
@@ -930,9 +851,11 @@ http://t.cn/RnAKafe
 【返红包】%.2f元
 【淘口令】%s
 
-请复制本条消息，打开淘宝APP下单后才能领取红包哦！
-订单完成后，请将订单完成日期和订单号发给我哦！
-例如：2018-01-01,123456789987654321
+省钱步骤：
+1,点击链接，进入下单
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
                                 ''' % (q, price, fx2, tao_token)
 
             itchat.send(res_text, msg['FromUserName'])
@@ -942,21 +865,17 @@ http://t.cn/RnAKafe
             info = '''
 一一一一 返利信息 一一一一
 
-返利失败，改商品暂未查询到优惠券及返利信息！
+返利失败，该商品暂无优惠券信息！
 
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
             '''
@@ -980,24 +899,15 @@ http://t.cn/RnAKafe
                     text = '''
 一一一一 视频信息 一一一一
 
-微信昵称你好！已为您找到【电影名称】
 播放链接：%s
 
-欢迎使用跑堂优惠券！
-
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
                     ''' % (player_url)
@@ -1039,12 +949,10 @@ http://t.cn/RnAKafe
                 text = '''
 一一一一优惠券集合一一一一
 
-【京东 淘宝 领券直降】
-
 亲，以为您找到所有【%s】优惠券,快快点击领取吧！
 
-京东优惠券集合：%s
-淘宝优惠券集合：%s
+京东：%s
+淘宝：%s
                         ''' % (msg['Text'][1:], jdurl, tburl)
                 itchat.send(text, msg['FromUserName'])
 
@@ -1100,18 +1008,6 @@ http://t.cn/RnAKafe
 添加好友备注：跑堂优惠券代理
 
 客服人员将尽快和您取得联系，请耐心等待！
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
-http://t.cn/RnAKafe
                         '''
                 itchat.send(text, msg['FromUserName'])
                 itchat.send(to_admin_text, '@2270c9a6e8ce6bef9305c511a1ff49ea478544d6fe9430085f50c24fbe4ae6f1')
@@ -1147,7 +1043,6 @@ def create_user_info(msg, lnivt_code=0, tool=False):
 
         if len(select_res) == 0:
             break
-    print()
     # 定义SQL语句 查询数据是否已经存在
     select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
     select_user_res = cm.ExecQuery(select_user_sql)
@@ -1163,12 +1058,12 @@ def create_user_info(msg, lnivt_code=0, tool=False):
 输入【提现】可申请账户余额提现
 输入【推广】可申请机器人代理
 
-淘京机器人使用说明：
+优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+免费看电影方法：
+http://t.cn/RnAKMul
+邀请好友得返利：
+http://t.cn/RnAKafe
                 '''
         itchat.send(text, msg['FromUserName'])
         return
@@ -1209,26 +1104,17 @@ http://tbyhq.ptjob.net
             text = '''
 一一一一 系统消息 一一一一
 
-添加成功，系统奖励金0.3元已发放到您的个人账户！（可随时提现）
-您的邀请码【%s】快快邀请更多好友吧，您将获取好友邀请奖励金和好友返利提成哦！
+添加成功！0.3元奖励金已到账！
+回复【个人信息】查看账户详情！
 
-回复【个人信息】查看账户信息
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
 免费看电影方法：
 http://t.cn/RnAKMul
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
+您的邀请码【%s】邀请好友得返利：
 http://t.cn/RnAKafe
                 ''' % (user_info[0][4])
 
@@ -1302,40 +1188,29 @@ http://t.cn/RnAKafe
                 current_info = current_info[0][0]
 
             text = '''
-一一一一系统消息一一一一
+一一一一 系统消息 一一一一
 
-账户激活成功，系统奖励金0.3元已发放到您的个人账户！（可随时提现）
-您的邀请码【%s】快快邀请更多好友吧，您将获取好友邀请奖励金和好友返利提成哦！
-回复【个人信息】查看账户信息
-回复【帮助】查看跑堂优惠券系统指令
+激活成功！0.3元奖励金已到账！
+回复【个人信息】查看账户详情！
 
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
+免费看电影方法：
+http://t.cn/RnAKMul
+您的邀请码【%s】邀请好友得返利：
 http://t.cn/RnAKafe
                     ''' % (user_info[0][4])
 
             lnivt_text = '''
 一一一一系统消息一一一一
 
-恭喜您，您的好友【%s】通过您的邀请码已成功关联到您的账户！
+您的好友【%s】已邀请成功！
 
-邀请奖励金0.3元已发放到您的个人账户！（可随时提现）
-您将永久获得该好友购物返利佣金
-
-快快邀请更多好友来使用吧！
+0.3元奖励金已到账
+您将永久获得该好友永久购物返利佣金提成
 
 邀请好友得返利说明：
 http://t.cn/RnAKafe
@@ -1366,17 +1241,14 @@ def lnivt_user(msg):
 一一一一系统消息一一一一
 
 好友关系绑定失败！
-当前账户已被绑定，请勿重复绑定！
 
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
     `                   '''
@@ -1388,17 +1260,14 @@ http://t.cn/RnAKafe
 一一一一系统消息一一一一
 
 好友关系绑定失败！
-邀请码是当前账户自己的，请勿发送自己的邀请码！
 
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
+免费看电影方法：
+http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
     `                   '''
@@ -1416,7 +1285,7 @@ http://t.cn/RnAKafe
 
 账户创建失败：邀请码无效，
 请检查邀请码并重新发送！
-    `                   '''
+                      '''
             itchat.send(gg_text, msg['FromUserName'])
             return
 
@@ -1453,28 +1322,34 @@ http://t.cn/RnAKafe
         if add_res:
             cm.Close()
             text = '''
-
 一一一一 系统消息 一一一一
 
-账户创建成功！
-账户开通奖励金0.3元已发放到您的账号
-当前账户余额：0.3元
-回复【个人信息】查看账户信息
-回复【帮助】可查询指令信息
+账户创建成功！0.3元奖励金已到账
+回复【个人信息】查看账户详情
+回复【帮助】查看指令说明
 
-您的邀请码为【%s】赶快邀请好友领取奖励金吧，还有好友返利拿！
-邀请详情：http://t.cn/RnAKafe
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+免费看电影方法：
+http://t.cn/RnAKMul
+您的邀请码【%s】邀请好友得返利：
+http://t.cn/RnAKafe
                     ''' % (check_user_res[0][4])
 
             lnivt_text = '''
-一一一一 推广消息 一一一一 
+一一一一系统消息一一一一
 
-微信好友【%s】通过邀请码已经绑定到你的账户
-你将获取好友推广奖励金：0.3元
-你将永久获得【%s】返利提成
-当前可提现金额：%s 元
-好友个数为%s 个
-            ''' % (check_user_res[0][3], check_user_res[0][3], jianli, friends_num)
+您的好友【%s】已邀请成功！
+
+0.3元奖励金已到账
+您将永久获得该好友永久购物返利佣金提成
+
+邀请好友得返利说明：
+http://t.cn/RnAKafe
+            ''' % (check_user_res[0][3])
             itchat.send(text, msg['FromUserName'])
             itchat.send(lnivt_text, lnivt_info[0][1])
         else:
@@ -1495,10 +1370,10 @@ def ishaveuserinfo(msg):
 
 你还没创建个人账户哦！
 
-回复【邀请码】或【10000】创建个人账户哦!
+回复【邀请码】创建个人账户哦!
 还可以领取现金红包哦！
 
-淘京机器人使用说明：
+优惠券使用说明：
 http://t.cn/RnAKqWW
                     '''
         return {"res": "not_info", "text": send_text}
@@ -1508,7 +1383,7 @@ http://t.cn/RnAKqWW
 
 class WxBot(object):
     # 消息回复(文本类型和分享类型消息)
-    @itchat.msg_register(['Text', 'Sharing'])
+    @itchat.msg_register(['Text', 'Sharing', 'Card'])
     def text(msg):
         print(msg)
         check_if_is_tb_link(msg)
@@ -1521,30 +1396,20 @@ class WxBot(object):
 
     @itchat.msg_register(FRIENDS)
     def add_friend(msg):
+        print(msg);
         itchat.add_friend(**msg['Text'])  # 该操作会自动将新好友的消息录入，不需要重载通讯录
         create_user_info(msg, 0, tool=True)
         text = '''
 一一一一 系统消息 一一一一
 
-你好！欢迎使用跑堂优惠券！
-先领券，再购物，更省钱！有返利！
-
-回复【邀请码】或【10000】领取新人红包
-
-回复【买+商品名称】
-回复【找+商品名称】
-回复【搜+商品名称】
-查看商品优惠券合集
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
 http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
+免费看电影方法：
+http://t.cn/RnAKMul
+您的邀请码【%s】邀请好友得返利：
 http://t.cn/RnAKafe
         '''
         itchat.send_msg(text, msg['RecommendInfo']['UserName'])
@@ -1557,7 +1422,5 @@ http://t.cn/RnAKafe
         else:
             itchat.auto_login(True)
         itchat.run()
-
-
 if __name__ == '__main__':
     mi = WxBot()
