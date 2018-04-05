@@ -221,7 +221,8 @@ class MediaJd:
 
             for item in skuList:
                 link_info = self.get_good_link(str(item))
-                item_image = link_info['data']['qRcode']
+                # item_image = link_info['data']['qRcode']
+                item_image = link_info['imgUrl']
                 # 请求图片
                 res_img = requests.get(item_image)
                 img_name = item_image.split('/')

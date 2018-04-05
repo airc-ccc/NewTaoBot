@@ -1525,6 +1525,11 @@ def async(f):
 @async
 def groupMessages():
     time.sleep(20)
+    yorn = input("是否重新选群？y/n:")
+    if yorn == 'n':
+        start_send_msg_thread()
+        return
+
     print('start.....')
     cm = ConnectMysql()
 
@@ -1615,9 +1620,10 @@ def send_group_meg():
         img_name = data[0][3].split('/')
 
         img_path = "images/" + img_name[-1]
+        print(img_path)
         for item in group_info:
             itchat.send_image(img_path, item[2])
-            itchat.send(text, item[2])
+            # itchat.send(text, item[2])
 
 
 # 启动一个线程，定时发送商品信息
@@ -1636,13 +1642,13 @@ class WxBot(object):
     # 消息回复(文本类型和分享类型消息)
     @itchat.msg_register(['Text', 'Sharing'])
     def text(msg):
-        print(msg)
+        # print(msg)
         check_if_is_tb_link(msg)
 
     # 消息回复(文本类型和分享类型消息) 群聊
     @itchat.msg_register(['Text', 'Sharing'], isGroupChat=True)
     def text(msg):
-        print(msg)
+        # print(msg)
         # mjd.get_good_info()
         check_if_is_group(msg)
 
