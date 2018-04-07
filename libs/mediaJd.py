@@ -292,45 +292,45 @@ class MediaJd:
 
 
     def get_jd_order(self, msg, times, orderId, userInfo):
-        try:
+        # try:
 
-            timestr = re.sub('-', '', times)
-            order_id = int(orderId)
+        timestr = re.sub('-', '', times)
+        order_id = int(orderId)
 
-            cm = ConnectMysql()
+        cm = ConnectMysql()
 
-            # 查询订单是否已经提现过了
-            check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "';"
-            check_order_res = cm.ExecQuery(check_order_sql)
+        # 查询订单是否已经提现过了
+        check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "';"
+        check_order_res = cm.ExecQuery(check_order_sql)
 
-            # 判断该订单是否已经提现
-            if len(check_order_res) >= 1:
-                cm.Close()
-                send_text = '''
+        # 判断该订单是否已经提现
+        if len(check_order_res) >= 1:
+            cm.Close()
+            send_text = '''
 一一一一 订单消息 一一一一
 
 订单【%s】已经成功返利，请勿重复提交订单信息！
 回复【个人信息】 查看订单及返利信息
 如有疑问！请联系管理员
-                            ''' % (order_id)
-                return {"info": "order_exit", "send_text": send_text}
+                        ''' % (order_id)
+            return {"info": "order_exit", "send_text": send_text}
 
-            self.load_cookies()
+        self.load_cookies()
 
-            url = 'https://api.jd.com/routerjson?v=2.0&method=jingdong.UnionService.queryOrderList&app_key=96432331E3ACE521CC0D66246EB4C371&access_token=a67c6103-691c-4691-92a2-4dee41ce0f88&360buy_param_json={"unionId":"2011005331","time":"'+timestr+'","pageIndex":"1","pageSize":"50"}&timestamp='+strftime("%Y-%m-%d %H:%M:%S", gmtime())+'&sign=E9D115D4769BDF68FE1DF07D33F7720B'
+        url = 'https://api.jd.com/routerjson?v=2.0&method=jingdong.UnionService.queryOrderList&app_key=96432331E3ACE521CC0D66246EB4C371&access_token=a67c6103-691c-4691-92a2-4dee41ce0f88&360buy_param_json={"unionId":"2011005331","time":"'+timestr+'","pageIndex":"1","pageSize":"50"}&timestamp='+strftime("%Y-%m-%d %H:%M:%S", gmtime())+'&sign=E9D115D4769BDF68FE1DF07D33F7720B'
 
-            res = requests.get(url)
+        res = requests.get(url)
 
-            rj = json.loads(res.text)
-            print(rj, url)
-            data = json.loads(rj['jingdong_UnionService_queryOrderList_responce']['result'])
+        rj = json.loads(res.text)
+        print(rj, url)
+        data = json.loads(rj['jingdong_UnionService_queryOrderList_responce']['result'])
 
-            for item in data['data']:
-                if order_id == item['orderId']:
-                    res = self.changeInfo(msg, item, order_id, userInfo)
-                    return res
+        for item in data['data']:
+            if order_id == item['orderId']:
+                res = self.changeInfo(msg, item, order_id, userInfo)
+                return res
 
-            user_text = '''
+        user_text = '''
 一一一一订单信息一一一一
 
 订单返利失败！
@@ -343,85 +343,86 @@ class MediaJd:
 【6】，订单号错误，请输入正确的订单号
 
 请按照提示进行重新操作！
-                        '''
+                    '''
 
-            return {'info': 'not_order', 'user_text': user_text}
-        except Exception as e:
-            print(e)
-            return {'info': 'feild'}
+        return {'info': 'not_order', 'user_text': user_text}
+        # except Exception as e:
+        #     print(e)
+        #     return {'info': 'feild'}
 
     def changeInfo(self, msg, info, order_id, userInfo):
 
         cm = ConnectMysql()
-        try:
+        # try:
 
-            # 查询用户是否有上线
-            check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "';"
-            check_user_res = cm.ExecQuery(check_user_sql)
+        # 查询用户是否有上线
+        check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "';"
+        check_user_res = cm.ExecQuery(check_user_sql)
 
-            # 判断是否已经有个人账户，没有返回信息
-            if len(check_user_res) < 1:
-                cm.Close()
-                return {"info": "not_info"}
-            else:
-                get_query_sql = "SELECT * FROM taojin_query_record WHERE good_title='" + info['skuList'][0]['skuName'] + "'AND username='" + check_user_res[0][1] + "' ORDER BY create_time LIMIT 1;"
+        # 判断是否已经有个人账户，没有返回信息
+        if len(check_user_res) < 1:
+            cm.Close()
+            return {"info": "not_info"}
+        else:
+            get_query_sql = "SELECT * FROM taojin_query_record WHERE good_title='" + info['skuList'][0]['skuName'] + "'AND username='" + check_user_res[0][1] + "' ORDER BY create_time LIMIT 1;"
 
-                get_query_info = cm.ExecQuery(get_query_sql)
+            get_query_info = cm.ExecQuery(get_query_sql)
 
-                # 定义SQL语句 查询用户是否已经存在邀请人
-                # 判断是否已经有邀请人了
-                if check_user_res and check_user_res[0][16] != 0:
+            # 定义SQL语句 查询用户是否已经存在邀请人
+            # 判断是否已经有邀请人了
+            if check_user_res and check_user_res[0][16] != 0:
 
-                    get_parent_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + str(
-                        check_user_res[0][16]) + "';"
+                get_parent_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + str(
+                    check_user_res[0][16]) + "';"
 
-                    get_parent_info = cm.ExecQuery(get_parent_sql)
+                get_parent_info = cm.ExecQuery(get_parent_sql)
+                print(get_parent_info)
 
-                    add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    withdrawals_amount = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    jd = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    total_rebate_amount = round(float(check_user_res[0][5]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    save_money = round(
-                        check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['skuList'][0]['payPrice'])), 2)
+                add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                withdrawals_amount = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                jd = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                total_rebate_amount = round(float(check_user_res[0][5]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                save_money = round(
+                    check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['skuList'][0]['payPrice'])), 2)
 
-                    add_parent_balance = round(float(info['skuList'][0]['actualFee']) * 0.1, 2)
-                    withdrawals_amount2 = round(float(get_parent_info[0][8]) + float(add_balance) * 0.1, 2)
+                add_parent_balance = round(float(info['skuList'][0]['actualFee']) * 0.1, 2)
+                withdrawals_amount2 = round(float(get_parent_info[0][8]) + float(add_balance) * 0.1, 2)
 
-                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', jd_rebate_amount='" + str(jd) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';")
-                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', update_time='" + str(time.time()) + "' WHERE lnivt_code='" + str(check_user_res[0][16]) + "';")
+                cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', jd_rebate_amount='" + str(jd) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';")
+                cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', update_time='" + str(time.time()) + "' WHERE lnivt_code='" + str(check_user_res[0][16]) + "';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '1')")
+                cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '1')")
 
-                    args = {
-                        'username': check_user_res[0][1],
-                        'rebate_amount': add_balance,
-                        'type': 3,
-                        'create_time': time.time()
-                    }
-
-
-                    # 写入返利日志
-                    cm.InsertRebateLog(args)
-
-                    args2 = {
-                        'username': get_parent_info[0][1],
-                        'rebate_amount': add_parent_balance,
-                        'type': 4,
-                        'create_time': time.time()
-                    }
+                args = {
+                    'username': check_user_res[0][1],
+                    'rebate_amount': add_balance,
+                    'type': 3,
+                    'create_time': time.time()
+                }
 
 
-                    # 写入返利日志
-                    cm.InsertRebateLog(args2)
+                # 写入返利日志
+                cm.InsertRebateLog(args)
 
-                    parent_user_text = '''
+                args2 = {
+                    'username': get_parent_info[0][1],
+                    'rebate_amount': add_parent_balance,
+                    'type': 4,
+                    'create_time': time.time()
+                }
+
+
+                # 写入返利日志
+                cm.InsertRebateLog(args2)
+
+                parent_user_text = '''
 一一一一  推广信息 一一一一
 
 您的好友【%s】又完成了一笔订单，返利提成%s元已发放到您的账户
 回复【个人信息】查询账户信息及提成
-                            ''' % (check_user_res[0][3], add_parent_balance)
+                        ''' % (check_user_res[0][3], add_parent_balance)
 
-                    user_text = '''
+                user_text = '''
 一一一一系统消息一一一一
 
 订单【%s】已完成！
@@ -441,45 +442,45 @@ http://jdyhq.ptjob.net
 http://tbyhq.ptjob.net
 邀请好友得返利：
 http://t.cn/RnAKafe
-                            ''' % (order_id, add_balance)
-                    cm.Close()
-                    return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success',
-                            'parent': get_parent_info[0][1]}
-                else:
-                    add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    withdrawals_amount = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    jd = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    total_rebate_amount = round(float(check_user_res[0][5]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                    save_money = round(check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['skuList'][0]['payPrice'])), 2)
+                        ''' % (order_id, add_balance)
+                cm.Close()
+                return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success',
+                        'parent': get_parent_info[0][1]}
+            else:
+                add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                withdrawals_amount = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                jd = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                total_rebate_amount = round(float(check_user_res[0][5]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                save_money = round(check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['skuList'][0]['payPrice'])), 2)
 
 
-                    up_sql = "UPDATE taojin_user_info SET jd_rebate_amount='" + str(jd) + "', withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';"
-                    cm.ExecNonQuery(up_sql)
-                    # cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "' WHERE wx_number='" + str(msg['FromUserName']) + "';")
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '2')")
+                up_sql = "UPDATE taojin_user_info SET jd_rebate_amount='" + str(jd) + "', withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';"
+                cm.ExecNonQuery(up_sql)
+                # cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "' WHERE wx_number='" + str(msg['FromUserName']) + "';")
+                cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '2')")
 
-                    args = {
-                        'username': check_user_res[0][1],
-                        'rebate_amount': add_balance,
-                        'type': 3,
-                        'create_time': time.time()
-                    }
+                args = {
+                    'username': check_user_res[0][1],
+                    'rebate_amount': add_balance,
+                    'type': 3,
+                    'create_time': time.time()
+                }
 
 
-                    # 写入返利日志
-                    cm.InsertRebateLog(args)
+                # 写入返利日志
+                cm.InsertRebateLog(args)
 
-                    user_text = '''
+                user_text = '''
 一一一一 订单消息 一一一一
 
 订单【%s】标记成功，返利金%s已发放到您的账户
 回复【个人信息】 查看订单及返利信息
-                                ''' % (order_id, add_balance)
-                    cm.Close()
-                    return {'user_text': user_text, 'info': 'not_parent_and_success'}
-        except Exception as e:
-            print(e)
-            return {'info': 'feild'}
+                            ''' % (order_id, add_balance)
+                cm.Close()
+                return {'user_text': user_text, 'info': 'not_parent_and_success'}
+        # except Exception as e:
+        #     print(e)
+        #     return {'info': 'feild'}
 
 
 
