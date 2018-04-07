@@ -322,8 +322,8 @@ class Alimama:
             return 'login failed'
 
     def open_do_login(self):
-        # loginname = input('请输入淘宝联盟账号:')
-        # nloginpwd = input('请输入淘宝联盟密码:')
+        loginname = input('请输入淘宝联盟账号:')
+        nloginpwd = input('请输入淘宝联盟密码:')
 
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             firefoxOptions = webdriver.FirefoxOptions()
@@ -346,11 +346,11 @@ class Alimama:
         wd.find_element_by_class_name('login-switch').click()
         time.sleep(3)
         # 输入账号密码
-        wd.find_element_by_id('TPL_username_1').send_keys('15399888412')
+        wd.find_element_by_id('TPL_username_1').send_keys(loginname)
         # 休息3秒
         time.sleep(3)
         # 输入密码
-        wd.find_element_by_id('TPL_password_1').send_keys('smile007')
+        wd.find_element_by_id('TPL_password_1').send_keys(nloginpwd)
         # 点击登录按钮
         time.sleep(5)
         wd.find_element_by_id('J_SubmitStatic').click()
