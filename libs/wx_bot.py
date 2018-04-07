@@ -22,6 +22,10 @@ from bs4 import BeautifulSoup
 from bottle import template
 from libs.groupMessage import FormData
 
+'''
+[["t", "77ca00e3299d5a708d3d1b6dfaf33116"], ["cookie2", "16f60fb312f749f01bbcfb10e5a26b96"], ["v", "0"], ["_tb_token_", "ee8eb77717917"], ["alimamapwag", "TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NDsgcnY6NTkuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC81OS4w"], ["cookie32", "6d50a6f9ad98f2c0f0a1978a4bf9cd5a"], ["alimamapw", "QhRcX15tCANSAwIEAQ4IUwIBDFZXVQQHCwEFBFZUAQheBQZSUAY%3D"], ["cookie31", "MjE4Njc3MDYsd3BobGosZ2VuZXI0MTJAc2luYS5jb20sVEI%3D"], ["login", "URm48syIIVrSKA%3D%3D"], ["cna", "w85PE4FQagYCAWU2iTPPrpDc"], ["isg", "BBsbLgCExWr51zmeHWvJoR-hqXyF8C_yadTDBQ1Y95ox7DvOlcC_QjnugsTiV4fq"]]
+
+'''
 
 logger = utils.init_logger()
 
