@@ -398,10 +398,48 @@ class Alimama:
                 'accept-language': 'en-US,en;q=0.5',
             }
             res = self.get_url(url, headers)
-            # print(res.text)
+            print(res.text)
             rj = res.json()
             if rj['data']['pageList'] != None:
                 insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + userInfo['NickName'] + "', '" + str(time.time()) + "')"
+                cm.ExecNonQuery(insert_sql)
+                cm.Close()
+                return rj['data']['pageList'][0]
+            else:
+                return 'no match item'
+        except Exception as e:
+            trace = traceback.format_exc()
+            self.logger.warning("error:{},trace:{}".format(str(e), trace))
+
+    # 获取商品详情
+    def get_group_detail(self, q, msg):
+        cm = ConnectMysql()
+
+        chatrooms = itchat.search_chatrooms(userName=msg['FromUserName'])
+
+        try:
+            t = int(time.time() * 1000)
+            tb_token = self.se.cookies.get('_tb_token_', domain="pub.alimama.com")
+            pvid = '10_%s_1686_%s' % (self.myip, t)
+            url = 'http://pub.alimama.com/items/search.json?q=%s&_t=%s&auctionTag=&perPageSize=40&shopTag=&t=%s&_tb_token_=%s&pvid=%s' % (
+                urllib.quote(q.encode('utf8')), t, t, tb_token, pvid)
+            headers = {
+                'method': 'GET',
+                'authority': 'pub.alimama.com',
+                'scheme': 'https',
+                'path': '/items/search.json?%s' % url.split('search.json?')[-1],
+                'accept': 'application/json, text/javascript, */*; q=0.01',
+                'x-requested-with': 'XMLHttpRequest',
+                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0',
+                'referer': 'https://pub.alimama.com',
+                'accept-encoding': 'gzip, deflate, br',
+                'accept-language': 'en-US,en;q=0.5',
+            }
+            res = self.get_url(url, headers)
+            print(res.text)
+            rj = res.json()
+            if rj['data']['pageList'] != None:
+                insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + chatrooms['NickName'] + "', '" + str(time.time()) + "')"
                 cm.ExecNonQuery(insert_sql)
                 cm.Close()
                 return rj['data']['pageList'][0]

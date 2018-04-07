@@ -27,8 +27,8 @@ logger = utils.init_logger()
 
 mjd = MediaJd()
 mjd.login()
-# al = Alimama(logger)
-# al.login()
+al = Alimama(logger)
+al.login()
 
 
 def getTulingText(url):
@@ -50,6 +50,8 @@ def tuling(msg):
 def text_reply(msg, good_url):
     cm = ConnectMysql()
     print('开始查询分享商品的信息......', msg['Text'])
+
+    wei_info = itchat.search_friends(userName=msg['FromUserName'])
 
     sku_arr = good_url.split('https://item.m.jd.com/product/')
 
@@ -82,8 +84,7 @@ def text_reply(msg, good_url):
         itchat.send(text, msg['FromUserName'])
 
         insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
-                     res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '0', '" + msg[
-                         'FromUserName'] + "', '" + str(time.time()) + "')"
+                     res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '0', '" + wei_info['NickName'] + "', '" + str(time.time()) + "')"
         cm.ExecNonQuery(insert_sql)
         return
     else:
@@ -107,8 +108,7 @@ def text_reply(msg, good_url):
                res['data']['shotCouponUrl'])
 
         insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
-                     res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '" + res['coupon_price2'] + "', '" + msg[
-                         'FromUserName'] + "', '" + str(time.time()) + "')"
+                     res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '" + res['coupon_price2'] + "', '" + wei_info['NickName'] + "', '" + str(time.time()) + "')"
         cm.ExecNonQuery(insert_sql)
 
         itchat.send(text, msg['FromUserName'])
@@ -116,6 +116,9 @@ def text_reply(msg, good_url):
 
 # 检查是否是淘宝链接
 def check_if_is_tb_link(msg):
+    wei_info = itchat.search_friends(userName=msg['FromUserName'])
+    bot_info = itchat.search_friends(userName=msg['ToUserName'])
+
     cm = ConnectMysql()
     if re.search(r'【.*】', msg['Text']) and (
             u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
@@ -272,15 +275,15 @@ http://t.cn/RnAKafe
 http://t.cn/RnAKqWW
 免费看电影方法：
 http://t.cn/RnAKMul
-邀请好友得返利：
+邀请码好友得返利：
 http://t.cn/RnAKafe
                     ''' % (player_url)
                     itchat.send(text, msg['FromUserName'])
                     return
 
         text_reply(msg, msg['Url'])
-    elif msg['Text'].isdigit() and len(msg['Text']) == 6:
-        lnivt_user(msg)
+    # elif msg['Text'].isdigit() and len(msg['Text']) == 6:
+    #     lnivt_user(msg)
     # elif msg['Text'] == '10000':
     #     tool = False
     #     create_user_info(msg, 0, tool)
@@ -341,7 +344,7 @@ http://t.cn/RnAKafe
 一一一一 系统信息 一一一一
 
 回复【帮助】可查询指信息
-回复【提现】可申请账户余额提现
+回复【提现】申请账户余额提现
 回复【推广】可申请机器人代理
 回复【个人信息】可看个当前账户信息
 
@@ -373,27 +376,24 @@ http://t.cn/RnAKafe
                 if res['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
+                select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
                 select_user_res = cm.ExecQuery(select_user_sql)
 
                 if select_user_res and float(select_user_res[0][8]) > 0:
                     try:
                         # 修改余额
                         update_sql = "UPDATE taojin_user_info SET withdrawals_amount='0',update_time='" + str(
-                            time.time()) + "' WHERE wx_number='" + msg['FromUserName'] + "';"
+                            time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "';"
 
                         total_amount = float(select_user_res[0][5]) + float(select_user_res[0][8]);
                         update_total_sql = "UPDATE taojin_user_info SET total_rebate_amount='" + str(
-                            total_amount) + "',update_time='" + str(time.time()) + "' WHERE wx_number='" + msg[
-                                               'FromUserName'] + "';"
+                            total_amount) + "',update_time='" + str(time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "';"
 
                         # 插入提现日志
                         insert_current_log_sql = "INSERT INTO taojin_current_log(wx_bot, username, amount, create_time) VALUES('" + \
-                                                 msg['ToUserName'] + "', '" + msg['FromUserName'] + "', '" + str(
+                                                 bot_info['NickName'] + "', '" + wei_info['NickName'] + "', '" + str(
                             select_user_res[0][8]) + "', '" + str(time.time()) + "')"
 
-                        bot_res = itchat.search_friends(userName=msg['ToUserName'])
-                        user_res = itchat.search_friends(userName=msg['FromUserName'])
                         to_admin_text = '''
 一一一一 提现通知 一一一一
 
@@ -401,7 +401,7 @@ http://t.cn/RnAKafe
 提现人：%s
 提现金额：%s 元
 提现时间：%s
-                                        ''' % (bot_res['NickName'], user_res['NickName'], select_user_res[0][8],
+                                        ''' % (bot_info['NickName'], wei_info['NickName'], select_user_res[0][8],
                                                time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
                         to_user_text = '''
@@ -451,7 +451,7 @@ http://t.cn/RnAKafe
                 if res['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
+                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
 
                 user_info = cm.ExecQuery(user_sql)
 
@@ -475,7 +475,7 @@ http://t.cn/RnAKafe
                     itchat.send(send_text, msg['FromUserName'])
                     return
 
-                current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + msg['FromUserName'] + "';"
+                current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + wei_info['NickName'] + "';"
 
                 friends_count_sql = "SELECT count(*) FROM taojin_user_info WHERE lnivter='" + str(
                     user_info[0][4]) + "';"
@@ -523,17 +523,19 @@ http://t.cn/RnAKafe
                 if res['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + msg['FromUserName'] + "';"
+                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
 
                 user_info = cm.ExecQuery(user_sql)
 
                 text = '''
 一一一一 推广信息 一一一一
 
-将机器人和您的邀请码【%s】分享给好友
-好友添加机器人为好友，回复您的邀请码
-您和好友都将获取0.3元现金奖励，并永久享受好友返利提成
-邀请好友返利说明：http://t.cn/RnAKafe
+将机器人名片分享到群或者好友
+好友添加机器人为好友
+您和好友都将获取0.3元现金奖励
+您将永久享受好友返利提成
+邀请好友返利说明：
+http://t.cn/RnAKafe
                         ''' % (user_info[0][4])
                 itchat.send(text, msg['FromUserName'])
             elif pattern_proxy.search(msg['Text']) != None:
@@ -542,9 +544,6 @@ http://t.cn/RnAKafe
                 if res['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                bot_res = itchat.search_friends(userName=msg['ToUserName'])
-                user_res = itchat.search_friends(userName=msg['FromUserName'])
-
                 to_admin_text = '''
 一一一一 申请代理通知 一一一一
 
@@ -552,7 +551,7 @@ http://t.cn/RnAKafe
 申请人：%s
 申请代理时间：%s
                             ''' % (
-                bot_res['NickName'], user_res['NickName'], time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                bot_info['NickName'], wei_info['NickName'], time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
                 text = '''
 一一一一系统消息一一一一
 
@@ -566,14 +565,12 @@ http://t.cn/RnAKafe
                 itchat.send(to_admin_text, '@2270c9a6e8ce6bef9305c511a1ff49ea478544d6fe9430085f50c24fbe4ae6f1')
             elif (',' in msg['Text']) and (msg['Text'].split(',')[1].isdigit()) and (len(msg['Text'].split(',')[1]) == 11):
 
-                userInfo = itchat.search_friends(userName=msg['FromUserName'])
-
                 res2 = ishaveuserinfo(msg)
 
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                res = mjd.get_jd_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1], userInfo)
+                res = mjd.get_jd_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1], wei_info)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -609,9 +606,7 @@ http://t.cn/RnAKafe
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                userInfo = itchat.search_friends(userName=msg['FromUserName'])
-
-                res = mjd.get_jd_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1], userInfo)
+                res = mjd.get_jd_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1], wei_info)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -648,9 +643,7 @@ http://t.cn/RnAKafe
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                userInfo = itchat.search_friends(userName=msg['FromUserName'])
-
-                res = al.get_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1], userInfo)
+                res = al.get_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1], wei_info)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -687,9 +680,7 @@ http://t.cn/RnAKafe
                 if res2['res'] == 'not_info':
                     create_user_info(msg, 0, tool=False)
 
-                userInfo = itchat.search_friends(userName=msg['FromUserName'])
-
-                res = al.get_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1], userInfo)
+                res = al.get_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1], wei_info)
 
                 if res['info'] == 'success':
                     itchat.send(res['user_text'], msg['FromUserName'])
@@ -763,7 +754,6 @@ http://t.cn/RnAKafe
 # 检查是否是淘宝链接
 def check_if_is_group(msg):
     cm = ConnectMysql()
-
     if re.search(r'【.*】', msg['Text']) and (
             u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
         try:
@@ -787,32 +777,29 @@ def check_if_is_group(msg):
                 res = requests.post(taokoulingurl, data=parms)
                 url = res.json()['url'].replace('https://', 'http://')
                 info = "tkl url: {}".format(url)
-                # logger.debug(info)
 
-            # get real url
             real_url = al.get_real_url(url)
             info = "real_url: {}".format(real_url)
-            # logger.debug(info)
 
-            # get detail
-            res = al.get_detail(real_url, msg)
+            res = al.get_group_detail(real_url, msg)
+            print(res)
             if res == 'no match item':
                 text = '''
-一一一一 返利信息 一一一一
+        一一一一 返利信息 一一一一
 
-返利失败，该商品暂无优惠券信息！
+        返利失败，该商品暂无优惠券信息！
 
-分享【京东商品链接】或者【淘口令】
-精准查询商品优惠券和返利信息
+        分享【京东商品链接】或者【淘口令】
+        精准查询商品优惠券和返利信息
 
-优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
-免费看电影方法：
-http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
+        优惠券使用教程：
+        http://t.cn/RnAKqWW
+        常见问题解答：
+        http://t.cn/RnAK1w0
+        免费看电影方法：
+        http://t.cn/RnAKMul
+        邀请好友得返利：
+        http://t.cn/RnAKafe
                         '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -823,52 +810,48 @@ http://t.cn/RnAKafe
             price = res['zkPrice']
             fx2 = round(float(res['tkCommonFee']) * 0.3, 2)
             real_price = round(price - coupon_amount, 2)
-            # # get tk link
             res1 = al.get_tk_link(auctionid)
 
-            # 判斷數據是否為樓
             if res1 == None:
                 img = al.get_qr_image()
                 itchat.send(img, msg['FromUserName'])
                 return
-
-            # logger.debug(res1)
             tao_token = res1['taoToken']
             short_link = res1['shortLinkUrl']
             coupon_link = res1['couponLink']
             if coupon_link != "":
                 coupon_token = res1['couponLinkTaoToken']
                 res_text = '''
-一一一一返利信息一一一一
+        一一一一返利信息一一一一
 
-【商品名】%s元
+        【商品名】%s元
 
-【淘宝价】%s元
-【优惠券】%s元
-【券后价】%s元
-【返红包】%.2f元
-【淘口令】%s
+        【淘宝价】%s元
+        【优惠券】%s元
+        【券后价】%s元
+        【返红包】%.2f元
+        【淘口令】%s
 
-省钱步骤：
-1,点击链接，进入下单
-2,订单完成后，将订单完成日期和订单号发给我哦！
-例如：
-2018-01-01,12345678901
+        省钱步骤：
+        1,复制本条信息打开淘宝App领取优惠券下单！
+        2,订单完成后，将订单完成日期和订单号发给我哦！
+        例如：
+        2018-01-01,12345678901
                 ''' % (q, price, coupon_amount, real_price, fx2, coupon_token)
             else:
                 res_text = '''
-一一一一返利信息一一一一
+        一一一一返利信息一一一一
 
-【商品名】%s
-【淘宝价】%s元
-【返红包】%.2f元
-【淘口令】%s
+        【商品名】%s
+        【淘宝价】%s元
+        【返红包】%.2f元
+        【淘口令】%s
 
-省钱步骤：
-1,点击链接，进入下单
-2,订单完成后，将订单完成日期和订单号发给我哦！
-例如：
-2018-01-01,12345678901
+        省钱步骤：
+        1,复制本条信息打开淘宝App领取优惠券下单！
+        2,订单完成后，将订单完成日期和订单号发给我哦！
+        例如：
+        2018-01-01,12345678901
                                 ''' % (q, price, fx2, tao_token)
 
             itchat.send(res_text, msg['FromUserName'])
@@ -892,7 +875,8 @@ http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
             '''
-            return info
+            itchat.send(info, msg['FromUserName'])
+            return
 
     elif msg['Type'] == 'Sharing':
 
@@ -962,7 +946,7 @@ http://t.cn/RnAKafe
                 text = '''
 一一一一优惠券集合一一一一
 
-亲，以为您找到所有【%s】优惠券,快快点击领取吧！
+亲，已为您找到所有【%s】优惠券,快快点击领取吧！
 
 京东：%s
 淘宝：%s
@@ -975,7 +959,7 @@ http://t.cn/RnAKafe
 一一一一 系统信息 一一一一
 
 回复【帮助】可查询指信息
-回复【提现】可申请账户余额提现
+回复【提现】申请账户余额提现
 回复【推广】可申请机器人代理
 回复【个人信息】可看个当前账户信息
 
@@ -1055,30 +1039,6 @@ def create_user_info(msg, lnivt_code=0, tool=False):
 
         if len(select_res) == 0:
             break
-    # 定义SQL语句 查询数据是否已经存在
-    select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
-    select_user_res = cm.ExecQuery(select_user_sql)
-    if len(select_user_res) > 0:
-        cm.Close()
-        text = '''
-一一一一 系统信息 一一一一
-
-您已成功创建账户，请勿重新创建！
-
-输入【余额】可查询账户余额信息
-输入【帮助】可查询指信息
-输入【提现】可申请账户余额提现
-输入【推广】可申请机器人代理
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-免费看电影方法：
-http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
-                '''
-        itchat.send(text, msg['FromUserName'])
-        return
 
     if lnivt_code == 0:
         sql = "INSERT INTO taojin_user_info(wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('" + \
@@ -1086,70 +1046,22 @@ http://t.cn/RnAKafe
             randNum) + "', '0.3', '" + str(lnivt_code) + "', '" + str(round(time.time())) + "');"
 
         insert_res = cm.ExecNonQuery(sql)
-
-        if (insert_res):
-
-            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
-
-            current = "SELECT sum(amount) FROM taojin_current_log WHERE username=" + res['NickName'] + ";"
-
-            user_info = cm.ExecQuery(user_sql)
-
-            # 日志参数
-            args = {
-                'username': res['NickName'],
-                'rebate_amount': 0.3,
-                'type': 1,
-                'create_time': time.time()
-            }
-
-            # 写入返利日志
-            cm.InsertRebateLog(args)
-
-            current_info = cm.ExecQuery(current)
-
-            if current_info == None:
-                current_info = 0
-            else:
-                current_info = current_info[0][0]
-
-            text = '''
-一一一一 系统消息 一一一一
-
-添加成功！0.3元奖励金已到账！
-回复【个人信息】查看账户详情！
-
-分享【京东商品链接】或者【淘口令】
-精准查询商品优惠券和返利信息！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-免费看电影方法：
-http://t.cn/RnAKMul
-您的邀请码【%s】邀请好友得返利：
-http://t.cn/RnAKafe
-                ''' % (user_info[0][4])
-
-            cm.Close()
-            if tool==False:
-                return
-            itchat.send(text, msg['FromUserName'])
-            return
+        # 日志参数
+        args = {
+            'username': res['NickName'],
+            'rebate_amount': 0.3,
+            'type': 1,
+            'create_time': time.time()
+        }
+        # 写入返利日志
+        cm.InsertRebateLog(args)
+        return
     else:
+        lnivt_2_info = itchat.search_friends(nickName=lnivt_code)
 
-        lnivter_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + lnivt_code + "' LIMIT 1;"
-
+        lnivter_sql = "SELECT * FROM taojin_user_info WHERE nickname='" + lnivt_code + "' LIMIT 1;"
         # 获取邀请人信息
         lnivt_info = cm.ExecQuery(lnivter_sql)
-
-        if len(lnivt_info) < 1:
-            cm.Close()
-            sn_text='''
-
-                    '''
-            itchat.send(sn_text, msg['FromUserName'])
-            return
-
         # 有邀请人时，插入用户信息，并奖励邀请人
         sql = "INSERT INTO taojin_user_info(wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('" + \
               res['NickName'] + "', '" + str(res['Sex']) + "', '" + res['NickName'] + "', '" + str(
@@ -1160,10 +1072,10 @@ http://t.cn/RnAKafe
 
         friends_num = int(lnivt_info[0][19]) + 1
 
-        lnivt_res = cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(
-            jianli) + "', friends_number='" + str(friends_num) + "'  WHERE lnivt_code='" + lnivt_code + "';")
+        cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(
+            jianli) + "', friends_number='" + str(friends_num) + "'  WHERE nickname='" + lnivt_code + "';")
 
-        insert_res = cm.ExecNonQuery(sql)
+        cm.ExecNonQuery(sql)
 
         # 日志参数
         args = {
@@ -1183,40 +1095,9 @@ http://t.cn/RnAKafe
         # 写入返利日志
         cm.InsertRebateLog(args)
         cm.InsertRebateLog(args2)
-
-        if (insert_res):
-
-            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
-
-            current = "SELECT sum(amount) FROM taojin_current_log WHERE username=" + res['NickName'] + ";"
-
-            user_info = cm.ExecQuery(user_sql)
-
-            current_info = cm.ExecQuery(current)
-
-            if current_info[0][0] == None:
-                current_info = 0
-            else:
-                current_info = current_info[0][0]
-
-            text = '''
-一一一一 系统消息 一一一一
-
-激活成功！0.3元奖励金已到账！
-回复【个人信息】查看账户详情！
-
-分享【京东商品链接】或者【淘口令】
-精准查询商品优惠券和返利信息！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-免费看电影方法：
-http://t.cn/RnAKMul
-您的邀请码【%s】邀请好友得返利：
-http://t.cn/RnAKafe
-                    ''' % (user_info[0][4])
-
-            lnivt_text = '''
+        user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
+        user_info = cm.ExecQuery(user_sql)
+        lnivt_text = '''
 一一一一系统消息一一一一
 
 您的好友【%s】已邀请成功！
@@ -1226,11 +1107,10 @@ http://t.cn/RnAKafe
 
 邀请好友得返利说明：
 http://t.cn/RnAKafe
-            ''' % (user_info[0][3])
+        ''' % (user_info[0][3])
 
-            cm.Close()
-            itchat.send(text, msg['FromUserName'])
-            itchat.send(lnivt_text, lnivt_info[0][1])
+        cm.Close()
+        itchat.send(lnivt_text, lnivt_2_info['UserName'])
 
 # 使用邀请码创建账户, 或绑定邀请人
 def lnivt_user(msg):
@@ -1347,7 +1227,7 @@ http://t.cn/RnAKafe
 http://t.cn/RnAKqWW
 免费看电影方法：
 http://t.cn/RnAKMul
-您的邀请码【%s】邀请好友得返利：
+邀请好友得返利：
 http://t.cn/RnAKafe
                     ''' % (check_user_res[0][4])
 
@@ -1512,28 +1392,38 @@ def start_send_msg_thread():
 
 class WxBot(object):
     def __init__(self):
-        groupMessages()
+        # groupMessages()
         print('run.....')
         self.run()
 
     # 消息回复(文本类型和分享类型消息)
     @itchat.msg_register(['Text', 'Sharing', 'Card'])
     def text(msg):
-        # print(msg)
+        print(msg)
         check_if_is_tb_link(msg)
 
     # 消息回复(文本类型和分享类型消息) 群聊
     @itchat.msg_register(['Text', 'Sharing'], isGroupChat=True)
     def text(msg):
-        # print(msg)
-        # mjd.get_good_info()
+        print(msg)
         check_if_is_group(msg)
 
     @itchat.msg_register(FRIENDS)
     def add_friend(msg):
-        print(msg);
         itchat.add_friend(**msg['Text'])  # 该操作会自动将新好友的消息录入，不需要重载通讯录
-        create_user_info(msg, 0, tool=True)
+
+        soup = BeautifulSoup(msg['Content'], 'lxml')
+
+        msg_soup = soup.find('msg')
+
+        sourc = msg_soup.get('sourcenickname')
+        print(sourc)
+        if sourc == '':
+            sourc = 0
+
+        create_user_info(msg, lnivt_code=sourc, tool=True)
+
+
         text = '''
 一一一一 系统消息 一一一一
 
@@ -1544,7 +1434,7 @@ class WxBot(object):
 http://t.cn/RnAKqWW
 免费看电影方法：
 http://t.cn/RnAKMul
-您的邀请码【%s】邀请好友得返利：
+邀请好友得返利：
 http://t.cn/RnAKafe
                 '''
         itchat.send_msg(text, msg['RecommendInfo']['UserName'])
