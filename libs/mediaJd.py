@@ -75,6 +75,7 @@ class MediaJd:
         # 写入Cookies文件
         with open(cookie_fname, 'w') as f:
             f.write(json.dumps(cookies))
+
         return 'Login Success'
 
     def login(self):
