@@ -9,6 +9,7 @@ import time
 import traceback
 import itchat
 import requests
+import random
 import datetime
 
 if sys.version_info[0] < 3:
@@ -20,6 +21,9 @@ from io import BytesIO
 from threading import Thread
 from dateutil.relativedelta import relativedelta
 from libs.mysql import ConnectMysql
+from libs.wx_bot import *
+from itchat.content import *
+from libs.orther import Orther
 from selenium import webdriver
 
 import pyqrcode
@@ -33,6 +37,8 @@ if (sysstr == "Linux") or (sysstr == "Darwin"):
 cookie_fname = 'cookies_taobao.txt'
 
 
+ort = Orther()
+
 class Alimama:
     def __init__(self, logger):
         self.se = requests.session()
@@ -40,6 +46,241 @@ class Alimama:
         self.myip = "127.0.0.1"
         self.start_keep_cookie_thread()
         self.logger = logger
+
+
+    def getTao(self, msg):
+        try:
+            q = re.search(r'【.*】', msg['Text']).group().replace(u'【', '').replace(u'】', '')
+            if u'打开👉天猫APP👈' in msg['Text']:
+                try:
+                    url = re.search(r'http://.* \)', msg['Text']).group().replace(u' )', '')
+                except:
+                    url = None
+
+            else:
+                try:
+                    url = re.search(r'http://.* ，', msg['Text']).group().replace(u' ，', '')
+                except:
+                    url = None
+
+            if url is None:
+                taokoulingurl = 'http://www.taokouling.com/index.php?m=api&a=taokoulingjm'
+                taokouling = re.search(r'￥.*?￥', msg['Text']).group()
+                parms = {'username': 'wx_tb_fanli', 'password': 'wx_tb_fanli', 'text': taokouling}
+                res = requests.post(taokoulingurl, data=parms)
+                url = res.json()['url'].replace('https://', 'http://')
+
+            real_url = self.get_real_url(url)
+
+            res = self.get_detail(real_url, msg)
+            if res == 'no match item':
+                text = '''
+一一一一 返利信息 一一一一
+
+返利失败，该商品暂无优惠券信息！
+
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
+邀请好友得返利：
+http://t.cn/RnAKafe
+                                '''
+                itchat.send(text, msg['FromUserName'])
+                return
+
+            auctionid = res['auctionId']
+            coupon_amount = res['couponAmount']
+            price = res['zkPrice']
+            fx2 = round(float(res['tkCommonFee']) * 0.3, 2)
+            real_price = round(price - coupon_amount, 2)
+            res1 = self.get_tk_link(auctionid)
+
+            if res1 == None:
+                img = self.get_qr_image()
+                itchat.send(img, msg['FromUserName'])
+                return
+            tao_token = res1['taoToken']
+            coupon_link = res1['couponLink']
+            if coupon_link != "":
+                coupon_token = res1['couponLinkTaoToken']
+                res_text = '''
+一一一一返利信息一一一一
+
+【商品名】%s元
+
+【淘宝价】%s元
+【优惠券】%s元
+【券后价】%s元
+【返红包】%.2f元
+【淘口令】%s
+
+省钱步骤：
+1,复制本条信息打开淘宝App领取优惠券下单！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
+                        ''' % (q, price, coupon_amount, real_price, fx2, coupon_token)
+            else:
+                res_text = '''
+一一一一返利信息一一一一
+
+【商品名】%s
+【淘宝价】%s元
+【返红包】%.2f元
+【淘口令】%s
+
+省钱步骤：
+1,复制本条信息打开淘宝App领取优惠券下单！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
+                                        ''' % (q, price, fx2, tao_token)
+
+            itchat.send(res_text, msg['FromUserName'])
+        except Exception as e:
+            trace = traceback.format_exc()
+            self.logger.warning("error:{},trace:{}".format(str(e), trace))
+            info = '''
+一一一一 返利信息 一一一一
+
+返利失败，该商品暂无优惠券信息！
+
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
+邀请好友得返利：
+http://t.cn/RnAKafe
+                    '''
+            itchat.send(info, msg['FromUserName'])
+
+    def getGroupTao(self, msg):
+        try:
+            q = re.search(r'【.*】', msg['Text']).group().replace(u'【', '').replace(u'】', '')
+            if u'打开👉天猫APP👈' in msg['Text']:
+                try:
+                    url = re.search(r'http://.* \)', msg['Text']).group().replace(u' )', '')
+                except:
+                    url = None
+
+            else:
+                try:
+                    url = re.search(r'http://.* ，', msg['Text']).group().replace(u' ，', '')
+                except:
+                    url = None
+
+            if url is None:
+                taokoulingurl = 'http://www.taokouling.com/index.php?m=api&a=taokoulingjm'
+                taokouling = re.search(r'￥.*?￥', msg['Text']).group()
+                parms = {'username': 'wx_tb_fanli', 'password': 'wx_tb_fanli', 'text': taokouling}
+                res = requests.post(taokoulingurl, data=parms)
+                url = res.json()['url'].replace('https://', 'http://')
+
+            real_url = self.get_real_url(url)
+
+            res = self.get_group_detail(real_url, msg)
+            if res == 'no match item':
+                text = '''
+一一一一 返利信息 一一一一
+
+返利失败，该商品暂无优惠券信息！
+
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
+邀请好友得返利：
+http://t.cn/RnAKafe
+                                '''
+                itchat.send(text, msg['FromUserName'])
+                return
+
+            auctionid = res['auctionId']
+            coupon_amount = res['couponAmount']
+            price = res['zkPrice']
+            fx2 = round(float(res['tkCommonFee']) * 0.3, 2)
+            real_price = round(price - coupon_amount, 2)
+            res1 = self.get_tk_link(auctionid)
+
+            if res1 == None:
+                img = self.get_qr_image()
+                itchat.send(img, msg['FromUserName'])
+                return
+            tao_token = res1['taoToken']
+            coupon_link = res1['couponLink']
+            if coupon_link != "":
+                coupon_token = res1['couponLinkTaoToken']
+                res_text = '''
+一一一一返利信息一一一一
+
+【商品名】%s元
+
+【淘宝价】%s元
+【优惠券】%s元
+【券后价】%s元
+【返红包】%.2f元
+【淘口令】%s
+
+省钱步骤：
+1,复制本条信息打开淘宝App领取优惠券下单！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
+                        ''' % (q, price, coupon_amount, real_price, fx2, coupon_token)
+            else:
+                res_text = '''
+一一一一返利信息一一一一
+
+【商品名】%s
+【淘宝价】%s元
+【返红包】%.2f元
+【淘口令】%s
+
+省钱步骤：
+1,复制本条信息打开淘宝App领取优惠券下单！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
+                                        ''' % (q, price, fx2, tao_token)
+
+            itchat.send(res_text, msg['FromUserName'])
+        except Exception as e:
+            trace = traceback.format_exc()
+            self.logger.warning("error:{},trace:{}".format(str(e), trace))
+            info = '''
+一一一一 返利信息 一一一一
+
+返利失败，该商品暂无优惠券信息！
+
+分享【京东商品链接】或者【淘口令】
+精准查询商品优惠券和返利信息
+
+优惠券使用教程：
+http://t.cn/RnAKqWW
+常见问题解答：
+http://t.cn/RnAK1w0
+免费看电影方法：
+http://t.cn/RnAKMul
+邀请好友得返利：
+http://t.cn/RnAKafe
+                    '''
+            itchat.send(info, msg['FromUserName'])
 
     # 启动一个线程，定时访问淘宝联盟主页，防止cookie失效
     def start_keep_cookie_thread(self):
@@ -64,14 +305,13 @@ class Alimama:
         while True:
             time.sleep(60 * 5)
             try:
-                # self.logger.debug(
-                #     "visit_main_url......,time:{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+                self.logger.debug("visit_main_url......,time:{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
                 self.get_url(url, headers)
-                # self.logger.debug(self.check_login())
+                self.logger.debug(self.check_login())
                 real_url = "https://detail.tmall.com/item.htm?id=42485910384"
                 res = self.get_detail2(real_url)
                 auctionid = res['auctionId']
-                # self.logger.debug(self.get_tk_link(auctionid))
+                self.logger.debug(self.get_tk_link(auctionid))
             except Exception as e:
                 trace = traceback.format_exc()
                 self.logger.warning("error:{},trace:{}".format(str(e), trace))
