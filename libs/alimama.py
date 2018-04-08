@@ -205,8 +205,6 @@ http://t.cn/RnAKqWW
 http://t.cn/RnAK1w0
 免费看电影方法：
 http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
                                 '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -277,8 +275,6 @@ http://t.cn/RnAKqWW
 http://t.cn/RnAK1w0
 免费看电影方法：
 http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
                     '''
             itchat.send(info, msg['FromUserName'])
 
@@ -930,10 +926,10 @@ http://t.cn/RnAKafe
 
 失败原因：
 【1】未确认收货（打开App确认收货后重新发送）
-【2】，当前商品不是通过机器人购买
-【3】，查询格式不正确(正确格式：2018-03-20,73462222028 )
-【4】，订单完成日期错误，请输入正确的订单查询日期
-【6】，订单号错误，请输入正确的订单号
+【2】当前商品不是通过机器人购买
+【3】查询格式不正确(正确格式：2018-03-20,73462222028 )
+【4】订单完成日期错误，请输入正确的订单查询日期
+【6】订单号错误，请输入正确的订单号
 
 请按照提示进行重新操作！
             '''

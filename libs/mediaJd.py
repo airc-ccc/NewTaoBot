@@ -103,6 +103,76 @@ class MediaJd:
             itchat.send(text, msg['FromUserName'])
             return
 
+    def getGroupJd(self, msg, good_url):
+        cm = ConnectMysql()
+        print('开始查询分享商品的信息......', msg['Text'])
+
+        wei_info = itchat.search_chatrooms(userName=msg['FromUserName'])
+
+        sku_arr = good_url.split('https://item.m.jd.com/product/')
+
+        if sku_arr == None:
+            msg_text = tu.tuling(msg)
+            print(msg_text)
+            itchat.send(msg_text, msg['FromUserName'])
+            return
+
+        sku = sku_arr[1].split('.')
+
+        res = self.get_good_link(sku[0])
+        logger.debug(res)
+        if res['data']['shotCouponUrl'] == '':
+            text = '''
+一一一一返利信息一一一一
+
+【商品名】%s
+
+【京东价】%s元
+【返红包】%s元
+ 返利链接:%s
+
+省钱步骤：
+1,点击链接，进入下单
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
+                ''' % (res['logTitle'], res['logUnitPrice'], res['rebate'], res['data']['shotUrl'])
+            itchat.send(text, msg['FromUserName'])
+
+            insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
+                         res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '0', '" + wei_info[
+                             'NickName'] + "', '" + str(time.time()) + "')"
+            cm.ExecNonQuery(insert_sql)
+            return
+        else:
+            text = '''
+一一一一返利信息一一一一
+
+【商品名】%s
+
+【京东价】%s元
+【优惠券】%s元
+【券后价】%s元
+【返红包】%s元
+ 领券链接:%s
+
+省钱步骤：
+1,点击链接领取优惠券，正常下单购买！
+2,订单完成后，将订单完成日期和订单号发给我哦！
+例如：
+2018-01-01,12345678901
+                ''' % (
+            res['logTitle'], res['logUnitPrice'], res['youhuiquan_price'], res['coupon_price'], res['rebate'],
+            res['data']['shotCouponUrl'])
+
+            insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
+                         res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '" + res['coupon_price2'] + "', '" + \
+                         wei_info['NickName'] + "', '" + str(time.time()) + "')"
+            cm.ExecNonQuery(insert_sql)
+
+            itchat.send(text, msg['FromUserName'])
+            return
+
     def check_login(self):
 
         self.load_cookies()

@@ -85,13 +85,13 @@ def check_if_is_group(msg):
             soup_xml = BeautifulSoup(msg['Content'], 'lxml')
             xml_info = soup_xml.select('appname')
             if xml_info[0].string == "京东":
-                text_reply(msg, msg['Url'])
+                mjd.getGroupJd(msg, msg['Url'])
                 return
             else:
                 text = movie.getMovie(msg)
                 itchat.send(text, msg['FromUserName'])
                 return
-                
+
     elif msg['Type'] == 'Text':
         tm.getGroupText(msg)
 
