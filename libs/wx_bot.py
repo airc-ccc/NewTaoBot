@@ -1417,7 +1417,7 @@ http://t.cn/RnAKafe
         sysstr = platform.system()
 
         if (sysstr == "Linux") or (sysstr == "Darwin"):
-            itchat.auto_login(enableCmdQR=2, hotReload=True)
+            itchat.auto_login(enableCmdQR=2, hotReload=True, statusStorageDir='peng.pkl')
         else:
             itchat.auto_login(True)
         itchat.run()
