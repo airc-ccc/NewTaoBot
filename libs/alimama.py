@@ -232,30 +232,19 @@ http://t.cn/RnAKMul
 【淘宝价】%s元
 【优惠券】%s元
 【券后价】%s元
-【返红包】%.2f元
 【淘口令】%s
 
-省钱步骤：
-1,复制本条信息打开淘宝App领取优惠券下单！
-2,订单完成后，将订单完成日期和订单号发给我哦！
-例如：
-2018-01-01,12345678901
-                        ''' % (q, price, coupon_amount, real_price, fx2, coupon_token)
+ 复制本条消息，打开淘宝App领取优惠券！
+                        ''' % (q, price, coupon_amount, real_price, coupon_token)
             else:
                 res_text = '''
 一一一一返利信息一一一一
 
 【商品名】%s
 【淘宝价】%s元
-【返红包】%.2f元
 【淘口令】%s
-
-省钱步骤：
-1,复制本条信息打开淘宝App领取优惠券下单！
-2,订单完成后，将订单完成日期和订单号发给我哦！
-例如：
-2018-01-01,12345678901
-                                        ''' % (q, price, fx2, tao_token)
+ 复制本条消息
+                                        ''' % (q, price, tao_token)
 
             itchat.send(res_text, msg['FromUserName'])
         except Exception as e:

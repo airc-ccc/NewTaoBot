@@ -37,13 +37,6 @@ tm = TextMessage()
 fm = FormData()
 ort = Orther()
 
-"""
-    
-    [["t", "226ef818793c9a6696f1ad1a14549b55"], ["cookie2", "1e099371140b4c60bfc13f085295d7d8"], ["v", "0"], ["_tb_token_", "e3a5e69e6d8ee"], ["alimamapwag", "TW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NDsgcnY6NTkuMCkgR2Vja28vMjAxMDAxMDEgRmlyZWZveC81OS4w"], ["cookie32", "6d50a6f9ad98f2c0f0a1978a4bf9cd5a"], ["alimamapw", "QhRcX15tCANSAwIEAQ4IUwIBDFZXVQQHCwEFBFZUAQheBQZSUAY%3D"], ["cookie31", "MjE4Njc3MDYsd3BobGosZ2VuZXI0MTJAc2luYS5jb20sVEI%3D"], ["login", "W5iHLLyFOGW7aA%3D%3D"], ["cna", "2R5RE//Gs3wCAWU2iTPVVSRB"], ["isg", "BFJSCT9NXCeIIKDbfOxDPs39oBs0Y1b9yLd6ghyrfoXwL_IpBPOmDVjNmwMTRM6V"], ["apush86b7c0cd604ee7fb04c27a04565ab3a7", "%7B%22ts%22%3A1523200250579%2C%22parentId%22%3A1523200250570%7D"]]
-
-"""
-
-
 def text_reply(msg, good_url):
     print(11)
     mjd.getJd(msg, good_url)
@@ -60,7 +53,6 @@ def check_if_is_tb_link(msg):
             ort.create_user_info(msg, 0, tool=False)
 
         htm = re.findall(r"<appname>.*?</appname>", msg['Content'])
-
         if htm:
             soup_xml = BeautifulSoup(msg['Content'], 'lxml')
             xml_info = soup_xml.select('appname')
@@ -94,7 +86,7 @@ def check_if_is_group(msg):
                 mjd.getGroupJd(msg, msg['Url'])
                 return
             else:
-                text = movie.getMovie(msg)
+                text = movie.getGroupMovie(msg)
                 itchat.send(text, msg['FromUserName'])
                 return
 
@@ -104,20 +96,20 @@ def check_if_is_group(msg):
 class WxBot(object):
 
     def __init__(self):
-        # fm.groupMessages()
+        fm.groupMessages()
         print('run.....')
         self.run()
 
     # 消息回复(文本类型和分享类型消息)
     @itchat.msg_register(['Text', 'Sharing', 'Card'])
     def text(msg):
-        print(msg)
+        # print(msg)
         check_if_is_tb_link(msg)
 
     # 消息回复(文本类型和分享类型消息) 群聊
     @itchat.msg_register(['Text', 'Sharing'], isGroupChat=True)
     def text(msg):
-        print(msg)
+        # print(msg)
         check_if_is_group(msg)
 
     @itchat.msg_register(FRIENDS)

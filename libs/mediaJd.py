@@ -128,15 +128,8 @@ class MediaJd:
 【商品名】%s
 
 【京东价】%s元
-【返红包】%s元
  返利链接:%s
-
-省钱步骤：
-1,点击链接，进入下单
-2,订单完成后，将订单完成日期和订单号发给我哦！
-例如：
-2018-01-01,12345678901
-                ''' % (res['logTitle'], res['logUnitPrice'], res['rebate'], res['data']['shotUrl'])
+                ''' % (res['logTitle'], res['logUnitPrice'], res['data']['shotUrl'])
             itchat.send(text, msg['FromUserName'])
 
             insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
@@ -153,16 +146,9 @@ class MediaJd:
 【京东价】%s元
 【优惠券】%s元
 【券后价】%s元
-【返红包】%s元
  领券链接:%s
-
-省钱步骤：
-1,点击链接领取优惠券，正常下单购买！
-2,订单完成后，将订单完成日期和订单号发给我哦！
-例如：
-2018-01-01,12345678901
                 ''' % (
-            res['logTitle'], res['logUnitPrice'], res['youhuiquan_price'], res['coupon_price'], res['rebate'],
+            res['logTitle'], res['logUnitPrice'], res['youhuiquan_price'], res['coupon_price'],
             res['data']['shotCouponUrl'])
 
             insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \

@@ -5,44 +5,19 @@ from flask import Flask
 from flask import request
 from libs.mysql import ConnectMysql
 from libs import wx_bot
+from threading import Thread
+from bottle import template
 from libs.wx_bot import *
 from itchat.content import *
+import datetime
 
 app = Flask(__name__)
-
-@app.route('/', methods=['GET', 'POST'])
-def index():
-	return "<h1>访问form路由</h1>"
-
-
-@app.route('/form', methods=['GET', 'POST'])
-def formShow():
-	# 使用浏览器打开html
-	html = open('form.html', 'r', encoding='utf-8')
-	return html.read()
-
-@app.route('/formdata', methods=['POST'])
-def setData():
-	cm = ConnectMysql()
-	# 需要从request对象读取表单内容：
-	formdata = request.form
-	username = formdata['username']
-	for item in formdata:
-		if item != 'username':
-			insert_sql = "INSERT INTO taojin_group_message(username, groupid, groupname, create_time) VALUES('"+username+"', '"+item+"', '"+formdata[item]+"', '"+str(time.time())+"')"
-			cm.ExecNonQuery(insert_sql)
-	# 执行群发任务
-	wx_bot.start_send_msg_thread()
-	return "添加成功！"
-def run_app():
-	webbrowser.open('http:127.0.0.1:5000/form')
-	app.run()
 
 class FormData(object):
 	def run(self):
 		run_app()
 
-	def async(self):
+	def async(f):
 		def wrapper(*args, **kwargs):
 			thr = Thread(target=f, args=args, kwargs=kwargs)
 			thr.start()
@@ -52,10 +27,10 @@ class FormData(object):
 	# 获取群
 	@async
 	def groupMessages(self):
-		time.sleep(30)
+		time.sleep(20)
 		yorn = input("是否重新选群？y/n:")
 		if yorn == 'n':
-			start_send_msg_thread()
+			self.start_send_msg_thread()
 			return
 
 		print('start.....')
@@ -108,23 +83,13 @@ class FormData(object):
 
 		while True:
 
-			a = datetime.datetime.now().strftime("%Y-%m-%d") + " %2d:00:00" % 8
+			a = datetime.datetime.now().hour
 
-			timeArray = time.strptime(a, "%Y-%m-%d %H:%M:%S")
-
-			Stamp = int(time.mktime(timeArray))
-
-			b = datetime.datetime.now().strftime("%Y-%m-%d") + " %2d:00:00" % 20
-
-			timeEndArray = time.strptime(b, "%Y-%m-%d %H:%M:%S")
-
-			Etamp = int(time.mktime(timeArray))
-
-			thistime = int(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
-			if thistime < Stamp | thistime > Etamp:
+			if int(a) < 8 | int(a) >= 20:
+				print('时间不够')
 				continue
 
+			print('ok')
 			time.sleep(300)
 
 			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 LIMIT 1"
@@ -159,6 +124,37 @@ class FormData(object):
 
 	# 启动一个线程，定时发送商品信息
 	def start_send_msg_thread(self):
-		t = Thread(target=send_group_meg, args=())
+		t = Thread(target=self.send_group_meg, args=())
 		t.setDaemon(True)
 		t.start()
+
+
+fmm = FormData()
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+	return "<h1>访问form路由</h1>"
+
+
+@app.route('/form', methods=['GET', 'POST'])
+def formShow():
+	# 使用浏览器打开html
+	html = open('form.html', 'r', encoding='utf-8')
+	return html.read()
+
+@app.route('/formdata', methods=['POST'])
+def setData():
+	cm = ConnectMysql()
+	# 需要从request对象读取表单内容：
+	formdata = request.form
+	username = formdata['username']
+	for item in formdata:
+		if item != 'username':
+			insert_sql = "INSERT INTO taojin_group_message(username, groupid, groupname, create_time) VALUES('"+username+"', '"+item+"', '"+formdata[item]+"', '"+str(time.time())+"')"
+			cm.ExecNonQuery(insert_sql)
+	# 执行群发任务
+	fmm.start_send_msg_thread()
+	return "添加成功！"
+def run_app():
+	webbrowser.open('http:127.0.0.1:5000/form')
+	app.run()
