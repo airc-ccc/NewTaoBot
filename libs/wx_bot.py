@@ -19,7 +19,6 @@ from libs.mediaJd import MediaJd
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
 from bottle import template
-from libs.alimama import Alimama
 from libs.groupMessage import FormData
 from libs.movie import SharMovie
 from libs.tuling import tuling
@@ -30,8 +29,6 @@ logger = utils.init_logger()
 
 mjd = MediaJd()
 mjd.login()
-al = Alimama(logger)
-al.login()
 movie = SharMovie()
 tm = TextMessage()
 fm = FormData()
@@ -41,13 +38,8 @@ def text_reply(msg, good_url):
     print(11)
     mjd.getJd(msg, good_url)
 
-# 检查是否是淘宝链接
 def check_if_is_tb_link(msg):
-    if re.search(r'【.*】', msg['Text']) and (
-            u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
-        al.getTao(msg)
-
-    elif msg['Type'] == 'Sharing':  # vip 电影
+    if msg['Type'] == 'Sharing':  # vip 电影
         res = ort.ishaveuserinfo(msg)
         if res['res'] == 'not_info':
             ort.create_user_info(msg, 0, tool=False)
@@ -64,19 +56,12 @@ def check_if_is_tb_link(msg):
                 itchat.send(text, msg['FromUserName'])
                 return
 
-        
     elif msg['Type'] == 'Text':  # 关键字查询信息
         tm.getText(msg)
 
 
-# 检查是否是淘宝链接
 def check_if_is_group(msg):
-    if re.search(r'【.*】', msg['Text']) and (
-            u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
-        al.getGroupTao(msg)
-
-    elif msg['Type'] == 'Sharing':
-
+    if msg['Type'] == 'Sharing':
         htm = re.findall(r"<appname>.*?</appname>", msg['Content'])
 
         if htm:
@@ -97,7 +82,6 @@ class WxBot(object):
 
     def __init__(self):
         # fm.groupMessages()
-        mjd.get_good_info()
         print('run.....')
         self.run()
 
@@ -135,7 +119,7 @@ class WxBot(object):
         text = '''
 一一一一 系统消息 一一一一
 
-分享【京东商品链接】或者【淘口令】
+分享【京东商品链接】
 精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
@@ -151,9 +135,9 @@ http://t.cn/RnAKafe
         sysstr = platform.system()
 
         if (sysstr == "Linux") or (sysstr == "Darwin"):
-            itchat.auto_login(enableCmdQR=2, hotReload=True, statusStorageDir='peng.pkl')
+            itchat.auto_login(enableCmdQR=2, hotReload=True, statusStorageDir='jd.pkl')
         else:
-            itchat.auto_login(True)
+            itchat.auto_login(True, statusStorageDir='jd.pkl')
         itchat.run()
 
 if __name__ == '__main__':
