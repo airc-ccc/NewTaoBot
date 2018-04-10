@@ -121,6 +121,7 @@ class FormData(object):
 
 			img_path = "images/" + img_name[-1]
 			for item in group_info:
+				time.sleep(2)
 				itchat.send_image(img_path, item[2])
 				itchat.send(text, item[2])
 

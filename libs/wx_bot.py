@@ -96,7 +96,8 @@ def check_if_is_group(msg):
 class WxBot(object):
 
     def __init__(self):
-        fm.groupMessages()
+        # fm.groupMessages()
+        mjd.get_good_info()
         print('run.....')
         self.run()
 
