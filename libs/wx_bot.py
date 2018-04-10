@@ -28,8 +28,8 @@ from libs.textMessage import TextMessage
 
 logger = utils.init_logger()
 
-mjd = MediaJd()
-mjd.login()
+al = Alimama(logger)
+al.login()
 movie = SharMovie()
 tm = TextMessage()
 fm = FormData()
