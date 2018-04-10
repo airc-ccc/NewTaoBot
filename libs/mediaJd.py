@@ -366,10 +366,7 @@ class MediaJd:
                 fp.write(res_img.content)
                 fp.close()
                 if link_info['data']['shotCouponUrl'] == '':
-                    sql = "INSERT INTO taojin_good_info(skuid, title , image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('" + str(
-                        item) + "', '" + str(link_info['logTitle']) + "', '" + str(item_image) + "', '" + str(
-                        link_info['logUnitPrice']) + "', '" + str(link_info['rebate']) + "', '0', '0', '" + str(
-                        link_info['data']['shotUrl']) + "', '0', '1', '" + str(time.time()) + "')"
+                    continue
                 else:
                     sql = "INSERT INTO taojin_good_info(skuid, title, image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('" + str(
                         item) + "', '" + str(link_info['logTitle']) + "', '" + str(item_image) + "', '" + str(
