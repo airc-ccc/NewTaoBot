@@ -23,6 +23,7 @@ from dateutil.relativedelta import relativedelta
 from libs.mysql import ConnectMysql
 from libs.wx_bot import *
 from itchat.content import *
+from libs.mediaJd import MediaJd
 from libs.orther import Orther
 from selenium import webdriver
 

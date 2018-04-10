@@ -14,12 +14,12 @@ import webbrowser
 from libs import utils
 from urllib.parse import quote
 from itchat.content import *
-from libs.mediaJd import MediaJd
 from threading import Thread
-from libs.alimama import Alimama
+from libs.mediaJd import MediaJd
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
 from bottle import template
+from libs.alimama import Alimama
 from libs.groupMessage import FormData
 from libs.movie import SharMovie
 from libs.tuling import tuling
@@ -103,13 +103,13 @@ class WxBot(object):
     # 消息回复(文本类型和分享类型消息)
     @itchat.msg_register(['Text', 'Sharing', 'Card'])
     def text(msg):
-        # print(msg)
+        print(msg)
         check_if_is_tb_link(msg)
 
     # 消息回复(文本类型和分享类型消息) 群聊
     @itchat.msg_register(['Text', 'Sharing'], isGroupChat=True)
     def text(msg):
-        # print(msg)
+        print(msg)
         check_if_is_group(msg)
 
     @itchat.msg_register(FRIENDS)

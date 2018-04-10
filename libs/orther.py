@@ -18,15 +18,12 @@ from threading import Thread
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
 from bottle import template
-from libs.groupMessage import FormData
 from libs.movie import SharMovie
 from libs.tuling import tuling
 
 logger = utils.init_logger()
 
 movie = SharMovie()
-fm = FormData()
-
 
 class Orther(object):
 

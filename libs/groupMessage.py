@@ -8,10 +8,12 @@ from libs import wx_bot
 from threading import Thread
 from bottle import template
 from libs.wx_bot import *
+from libs.mediaJd import MediaJd
 from itchat.content import *
 import datetime
 
 app = Flask(__name__)
+mjd = MediaJd()
 
 class FormData(object):
 	def run(self):
@@ -27,7 +29,7 @@ class FormData(object):
 	# 获取群
 	@async
 	def groupMessages(self):
-		time.sleep(20)
+		time.sleep(30)
 		yorn = input("是否重新选群？y/n:")
 		if yorn == 'n':
 			self.start_send_msg_thread()
