@@ -30,8 +30,6 @@ logger = utils.init_logger()
 
 mjd = MediaJd()
 mjd.login()
-al = Alimama(logger)
-al.login()
 movie = SharMovie()
 tm = TextMessage()
 fm = FormData()
@@ -57,7 +55,13 @@ def check_if_is_tb_link(msg):
             soup_xml = BeautifulSoup(msg['Content'], 'lxml')
             xml_info = soup_xml.select('appname')
             if xml_info[0].string == "京东":
-                text_reply(msg, msg['Url'])
+                text = '''
+一一一一 系统消息 一一一一
+
+暂不支持京东商品分享，请发送【淘口令】
+查询优惠信息！
+                '''
+                itchat.send_msg(text, msg['FromUserName'])
                 return
             else:
                 text = movie.getMovie(msg)
@@ -83,7 +87,13 @@ def check_if_is_group(msg):
             soup_xml = BeautifulSoup(msg['Content'], 'lxml')
             xml_info = soup_xml.select('appname')
             if xml_info[0].string == "京东":
-                mjd.getGroupJd(msg, msg['Url'])
+                text = '''
+一一一一 系统消息 一一一一
+
+暂不支持京东商品分享，请发送【淘口令】
+查询优惠信息！
+                '''
+                itchat.send_msg(text, msg['FromUserName'])
                 return
             else:
                 text = movie.getGroupMovie(msg)
@@ -97,7 +107,6 @@ class WxBot(object):
 
     def __init__(self):
         # fm.groupMessages()
-        mjd.get_good_info()
         print('run.....')
         self.run()
 
@@ -153,7 +162,7 @@ http://t.cn/RnAKafe
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             itchat.auto_login(enableCmdQR=2, hotReload=True, statusStorageDir='peng.pkl')
         else:
-            itchat.auto_login(True)
+            itchat.auto_login(True, statusStorageDir='taobao.pkl')
         itchat.run()
 
 if __name__ == '__main__':
