@@ -44,7 +44,10 @@ class Orther(object):
         else:
             res = itchat.search_friends(userName=msg['RecommendInfo']['UserName'])
 
-        select = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "'"
+
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
+
+        select = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"'"
 
         is_ext = cm.ExecQuery(select)
 
@@ -52,13 +55,14 @@ class Orther(object):
             return
 
         if lnivt_code == 0:
-            sql = "INSERT INTO taojin_user_info(wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('" + \
+            sql = "INSERT INTO taojin_user_info(wx_bot, wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('"+ bot_info['NickName'] +"', '" + \
                   res['NickName'] + "', '" + str(res['Sex']) + "', '" + res['NickName'] + "', '" + str(
                 wxid) + "', '0.3', '" + str(lnivt_code) + "', '" + str(round(time.time())) + "');"
 
             insert_res = cm.ExecNonQuery(sql)
             # 日志参数
             args = {
+                'wx_bot': bot_info['NickName'],
                 'username': res['NickName'],
                 'rebate_amount': 0.3,
                 'type': 1,
@@ -70,37 +74,38 @@ class Orther(object):
         else:
             lnivt_2_info = itchat.search_friends(nickName=sourcname)
 
-            lnivter_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + lnivt_code + "' LIMIT 1;"
+            lnivter_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + lnivt_code + "' AND wx_bot='"+ bot_info['NickName'] +"' LIMIT 1;"
             # 获取邀请人信息
             lnivt_info = cm.ExecQuery(lnivter_sql)
             print(lnivt_info)
             if lnivt_info == ():
-                lnivter_sql = "SELECT * FROM taojin_user_info WHERE nickname='" + sourcname + "' LIMIT 1;"
+                lnivter_sql = "SELECT * FROM taojin_user_info WHERE nickname='" + sourcname + "' AND wx_bot='"+ bot_info['NickName'] +"' LIMIT 1;"
                 # 获取邀请人信息
                 lnivt_info = cm.ExecQuery(lnivter_sql)
 
                 if lnivt_info != ():
-                    u_sql = "UPDATE taojin_user_info SET lnivt_code='" + lnivt_code + "' WHERE nickname='" + sourcname + "';"
+                    u_sql = "UPDATE taojin_user_info SET lnivt_code='" + lnivt_code + "' WHERE nickname='" + sourcname + "' AND wx_bot='"+ bot_info['NickName'] +"';"
                     # 修改邀请人wxid
                     cm.ExecNonQuery(u_sql)
 
             # 有邀请人时，插入用户信息，并奖励邀请人
-            sql = "INSERT INTO taojin_user_info(wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('" + \
+            sql = "INSERT INTO taojin_user_info(wx_bot, wx_number, sex, nickname, lnivt_code, withdrawals_amount, lnivter, create_time) VALUES('"+ bot_info['NickName'] +"', '" + \
                   res['NickName'] + "', '" + str(res['Sex']) + "', '" + res['NickName'] + "', '" + str(
                 wxid) + "', '0.3', '" + str(lnivt_code) + "', '" + str(round(time.time())) + "');"
 
             # 给邀请人余额加0.3元奖励
-            jianli = round(float(lnivt_info[0][8]) + 0.3, 2)
+            jianli = round(float(lnivt_info[0][9]) + 0.3, 2)
 
-            friends_num = int(lnivt_info[0][19]) + 1
+            friends_num = int(lnivt_info[0][20]) + 1
 
             cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(
-                jianli) + "', friends_number='" + str(friends_num) + "'  WHERE lnivt_code='" + lnivt_code + "';")
+                jianli) + "', friends_number='" + str(friends_num) + "'  WHERE lnivt_code='" + lnivt_code + "' AND wx_bot='"+ bot_info['NickName'] +"';")
 
             cm.ExecNonQuery(sql)
 
             # 日志参数
             args = {
+                'wx_bot': bot_info['NickName'],
                 'username': res['NickName'],
                 'rebate_amount': 0.3,
                 'type': 1,
@@ -108,7 +113,8 @@ class Orther(object):
             }
 
             args2 = {
-                'username': lnivt_info[0][1],
+                'wx_bot': bot_info['NickName'],
+                'username': lnivt_info[0][2],
                 'rebate_amount': 0.3,
                 'type': 2,
                 'create_time': time.time()
@@ -117,7 +123,7 @@ class Orther(object):
             # 写入返利日志
             cm.InsertRebateLog(args)
             cm.InsertRebateLog(args2)
-            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "';"
+            user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + res['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
             user_info = cm.ExecQuery(user_sql)
             lnivt_text = '''
 一一一一系统消息一一一一
@@ -129,7 +135,7 @@ class Orther(object):
 
 邀请好友得返利说明：
 http://t.cn/RnAKafe
-            ''' % (user_info[0][3])
+            ''' % (user_info[0][4])
 
             cm.Close()
             itchat.send(lnivt_text, lnivt_2_info[0]['UserName'])
@@ -279,7 +285,8 @@ http://t.cn/RnAKafe
         cm = ConnectMysql()
 
         res = itchat.search_friends(userName=msg['FromUserName'])
-        check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(res['NickName']) + "';"
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
+        check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(res['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
         check_user_res = cm.ExecQuery(check_user_sql)
         # 判断是否已经有个人账户，没有去创建
         if len(check_user_res) < 1:

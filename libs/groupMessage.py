@@ -94,7 +94,7 @@ class FormData(object):
 			print('ok')
 			time.sleep(300)
 
-			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 LIMIT 1"
+			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 AND wx_bot='"+ res['User']['NickName'] +"' LIMIT 1"
 
 			data1 = cm.ExecQuery(data_sql)
 			if data1 == ():
@@ -112,9 +112,9 @@ class FormData(object):
 领券链接:%s
 
 请点击链接领取优惠券，下单购买！
-	                ''' % (data[0][2], data[0][4], data[0][6], data[0][7], data[0][9])
+	                ''' % (data[0][3], data[0][5], data[0][7], data[0][8], data[0][10])
 
-			delete_sql = "UPDATE taojin_good_info SET status='2' WHERE id='" + str(data[0][0]) + "'"
+			delete_sql = "UPDATE taojin_good_info SET status='2' WHERE id='" + str(data[0][0]) + "'  AND wx_bot='"+ res['User']['NickName'] +"'"
 			cm.ExecNonQuery(delete_sql)
 
 			img_name = data[0][3].split('/')

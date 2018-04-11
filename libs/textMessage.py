@@ -114,24 +114,24 @@ http://t.cn/RnAKafe
                     ort.create_user_info(msg, 0, tool=False)
 
                 adminuser = itchat.search_friends(nickName="彭波")
-                select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
+                select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
                 select_user_res = cm.ExecQuery(select_user_sql)
 
-                if select_user_res and float(select_user_res[0][8]) > 0:
+                if select_user_res and float(select_user_res[0][9]) > 0:
                     try:
                         # 修改余额
                         update_sql = "UPDATE taojin_user_info SET withdrawals_amount='0',update_time='" + str(
-                            time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "';"
+                            time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
-                        total_amount = float(select_user_res[0][5]) + float(select_user_res[0][8]);
+                        total_amount = float(select_user_res[0][6]) + float(select_user_res[0][9]);
                         update_total_sql = "UPDATE taojin_user_info SET total_rebate_amount='" + str(
                             total_amount) + "',update_time='" + str(time.time()) + "' WHERE wx_number='" + wei_info[
-                                               'NickName'] + "';"
+                                               'NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                         # 插入提现日志
                         insert_current_log_sql = "INSERT INTO taojin_current_log(wx_bot, username, amount, create_time) VALUES('" + \
                                                  bot_info['NickName'] + "', '" + wei_info['NickName'] + "', '" + str(
-                            select_user_res[0][8]) + "', '" + str(time.time()) + "')"
+                            select_user_res[0][9]) + "', '" + str(time.time()) + "')"
 
                         to_admin_text = '''
 一一一一 提现通知 一一一一
@@ -141,7 +141,7 @@ http://t.cn/RnAKafe
 提现金额：%s 元
 提现时间：%s
                                                 ''' % (
-                        bot_info['NickName'], wei_info['NickName'], select_user_res[0][8],
+                        bot_info['NickName'], wei_info['NickName'], select_user_res[0][9],
                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
                         to_user_text = '''
@@ -191,14 +191,14 @@ http://t.cn/RnAKafe
                 if res['res'] == 'not_info':
                     ort.create_user_info(msg, 0, tool=False)
 
-                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
+                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 user_info = cm.ExecQuery(user_sql)
 
-                current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + wei_info['NickName'] + "';"
+                current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 friends_count_sql = "SELECT count(*) FROM taojin_user_info WHERE lnivter='" + str(
-                    user_info[0][4]) + "';"
+                    user_info[0][5]) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 current_info = cm.ExecQuery(current)
                 friends_count = cm.ExecQuery(friends_count_sql)
@@ -231,8 +231,8 @@ http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
                                     ''' % (
-                user_info[0][5], user_info[0][6], user_info[0][7], user_info[0][8], current_info, user_info[0][10],
-                user_info[0][11], user_info[0][12], user_info[0][18], friends_count[0][0])
+                user_info[0][6], user_info[0][7], user_info[0][8], user_info[0][9], current_info, user_info[0][11],
+                user_info[0][12], user_info[0][13], user_info[0][19], friends_count[0][0])
                 cm.Close()
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -242,7 +242,7 @@ http://t.cn/RnAKafe
                 if res['res'] == 'not_info':
                     ort.create_user_info(msg, 0, tool=False)
 
-                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
+                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 cm.ExecQuery(user_sql)
 
