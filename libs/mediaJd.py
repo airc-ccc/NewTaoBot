@@ -38,6 +38,7 @@ class MediaJd:
         print('开始查询分享商品的信息......', msg['Text'])
 
         wei_info = itchat.search_friends(userName=msg['FromUserName'])
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
 
         sku_arr = good_url.split('https://item.m.jd.com/product/')
 
@@ -69,7 +70,7 @@ class MediaJd:
                 ''' % (res['logTitle'], res['logUnitPrice'], res['rebate'], res['data']['shotUrl'])
             itchat.send(text, msg['FromUserName'])
 
-            insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
+            insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + bot_info['NickName'] + "', '" + \
                          res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '0', '" + wei_info[
                              'NickName'] + "', '" + str(time.time()) + "')"
             cm.ExecNonQuery(insert_sql)
@@ -95,7 +96,7 @@ class MediaJd:
             res['logTitle'], res['logUnitPrice'], res['youhuiquan_price'], res['coupon_price'], res['rebate'],
             res['data']['shotCouponUrl'])
 
-            insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
+            insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + bot_info['NickName'] + "', '" + \
                          res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '" + res['coupon_price2'] + "', '" + \
                          wei_info['NickName'] + "', '" + str(time.time()) + "')"
             cm.ExecNonQuery(insert_sql)
@@ -108,7 +109,7 @@ class MediaJd:
         print('开始查询分享商品的信息......', msg['Text'])
 
         wei_info = itchat.search_chatrooms(userName=msg['FromUserName'])
-
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
         sku_arr = good_url.split('https://item.m.jd.com/product/')
 
         if sku_arr == None:
@@ -132,7 +133,7 @@ class MediaJd:
                 ''' % (res['logTitle'], res['logUnitPrice'], res['data']['shotUrl'])
             itchat.send(text, msg['FromUserName'])
 
-            insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
+            insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + bot_info['NickName'] + "', '" + \
                          res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '0', '" + wei_info[
                              'NickName'] + "', '" + str(time.time()) + "')"
             cm.ExecNonQuery(insert_sql)
@@ -151,7 +152,7 @@ class MediaJd:
             res['logTitle'], res['logUnitPrice'], res['youhuiquan_price'], res['coupon_price'],
             res['data']['shotCouponUrl'])
 
-            insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + \
+            insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + bot_info['NickName'] + "', '" + \
                          res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '" + res['coupon_price2'] + "', '" + \
                          wei_info['NickName'] + "', '" + str(time.time()) + "')"
             cm.ExecNonQuery(insert_sql)
@@ -323,7 +324,7 @@ class MediaJd:
 
 
     # 随机获取商品信息
-    def get_good_info(self):
+    def get_good_info(self, wx_bot):
         cm = ConnectMysql()
         self.load_cookies()
         page = 1
@@ -339,7 +340,7 @@ class MediaJd:
             for li in soup.find_all('li', skuid = re.compile('^[0-9]+$')):
                 sku = li.get('skuid')
 
-                exists_sql = "SELECT * FROM taojin_good_info WHERE skuid='"+str(sku)+"';"
+                exists_sql = "SELECT * FROM taojin_good_info WHERE skuid='"+str(sku)+"' AND wx_bot='"+ wx_bot +"';"
                 is_exists = cm.ExecQuery(exists_sql)
                 if len(is_exists) != 0:
                     print('0....')
@@ -368,7 +369,7 @@ class MediaJd:
                 if link_info['data']['shotCouponUrl'] == '':
                     continue
                 else:
-                    sql = "INSERT INTO taojin_good_info(skuid, title, image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('" + str(
+                    sql = "INSERT INTO taojin_good_info(wx_bot, skuid, title, image, price, rebate, yhq_price, coupon_price, shoturl, shotcouponurl, status, create_time) VALUES('" + wx_bot + "', '" + str(
                         item) + "', '" + str(link_info['logTitle']) + "', '" + str(item_image) + "', '" + str(
                         link_info['logUnitPrice']) + "', '" + str(link_info['rebate']) + "', '" + str(
                         link_info['youhuiquan_price']) + "', '" + str(link_info['coupon_price']) + "', '" + str(
@@ -386,10 +387,12 @@ class MediaJd:
             timestr = re.sub('-', '', times)
             order_id = int(orderId)
 
+            bot_info = itchat.search_friends(userName=msg['ToUserName'])
+
             cm = ConnectMysql()
 
             # 查询订单是否已经提现过了
-            check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "';"
+            check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
             check_order_res = cm.ExecQuery(check_order_sql)
 
             # 判断该订单是否已经提现
@@ -443,47 +446,49 @@ class MediaJd:
 
         cm = ConnectMysql()
         # try:
-
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
         # 查询用户是否有上线
-        check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "';"
+        check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
         check_user_res = cm.ExecQuery(check_user_sql)
+
 
         # 判断是否已经有个人账户，没有返回信息
         if len(check_user_res) < 1:
             cm.Close()
             return {"info": "not_info"}
         else:
-            get_query_sql = "SELECT * FROM taojin_query_record WHERE good_title='" + info['skuList'][0]['skuName'] + "'AND username='" + check_user_res[0][1] + "' ORDER BY create_time LIMIT 1;"
+            get_query_sql = "SELECT * FROM taojin_query_record WHERE good_title='" + info['skuList'][0]['skuName'] + "'AND username='" + check_user_res[0][2] + "'  AND wx_bot='"+ bot_info['NickName'] +"' ORDER BY create_time LIMIT 1;"
 
             get_query_info = cm.ExecQuery(get_query_sql)
 
             # 定义SQL语句 查询用户是否已经存在邀请人
             # 判断是否已经有邀请人了
-            if check_user_res and check_user_res[0][16] != 0:
+            if check_user_res and check_user_res[0][17] != 0:
 
                 get_parent_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + str(
-                    check_user_res[0][16]) + "';"
+                    check_user_res[0][17]) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 get_parent_info = cm.ExecQuery(get_parent_sql)
                 print(get_parent_info)
 
                 add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                withdrawals_amount = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                jd = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                total_rebate_amount = round(float(check_user_res[0][5]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                withdrawals_amount = round(float(check_user_res[0][9]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                jd = round(float(check_user_res[0][7]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                total_rebate_amount = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
                 save_money = round(
-                    check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['skuList'][0]['payPrice'])), 2)
+                    check_user_res[0][10] + (float(get_query_info[0][3]) - float(info['skuList'][0]['payPrice'])), 2)
 
                 add_parent_balance = round(float(info['skuList'][0]['actualFee']) * 0.1, 2)
-                withdrawals_amount2 = round(float(get_parent_info[0][8]) + float(add_balance) * 0.1, 2)
+                withdrawals_amount2 = round(float(get_parent_info[0][9]) + float(add_balance) * 0.1, 2)
 
-                cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', jd_rebate_amount='" + str(jd) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';")
-                cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', update_time='" + str(time.time()) + "' WHERE lnivt_code='" + str(check_user_res[0][16]) + "';")
+                cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', jd_rebate_amount='" + str(jd) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';")
+                cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', update_time='" + str(time.time()) + "' WHERE lnivt_code='" + str(check_user_res[0][17]) + "' AND wx_bot='"+ bot_info['NickName'] +"';")
 
-                cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '1')")
+                cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('" + bot_info['NickName'] + "', '" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '1')")
 
                 args = {
-                    'username': check_user_res[0][1],
+                    'wx_bot': bot_info['NickName'],
+                    'username': check_user_res[0][2],
                     'rebate_amount': add_balance,
                     'type': 3,
                     'create_time': time.time()
@@ -494,7 +499,8 @@ class MediaJd:
                 cm.InsertRebateLog(args)
 
                 args2 = {
-                    'username': get_parent_info[0][1],
+                    'wx_bot': bot_info['NickName'],
+                    'username': get_parent_info[0][2],
                     'rebate_amount': add_parent_balance,
                     'type': 4,
                     'create_time': time.time()
@@ -509,7 +515,7 @@ class MediaJd:
 
 您的好友【%s】又完成了一笔订单，返利提成%s元已发放到您的账户
 回复【个人信息】查询账户信息及提成
-                        ''' % (check_user_res[0][3], add_parent_balance)
+                        ''' % (check_user_res[0][2], add_parent_balance)
 
                 user_text = '''
 一一一一系统消息一一一一
@@ -527,29 +533,28 @@ class MediaJd:
 http://t.cn/RnAKqWW
 京东优惠券网站：
 http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
 邀请好友得返利：
 http://t.cn/RnAKafe
                         ''' % (order_id, add_balance)
                 cm.Close()
                 return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success',
-                        'parent': get_parent_info[0][1]}
+                        'parent': get_parent_info[0][2]}
             else:
                 add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                withdrawals_amount = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                jd = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                total_rebate_amount = round(float(check_user_res[0][5]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                save_money = round(check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['skuList'][0]['payPrice'])), 2)
+                withdrawals_amount = round(float(check_user_res[0][9]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                jd = round(float(check_user_res[0][7]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                total_rebate_amount = round(float(check_user_res[0][6]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                save_money = round(check_user_res[0][10] + (float(get_query_info[0][3]) - float(info['skuList'][0]['payPrice'])), 2)
 
 
-                up_sql = "UPDATE taojin_user_info SET jd_rebate_amount='" + str(jd) + "', withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "';"
+                up_sql = "UPDATE taojin_user_info SET jd_rebate_amount='" + str(jd) + "', withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
                 cm.ExecNonQuery(up_sql)
                 # cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "' WHERE wx_number='" + str(msg['FromUserName']) + "';")
-                cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '2')")
+                cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('"+bot_info['NickName']+"','" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '2')")
 
                 args = {
-                    'username': check_user_res[0][1],
+                    'wx_bot': bot_info['NickName'],
+                    'username': check_user_res[0][2],
                     'rebate_amount': add_balance,
                     'type': 3,
                     'create_time': time.time()

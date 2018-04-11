@@ -69,15 +69,3 @@ http://t.cn/RnAKqWW
 http://t.cn/RnAKMul
                         ''' % (player_url)
                 return text
-
-        error_info = '''
-一一一一 视频信息 一一一一
-
-抱歉，没找到你想要的视频！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-免费看电影方法：
-http://t.cn/RnAKMul
-                    '''
-        return error_info

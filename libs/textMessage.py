@@ -63,8 +63,7 @@ class TextMessage(object):
 亲，以为您找到所有【%s】优惠券,快快点击领取吧！
 
 京东：%s
-淘宝：%s
-                        ''' % (msg['Text'][1:], jdurl, tburl)
+                        ''' % (msg['Text'][1:], jdurl)
                 itchat.send(text, msg['FromUserName'])
 
             elif pattern_bz.search(msg['Text']) != None:
@@ -98,8 +97,6 @@ http://t.cn/RnAK1w0
 http://t.cn/RnAKMul
 京东优惠券商城：
 http://jdyhq.ptjob.net
-淘宝优惠券商城：
-http://tbyhq.ptjob.net
 邀请好友得返利说明：
 http://t.cn/RnAKafe
                         '''
@@ -114,13 +111,13 @@ http://t.cn/RnAKafe
                 select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
                 select_user_res = cm.ExecQuery(select_user_sql)
 
-                if select_user_res and float(select_user_res[0][8]) > 0:
+                if select_user_res and float(select_user_res[0][9]) > 0:
                     try:
                         # 修改余额
                         update_sql = "UPDATE taojin_user_info SET withdrawals_amount='0',update_time='" + str(
                             time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "';"
 
-                        total_amount = float(select_user_res[0][5]) + float(select_user_res[0][8]);
+                        total_amount = float(select_user_res[0][6]) + float(select_user_res[0][9]);
                         update_total_sql = "UPDATE taojin_user_info SET total_rebate_amount='" + str(
                             total_amount) + "',update_time='" + str(time.time()) + "' WHERE wx_number='" + wei_info[
                                                'NickName'] + "';"
@@ -128,7 +125,7 @@ http://t.cn/RnAKafe
                         # 插入提现日志
                         insert_current_log_sql = "INSERT INTO taojin_current_log(wx_bot, username, amount, create_time) VALUES('" + \
                                                  bot_info['NickName'] + "', '" + wei_info['NickName'] + "', '" + str(
-                            select_user_res[0][8]) + "', '" + str(time.time()) + "')"
+                            select_user_res[0][9]) + "', '" + str(time.time()) + "')"
 
                         to_admin_text = '''
 一一一一 提现通知 一一一一
@@ -138,7 +135,7 @@ http://t.cn/RnAKafe
 提现金额：%s 元
 提现时间：%s
                                                 ''' % (
-                        bot_info['NickName'], wei_info['NickName'], select_user_res[0][8],
+                        bot_info['NickName'], wei_info['NickName'], select_user_res[0][9],
                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
                         to_user_text = '''
@@ -213,7 +210,6 @@ http://t.cn/RnAKafe
 
 累计订单量: %s
 京东订单量: %s
-淘宝订单量: %s
 总好友返利: %s
 总好友个数: %s
 
@@ -224,8 +220,8 @@ http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
                                     ''' % (
-                user_info[0][5], user_info[0][6], user_info[0][8], current_info, user_info[0][10],
-                user_info[0][11], user_info[0][18], user_info[0][19])
+                user_info[0][6], user_info[0][7], user_info[0][9], current_info, user_info[0][11],
+                user_info[0][12], user_info[0][19], user_info[0][20])
                 cm.Close()
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -424,7 +420,7 @@ http://t.cn/RnAKafe
 查询失败！信息格式有误！
 正确格式如下：
 订单完成时间+逗号+订单号
-(京东订单号长度11位，淘宝订单号长度18位)
+(京东订单号长度11位)
 例如：
 2018-03-03,123456765432
 
@@ -438,7 +434,7 @@ http://t.cn/RnAKafe
 查询失败！信息格式有误！
 正确格式如下：
 订单完成时间+逗号+订单号
-(京东订单号长度11位，淘宝订单号长度18位)
+(京东订单号长度11位)
 例如：
 2018-03-03,123456765432
 
@@ -484,8 +480,7 @@ http://t.cn/RnAKafe
 亲，以为您找到所有【%s】优惠券,快快点击领取吧！
 
 京东：%s
-淘宝：%s
-                        ''' % (msg['Text'][1:], jdurl, tburl)
+                        ''' % (msg['Text'][1:], jdurl)
                 itchat.send(text, msg['FromUserName'])
 
             elif pattern_bz.search(msg['Text']) != None:
@@ -514,8 +509,6 @@ http://t.cn/RnAK1w0
 http://t.cn/RnAKMul
 京东优惠券商城：
 http://jdyhq.ptjob.net
-淘宝优惠券商城：
-http://tbyhq.ptjob.net
 邀请好友得返利说明：
 http://t.cn/RnAKafe
                         '''

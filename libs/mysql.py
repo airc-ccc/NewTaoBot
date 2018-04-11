@@ -69,7 +69,7 @@ class ConnectMysql:
     def InsertRebateLog(self,args):
         flag = False
         try:
-            sql = "INSERT INTO taojin_rebate_log(username, rebate_amount, type, create_time) VALUES('"+str(args['username'])+"','"+str(args['rebate_amount'])+"','"+str(args['type'])+"','"+str(args['create_time'])+"')"
+            sql = "INSERT INTO taojin_rebate_log(wx_bot, username, rebate_amount, type, create_time) VALUES('"+str(args['wx_bot'])+"','"+str(args['username'])+"','"+str(args['rebate_amount'])+"','"+str(args['type'])+"','"+str(args['create_time'])+"')"
             self._cur.execute(sql)
             self._conn.commit()
             flag = True

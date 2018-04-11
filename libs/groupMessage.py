@@ -1,5 +1,6 @@
 # -*-coding: UTF-8-*-
 import time
+import os
 import webbrowser
 from flask import Flask
 from flask import request
@@ -40,9 +41,6 @@ class FormData(object):
 
 		res = itchat.web_init()
 
-		select_sql = "DELETE FROM taojin_group_message WHERE username='" + str(res['User']['NickName']) + "';"
-		cm.ExecNonQuery(select_sql)
-
 		group = itchat.get_chatrooms(update=True, contactOnly=False)
 
 		template_demo = """
@@ -79,8 +77,6 @@ class FormData(object):
 
 		res = itchat.web_init()
 
-		select_sql = "SELECT * FROM taojin_group_message WHERE username='" + str(res['User']['NickName']) + "';"
-
 		group_info = cm.ExecQuery(select_sql)
 
 		while True:
@@ -94,7 +90,7 @@ class FormData(object):
 			print('ok')
 			time.sleep(1200)
 
-			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 LIMIT 1"
+			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 LIMIT 1 AND wx_bot='"+ res['User']['NickName'] +"'"
 
 			data1 = cm.ExecQuery(data_sql)
 			if data1 == ():
@@ -112,18 +108,21 @@ class FormData(object):
 领券链接:%s
 
 请点击链接领取优惠券，下单购买！
-	                ''' % (data[0][2], data[0][4], data[0][6], data[0][7], data[0][9])
+	                ''' % (data[0][3], data[0][5], data[0][7], data[0][8], data[0][10])
 
-			delete_sql = "UPDATE taojin_good_info SET status='2' WHERE id='" + str(data[0][0]) + "'"
+			delete_sql = "UPDATE taojin_good_info SET status='2' WHERE id='" + str(data[0][0]) + "' AND wx_bot='"+ res['User']['NickName'] +"'"
 			cm.ExecNonQuery(delete_sql)
 
-			img_name = data[0][3].split('/')
+			img_name = data[0][4].split('/')
 
 			img_path = "images/" + img_name[-1]
 			for item in group_info:
 				time.sleep(2)
 				itchat.send_image(img_path, item[2])
 				itchat.send(text, item[2])
+
+			# 删除图片
+			os.remove(img_path)
 
 	# 启动一个线程，定时发送商品信息
 	def start_send_msg_thread(self):

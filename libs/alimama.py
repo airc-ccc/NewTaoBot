@@ -604,6 +604,7 @@ http://t.cn/RnAKMul
         cm = ConnectMysql()
 
         userInfo = itchat.search_friends(userName=msg['FromUserName'])
+        botInfo = itchat.search_friends(userName=msg['ToUserName'])
 
         try:
             t = int(time.time() * 1000)
@@ -627,7 +628,7 @@ http://t.cn/RnAKMul
             print(res.text)
             rj = res.json()
             if rj['data']['pageList'] != None:
-                insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + userInfo['NickName'] + "', '" + str(time.time()) + "')"
+                insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + botInfo['NickName'] + "', '" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + userInfo['NickName'] + "', '" + str(time.time()) + "')"
                 cm.ExecNonQuery(insert_sql)
                 cm.Close()
                 return rj['data']['pageList'][0]
@@ -665,7 +666,7 @@ http://t.cn/RnAKMul
             print(res.text)
             rj = res.json()
             if rj['data']['pageList'] != None:
-                insert_sql = "INSERT INTO taojin_query_record(good_title, good_price, good_coupon, username, create_time) VALUES('" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + chatrooms['NickName'] + "', '" + str(time.time()) + "')"
+                insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('group', '" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + chatrooms['NickName'] + "', '" + str(time.time()) + "')"
                 cm.ExecNonQuery(insert_sql)
                 cm.Close()
                 return rj['data']['pageList'][0]
@@ -934,6 +935,8 @@ http://t.cn/RnAKMul
         try:
             cm = ConnectMysql()
 
+            botInfo = itchat.search_friends(userName=msg['ToUserName'])
+
             # 查询用户是否有上线
             check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "';"
             check_user_res = cm.ExecQuery(check_user_sql)
@@ -971,7 +974,7 @@ http://t.cn/RnAKMul
                     cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='"+ str(save_money) +"', taobao_rebate_amount='"+ str(taobao_rebate_amount) +"', total_rebate_amount='"+ str(total_rebate_amount) +"', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='"+str(time.time())+"' WHERE wx_number='" + str(userInfo['NickName']) + "';")
                     cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', friends_rebate='"+str(friends_rebatr)+"', update_time='"+str(time.time())+"' WHERE lnivt_code='" + str(check_user_res[0][16]) + "';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
+                    cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('" +botInfo['NickName']+ "', '"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
 
                     args = {
                         'username': check_user_res[0][1],
@@ -985,6 +988,7 @@ http://t.cn/RnAKMul
                     cm.InsertRebateLog(args)
 
                     args2 = {
+                        'wx_bot': botInfo['NickName'],
                         'username': get_parent_info[0][1],
                         'rebate_amount': add_parent_balance,
                         'type': 4,
@@ -1040,9 +1044,10 @@ http://t.cn/RnAKMul
                         total_rebate_amount) + "', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(
                         userInfo['NickName']) + "';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(username, order_id, order_source) VALUES('"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
+                    cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('" +botInfo['NickName']+ "', '"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
 
                     args = {
+                        'wx_bot': botInfo['NickName'],
                         'username': check_user_res[0][1],
                         'rebate_amount': add_balance,
                         'type': 3,
@@ -1069,8 +1074,6 @@ http://t.cn/RnAKMul
     http://t.cn/RnAKqWW
     京东优惠券网站：
     http://jdyhq.ptjob.net
-    淘宝优惠券网站：
-    http://tbyhq.ptjob.net
     邀请好友得返利：
     http://t.cn/RnAKafe
                                 ''' % (order_id, add_balance)
