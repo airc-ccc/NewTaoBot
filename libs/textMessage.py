@@ -10,7 +10,6 @@ from libs import utils
 from urllib.parse import quote
 from itchat.content import *
 from libs.mediaJd import MediaJd
-from libs.alimama import Alimama
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
 from libs.groupMessage import FormData
@@ -21,8 +20,6 @@ from libs.wx_bot import *
 from libs.orther import Orther
 
 cm = ConnectMysql()
-logger = utils.init_logger()
-al = Alimama(logger)
 mjd = MediaJd()
 tu = tuling()
 ort = Orther()
@@ -89,7 +86,7 @@ class TextMessage(object):
 回复【找+商品名称】
 回复【搜+商品名称】查看商品优惠券合集
 
-分享【京东商品链接】或者【淘口令】
+分享【京东商品链接】
 精准查询商品优惠券和返利信息！
 分享【VIP视频链接】免费查看高清VIP视频！
 
@@ -150,7 +147,7 @@ http://t.cn/RnAKafe
 提现成功！
 提现金额将以微信红包的形式发放，请耐心等待！
 
-分享【京东商品链接】或者【淘口令】
+分享【京东商品链接】
 精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
@@ -182,6 +179,7 @@ http://t.cn/RnAKafe
 一一一一 提现信息 一一一一
 
 提现申请失败，请稍后重试！
+余额必须大于0！
                                     '''
                     itchat.send(text, msg['FromUserName'])
                     return
@@ -197,11 +195,7 @@ http://t.cn/RnAKafe
 
                 current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + wei_info['NickName'] + "';"
 
-                friends_count_sql = "SELECT count(*) FROM taojin_user_info WHERE lnivter='" + str(
-                    user_info[0][4]) + "';"
-
                 current_info = cm.ExecQuery(current)
-                friends_count = cm.ExecQuery(friends_count_sql)
 
                 # 如果总提现金额不存在，赋值为0
                 if current_info[0][0] == None:
@@ -214,7 +208,6 @@ http://t.cn/RnAKafe
 
 总返利金额: %s元
 京东返利金额: %s元
-淘宝返利金额: %s元
 可提现余额: %s元
 累计提现金额: %s元
 
@@ -231,8 +224,8 @@ http://t.cn/RnAKMul
 邀请好友得返利：
 http://t.cn/RnAKafe
                                     ''' % (
-                user_info[0][5], user_info[0][6], user_info[0][7], user_info[0][8], current_info, user_info[0][10],
-                user_info[0][11], user_info[0][12], user_info[0][18], friends_count[0][0])
+                user_info[0][5], user_info[0][6], user_info[0][8], current_info, user_info[0][10],
+                user_info[0][11], user_info[0][18], user_info[0][19])
                 cm.Close()
                 itchat.send(text, msg['FromUserName'])
                 return
