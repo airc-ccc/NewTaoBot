@@ -137,7 +137,7 @@ http://t.cn/RnAKafe
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             itchat.auto_login(enableCmdQR=2, hotReload=True, statusStorageDir='jd.pkl')
         else:
-            itchat.auto_login(True, statusStorageDir='jd.pkl')
+            itchat.auto_login(True, statusStorageDir='jd_kehu.pkl',enableCmdQR=True)
         itchat.run()
 
 if __name__ == '__main__':
