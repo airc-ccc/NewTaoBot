@@ -87,12 +87,12 @@ class FormData(object):
 
 			a = datetime.datetime.now().hour
 
-			if int(a) < 8 | int(a) >= 20:
+			if int(a) < 8 | int(a) > 20:
 				print('时间不够')
 				continue
 
 			print('ok')
-			time.sleep(300)
+			time.sleep(1200)
 
 			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 LIMIT 1"
 
