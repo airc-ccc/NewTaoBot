@@ -561,13 +561,13 @@ http://t.cn/RnAKMul
         else:
             wd = webdriver.Firefox()
 
-        wd.get('https://login.taobao.com/member/login.jhtml?style=mini&newMini2=true&from=alimama&redirectURL=http://login.taobao.com/member/taobaoke/login.htm?is_login=1&full_redirect=true&disableQuickLogin=true')
+        wd.get('http://pub.alimama.com')
 
         time.sleep(10)
+		wd.switch_to.frame('taobaoLoginIfr')
+        #js = "var pass = document.getElementById(\"TPL_password_1\").setAttribute(\"autocomplete\", \"on\")"
 
-        js = "var pass = document.getElementById(\"TPL_password_1\").setAttribute(\"autocomplete\", \"on\")"
-
-        wd.execute_script(js)
+        #wd.execute_script(js)
         time.sleep(3)
         wd.find_element_by_class_name('login-switch').click()
         time.sleep(3)
