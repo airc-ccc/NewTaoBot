@@ -155,7 +155,7 @@ http://t.cn/RnAKafe
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             itchat.auto_login(enableCmdQR=2, hotReload=True, statusStorageDir='peng.pkl')
         else:
-            itchat.auto_login(True)
+            itchat.auto_login(True, enableCmdQR=True)
         itchat.run()
 
 if __name__ == '__main__':
