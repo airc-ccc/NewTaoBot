@@ -32,20 +32,6 @@ http://t.cn/RnAKafe
                         ''' % (player_url)
                 return text
 
-        error_info = '''
-一一一一 视频信息 一一一一
-
-抱歉，没找到你想要的视频！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-免费看电影方法：
-http://t.cn/RnAKMul
-邀请码好友得返利：
-http://t.cn/RnAKafe
-                    '''
-        return error_info
-
     def getGroupMovie(self, msg):
         soup_xml = BeautifulSoup(msg['Content'], 'lxml')
         xml_info = soup_xml.select('appname')

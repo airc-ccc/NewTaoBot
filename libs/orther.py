@@ -69,6 +69,7 @@ class Orther(object):
             }
             # 写入返利日志
             cm.InsertRebateLog(args)
+            cm.Close()
             return
         else:
             lnivt_2_info = itchat.search_friends(nickName=sourcname)
