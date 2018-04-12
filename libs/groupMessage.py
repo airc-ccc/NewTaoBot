@@ -98,7 +98,7 @@ class FormData(object):
 
 			data1 = cm.ExecQuery(data_sql)
 			if data1 == ():
-				mjd.get_good_info()
+				mjd.get_good_info(res['User']['NickName'])
 				cm.Close()
 			cm2 = ConnectMysql()
 			data = cm2.ExecQuery(data_sql)

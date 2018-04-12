@@ -934,6 +934,7 @@ http://t.cn/RnAKMul
 
 
     def changeInfo(self, msg, info, order_id, userInfo):
+        print('info dddddddd')
         try:
             cm = ConnectMysql()
 
@@ -955,16 +956,16 @@ http://t.cn/RnAKMul
 
                 # 定义SQL语句 查询用户是否已经存在邀请人
                 # 判断是否已经有邀请人了
-                if check_user_res and check_user_res[0][17] != 0:
+                if check_user_res and check_user_res[0][17] != '0':
 
                     get_parent_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + str(check_user_res[0][17]) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                     get_parent_info = cm.ExecQuery(get_parent_sql)
 
                     add_balance = round(float(info['feeString']) * 0.3, 2)
-                    withdrawals_amount = round(float(check_user_res[0][9]) + float(info['feeString']) * 0.3, 2)
-                    taobao_rebate_amount = round(float(check_user_res[0][8]) + float(info['feeString']) * 0.3, 2)
-                    total_rebate_amount = round(float(check_user_res[0][6]) + float(info['feeString']) * 0.3, 2)
+                    withdrawals_amount = round(float(check_user_res[0][9]) + add_balance, 2)
+                    taobao_rebate_amount = round(float(check_user_res[0][8]) + add_balance, 2)
+                    total_rebate_amount = round(float(check_user_res[0][6]) + add_balance, 2)
                     save_money = round(check_user_res[0][10] + (float(get_query_info[0][3]) - float(info['realPayFeeString'])) + add_balance, 2)
                     total_order_num = int(check_user_res[0][11]) + 1
                     taobao_order_num = int(check_user_res[0][13]) + 1
@@ -1030,13 +1031,14 @@ http://t.cn/RnAKMul
     邀请好友得返利：
     http://t.cn/RnAKafe
                     ''' % (order_id, add_balance)
-
+                    cm.Close()
                     return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success', 'parent': get_parent_info[0][1]}
                 else:
+                    print('aabbacc')
                     add_balance = round(float(info['feeString']) * 0.3, 2)
-                    withdrawals_amount = round(float(check_user_res[0][9]) + float(info['feeString']) * 0.3, 2)
-                    taobao_rebate_amount = round(float(check_user_res[0][8]) + float(info['feeString']) * 0.3, 2)
-                    total_rebate_amount = round(float(check_user_res[0][6]) + float(info['feeString']) * 0.3, 2)
+                    withdrawals_amount = round(float(check_user_res[0][9]) + add_balance, 2)
+                    taobao_rebate_amount = round(float(check_user_res[0][8]) + add_balance, 2)
+                    total_rebate_amount = round(float(check_user_res[0][6]) + add_balance, 2)
                     save_money = round(check_user_res[0][10] + (float(get_query_info[0][3]) - float(info['realPayFeeString'])) + add_balance, 2)
                     total_order_num = int(check_user_res[0][11]) + 1
                     taobao_order_num = int(check_user_res[0][13]) + 1
@@ -1047,7 +1049,10 @@ http://t.cn/RnAKMul
                         total_rebate_amount) + "', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(
                         userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('" + bot_info['NickName'] + "', "+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
+
+                    sssq = "INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('" + str(bot_info['NickName']) + "', '"+str(userInfo['NickName'])+"', '"+str(order_id)+"', 2)"
+                    print(sssq)
+                    cm.ExecNonQuery(sssq)
 
                     args = {
                         'wx_bot': bot_info['NickName'],
@@ -1082,7 +1087,7 @@ http://t.cn/RnAKMul
     邀请好友得返利：
     http://t.cn/RnAKafe
                                 ''' % (order_id, add_balance)
-
+                    cm.Close()
                     return {'user_text': user_text, 'info': 'not_parent_and_success'}
         except Exception as e:
             self.logger.debug(e)

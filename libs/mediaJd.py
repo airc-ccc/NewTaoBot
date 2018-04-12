@@ -63,7 +63,7 @@ class MediaJd:
  返利链接:%s
 
 省钱步骤：
-1,点击链接，进入下单
+1,点击链接，进入下单！
 2,订单完成后，将订单完成日期和订单号发给我哦！
 例如：
 2018-01-01,12345678901
@@ -383,47 +383,47 @@ class MediaJd:
 
 
     def get_jd_order(self, msg, times, orderId, userInfo):
-        try:
+        # try:
 
-            timestr = re.sub('-', '', times)
-            order_id = int(orderId)
+        timestr = re.sub('-', '', times)
+        order_id = int(orderId)
 
-            cm = ConnectMysql()
+        cm = ConnectMysql()
 
-            bot_info = itchar.search_friends(userName=msg['ToUserName'])
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
 
-            # 查询订单是否已经提现过了
-            check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
-            check_order_res = cm.ExecQuery(check_order_sql)
+        # 查询订单是否已经提现过了
+        check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
+        check_order_res = cm.ExecQuery(check_order_sql)
 
-            # 判断该订单是否已经提现
-            if len(check_order_res) >= 1:
-                cm.Close()
-                send_text = '''
+        # 判断该订单是否已经提现
+        if len(check_order_res) >= 1:
+            cm.Close()
+            send_text = '''
 一一一一 订单消息 一一一一
 
 订单【%s】已经成功返利，请勿重复提交订单信息！
 回复【个人信息】 查看订单及返利信息
 如有疑问！请联系管理员
-                            ''' % (order_id)
-                return {"info": "order_exit", "send_text": send_text}
+                        ''' % (order_id)
+            return {"info": "order_exit", "send_text": send_text}
 
-            self.load_cookies()
+        self.load_cookies()
 
-            url = 'https://api.jd.com/routerjson?v=2.0&method=jingdong.UnionService.queryOrderList&app_key=96432331E3ACE521CC0D66246EB4C371&access_token=a67c6103-691c-4691-92a2-4dee41ce0f88&360buy_param_json={"unionId":"2011005331","time":"'+timestr+'","pageIndex":"1","pageSize":"50"}&timestamp='+strftime("%Y-%m-%d %H:%M:%S", gmtime())+'&sign=E9D115D4769BDF68FE1DF07D33F7720B'
+        url = 'https://api.jd.com/routerjson?v=2.0&method=jingdong.UnionService.queryOrderList&app_key=96432331E3ACE521CC0D66246EB4C371&access_token=a67c6103-691c-4691-92a2-4dee41ce0f88&360buy_param_json={"unionId":"2011005331","time":"'+timestr+'","pageIndex":"1","pageSize":"50"}&timestamp='+strftime("%Y-%m-%d %H:%M:%S", gmtime())+'&sign=E9D115D4769BDF68FE1DF07D33F7720B'
 
-            res = requests.get(url)
+        res = requests.get(url)
 
-            rj = json.loads(res.text)
-            print(rj, url)
-            data = json.loads(rj['jingdong_UnionService_queryOrderList_responce']['result'])
+        rj = json.loads(res.text)
+        print(rj, url)
+        data = json.loads(rj['jingdong_UnionService_queryOrderList_responce']['result'])
 
-            for item in data['data']:
-                if order_id == item['orderId']:
-                    res = self.changeInfo(msg, item, order_id, userInfo)
-                    return res
+        for item in data['data']:
+            if int(order_id) == int(item['orderId']):
+                res = self.changeInfo(msg, item, order_id, userInfo)
+                return res
 
-            user_text = '''
+        user_text = '''
 一一一一订单信息一一一一
 
 订单返利失败！
@@ -436,18 +436,18 @@ class MediaJd:
 【6】，订单号错误，请输入正确的订单号
 
 请按照提示进行重新操作！
-                    '''
+                '''
 
-            return {'info': 'not_order', 'user_text': user_text}
-        except Exception as e:
-            print(e)
-            return {'info': 'feild'}
+        return {'info': 'not_order', 'user_text': user_text}
+        # except Exception as e:
+        #     print(e)
+        #     return {'info': 'feild'}
 
     def changeInfo(self, msg, info, order_id, userInfo):
 
         cm = ConnectMysql()
         # try:
-
+        print()
         bot_info = itchat.search_friends(userName=msg['ToUserName'])
         # 查询用户是否有上线
         check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
@@ -473,9 +473,9 @@ class MediaJd:
                 print(get_parent_info)
 
                 add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                withdrawals_amount = round(float(check_user_res[0][10]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                jd = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                total_rebate_amount = round(float(check_user_res[0][7]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                withdrawals_amount = round(float(check_user_res[0][10]) + add_balance, 2)
+                jd = round(float(check_user_res[0][8]) + add_balance, 2)
+                total_rebate_amount = round(float(check_user_res[0][7]) + add_balance, 2)
                 save_money = round(
                     check_user_res[0][11] + (float(get_query_info[0][4]) - float(info['skuList'][0]['payPrice'])), 2)
 
@@ -485,7 +485,7 @@ class MediaJd:
                 cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='" + str(save_money) + "', jd_rebate_amount='" + str(jd) + "', total_rebate_amount='" + str(total_rebate_amount) + "', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';")
                 cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', update_time='" + str(time.time()) + "' WHERE lnivt_code='" + str(check_user_res[0][17]) + "';")
 
-                cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('"+ bot_info['NickName'] +"', '" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '1')")
+                cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('"+ str(bot_info['NickName']) +"', '" + str(userInfo['NickName']) + "', '" + str(order_id) + "', '1')")
 
                 args = {
                     'wx_bot': bot_info['NickName'],
@@ -544,9 +544,9 @@ http://t.cn/RnAKafe
                         'parent': get_parent_info[0][2]}
             else:
                 add_balance = round(float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                withdrawals_amount = round(float(check_user_res[0][10]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                jd = round(float(check_user_res[0][8]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
-                total_rebate_amount = round(float(check_user_res[0][7]) + float(info['skuList'][0]['actualFee']) * 0.3, 2)
+                withdrawals_amount = round(float(check_user_res[0][10]) + add_balance, 2)
+                jd = round(float(check_user_res[0][8]) + add_balance, 2)
+                total_rebate_amount = round(float(check_user_res[0][7]) + add_balance, 2)
                 save_money = round(check_user_res[0][11] + (float(get_query_info[0][4]) - float(info['skuList'][0]['payPrice'])), 2)
 
 

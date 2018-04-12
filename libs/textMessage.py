@@ -20,7 +20,7 @@ from libs.tuling import tuling
 from libs.wx_bot import *
 from libs.orther import Orther
 
-cm = ConnectMysql()
+
 logger = utils.init_logger()
 al = Alimama(logger)
 mjd = MediaJd()
@@ -108,6 +108,7 @@ http://t.cn/RnAKafe
                         '''
                 itchat.send(text, msg['FromUserName'])
             elif pattern_tixian.search(msg['Text']) != None:
+                cm = ConnectMysql()
                 res = ort.ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
@@ -181,11 +182,12 @@ http://t.cn/RnAKafe
                     text = '''
 一一一一 提现信息 一一一一
 
-提现申请失败，请稍后重试！
+提现申请失败，账户余额为0！
                                     '''
                     itchat.send(text, msg['FromUserName'])
                     return
             elif pattern_profile.search(msg['Text']) != None:
+                cm = ConnectMysql()
                 res = ort.ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
@@ -197,11 +199,11 @@ http://t.cn/RnAKafe
 
                 current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
-                friends_count_sql = "SELECT count(*) FROM taojin_user_info WHERE lnivter='" + str(
-                    user_info[0][5]) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
+                # friends_count_sql = "SELECT count(*) FROM taojin_user_info WHERE lnivter='" + str(
+                #     user_info[0][5]) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 current_info = cm.ExecQuery(current)
-                friends_count = cm.ExecQuery(friends_count_sql)
+                # friends_count = cm.ExecQuery(friends_count_sql)
 
                 # 如果总提现金额不存在，赋值为0
                 if current_info[0][0] == None:
@@ -232,11 +234,12 @@ http://t.cn/RnAKMul
 http://t.cn/RnAKafe
                                     ''' % (
                 user_info[0][6], user_info[0][7], user_info[0][8], user_info[0][9], current_info, user_info[0][11],
-                user_info[0][12], user_info[0][13], user_info[0][19], friends_count[0][0])
+                user_info[0][12], user_info[0][13], user_info[0][19], user_info[0][20])
                 cm.Close()
                 itchat.send(text, msg['FromUserName'])
                 return
             elif pattern_tuig.search(msg['Text']) != None:
+                cm = ConnectMysql()
                 res = ort.ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
@@ -269,7 +272,7 @@ http://t.cn/RnAKafe
 点击链接：http://t.cn/Rf0LUP0
 添加好友备注：跑堂优惠券代理
 
-客服人员将尽快和您取得联系，请耐心等待！
+客服人员将尽快和您取得联系，请耐心等待!
                         '''
                 itchat.send(text, msg['FromUserName'])
             elif (',' in msg['Text']) and (msg['Text'].split(',')[1].isdigit()) and (
@@ -465,6 +468,7 @@ http://t.cn/RnAKafe
             wx_bot.text_reply(msg, msg['Text'])
 
     def getGroupText(self, msg):
+        cm = ConnectMysql()
         wei_info = itchat.search_friends(userName=msg['FromUserName'])
 
         patternURL = re.compile('^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+')

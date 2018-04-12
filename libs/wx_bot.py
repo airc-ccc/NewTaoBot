@@ -38,7 +38,6 @@ fm = FormData()
 ort = Orther()
 
 def text_reply(msg, good_url):
-    print(11)
     mjd.getJd(msg, good_url)
 
 # 检查是否是淘宝链接
@@ -97,7 +96,7 @@ class WxBot(object):
 
     def __init__(self):
         # fm.groupMessages()
-        mjd.get_good_info()
+        # mjd.get_good_info()
         print('run.....')
         self.run()
 
@@ -135,6 +134,9 @@ class WxBot(object):
         text = '''
 一一一一 系统消息 一一一一
 
+账户创建成功！0.3元奖励金已发放！
+
+回复【个人信息】查看账户详情
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
 
