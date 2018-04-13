@@ -582,6 +582,13 @@ http://t.cn/RnAKMul
         time.sleep(5)
         wd.find_element_by_id('J_SubmitStatic').click()
 
+        # 判断是否需要验证码
+        time.sleep(5)
+
+        if self.isElementExist(wd, 'J_Checkcode'):
+            print('验证码存在！睡眠120秒')
+            time.sleep(120)
+
         self.logger.debug('login success')
         with open(cookie_fname, 'w') as f:
             cookies_arr = []
@@ -591,6 +598,14 @@ http://t.cn/RnAKMul
             f.write(json.dumps(cookies_arr))
         # wd.close()
         return 'login success'
+
+
+    def isElementExist(self, bower, element):
+        try:
+            bower.find_element_by_id(element)
+            return True
+        except Exception as e:
+            return False
 
     def get_tb_token(self):
         tb_token = None
