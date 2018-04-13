@@ -605,6 +605,7 @@ http://t.cn/RnAKMul
             bower.find_element_by_id(element)
             return True
         except Exception as e:
+            print(e)
             return False
 
     def get_tb_token(self):
