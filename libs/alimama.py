@@ -103,10 +103,10 @@ http://t.cn/RnAKafe
             real_price = round(price - coupon_amount, 2)
             res1 = self.get_tk_link(auctionid)
 
-            if res1 == None:
-                img = self.get_qr_image()
-                itchat.send(img, msg['FromUserName'])
-                return
+            # if res1 == None:
+            #     img = self.get_qr_image()
+            #     itchat.send(img, msg['FromUserName'])
+            #     return
             tao_token = res1['taoToken']
             coupon_link = res1['couponLink']
             if coupon_link != "":
@@ -292,13 +292,13 @@ http://t.cn/RnAKMul
         while True:
             time.sleep(60 * 5)
             try:
-                self.logger.debug("visit_main_url......,time:{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+                # self.logger.debug("visit_main_url......,time:{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
                 self.get_url(url, headers)
-                self.logger.debug(self.check_login())
+                # self.logger.debug(self.check_login())
                 real_url = "https://detail.tmall.com/item.htm?id=42485910384"
                 res = self.get_detail2(real_url)
                 auctionid = res['auctionId']
-                self.logger.debug(self.get_tk_link(auctionid))
+                # self.logger.debug(self.get_tk_link(auctionid))
             except Exception as e:
                 trace = traceback.format_exc()
                 self.logger.warning("error:{},trace:{}".format(str(e), trace))
@@ -713,6 +713,7 @@ http://t.cn/RnAKMul
     def __get_tk_link_s1(self, auctionid, tb_token, pvid):
         url = 'http://pub.alimama.com/common/adzone/newSelfAdzone2.json?tag=29&itemId=%s&blockId=&t=%s&_tb_token_=%s&pvid=%s' % (
             auctionid, int(time.time() * 1000), tb_token, pvid)
+        print(url)
         headers = {
             'Host': 'pub.alimama.com',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -723,7 +724,6 @@ http://t.cn/RnAKMul
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
         }
         res = self.get_url(url, headers)
-        self.logger.debug(res.text)
         rj = res.json()
         gcid = rj['data']['otherList'][0]['gcid']
         siteid = rj['data']['otherList'][0]['siteid']
@@ -777,7 +777,6 @@ http://t.cn/RnAKMul
         return rj['data']
 
     def get_real_url(self, url):
-        # return "https://detail.tmall.com/item.htm?id=548726815314"
         try:
             headers = {
                 'Host': url.split('http://')[-1].split('/')[0],
