@@ -95,7 +95,7 @@ class FormData(object):
 				continue
 
 			print('ok')
-			time.sleep(300)
+			time.sleep(1200)
 
 			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 AND wx_bot='"+ res['User']['NickName'] +"' LIMIT 1"
 
@@ -124,7 +124,7 @@ class FormData(object):
 
 			img_path = "images/" + img_name[-1]
 			for item in group_info:
-				time.sleep(2)
+				time.sleep(30)
 				itchat.send_image(img_path, item[2])
 				itchat.send(text, item[2])
 
