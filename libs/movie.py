@@ -24,11 +24,11 @@ class SharMovie(object):
 精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
+'''+config.get('URL', 'course')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
-邀请码好友得返利：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'movie')+'''
+邀请好友得返利说明：
+'''+config.get('URL', 'lnvit')+'''
                         ''' % (player_url)
                 return text
 
@@ -50,8 +50,8 @@ http://t.cn/RnAKafe
 精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
+'''+config.get('URL', 'course')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
                         ''' % (player_url)
                 return text

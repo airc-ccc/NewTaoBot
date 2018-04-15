@@ -94,15 +94,17 @@ class TextMessage(object):
 分享【VIP视频链接】免费查看高清VIP视频！
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
+'''+config.get('URL', 'course')+'''
 跑堂优惠券常见问题：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
 京东优惠券商城：
-http://jdyhq.ptjob.net
+'''+config.get('URL', 'jdshop')+'''
+淘宝优惠券商城：
+'''+config.get('URL', 'tbshop')+'''
 邀请好友得返利说明：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'lnvit')+'''
                         '''
                 itchat.send(text, msg['FromUserName'])
             elif pattern_tixian.search(msg['Text']) != None:
@@ -153,11 +155,11 @@ http://t.cn/RnAKafe
 精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
+'''+config.get('URL', 'course')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
 邀请好友得返利：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'lnvit')+'''
                                             '''
                         itchat.send(to_user_text, msg['FromUserName'])
                         itchat.send(to_admin_text, adminuser[0]['UserName'])
@@ -218,11 +220,11 @@ http://t.cn/RnAKafe
 总好友个数: %s
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
+'''+config.get('URL', 'course')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
 邀请好友得返利：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'lnvit')+'''
                                     ''' % (
                 user_info[0][6], user_info[0][7], user_info[0][9], current_info, user_info[0][11],
                 user_info[0][12], user_info[0][19], user_info[0][20])
@@ -247,8 +249,8 @@ http://t.cn/RnAKafe
 好友添加机器人为好友
 您和好友都将获取0.3元现金奖励
 您将永久享受好友返利提成
-邀请好友返利说明：
-http://t.cn/RnAKafe
+邀请好友得返利：
+'''+config.get('URL', 'lnvit')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
             elif pattern_proxy.search(msg['Text']) != None:
@@ -260,7 +262,7 @@ http://t.cn/RnAKafe
 一一一一系统消息一一一一
 
 您好！
-点击链接：http://t.cn/Rf0LUP0
+点击链接：'''+config.get('URL', 'proxy')+'''
 添加好友备注：跑堂优惠券代理
 
 客服人员将尽快和您取得联系，请耐心等待!
@@ -458,15 +460,17 @@ http://t.cn/RnAKafe
 分享【VIP视频链接】免费查看高清VIP视频！
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
+'''+config.get('URL', 'course')+'''
 跑堂优惠券常见问题：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
 京东优惠券商城：
-http://jdyhq.ptjob.net
+'''+config.get('URL', 'jdshop')+'''
+淘宝优惠券商城：
+'''+config.get('URL', 'tbshop')+'''
 邀请好友得返利说明：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'lnvit')+'''
                         '''
                 itchat.send(text, msg['FromUserName'])
             elif pattern_tuig.search(msg['Text']) != None:
@@ -477,8 +481,8 @@ http://t.cn/RnAKafe
 好友添加机器人为好友
 您和好友都将获取0.3元现金奖励
 您将永久享受好友返利提成
-邀请好友返利说明：
-http://t.cn/RnAKafe
+邀请好友得返利说明：
+'''+config.get('URL', 'lnvit')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
             elif pattern_proxy.search(msg['Text']) != None:
@@ -486,7 +490,7 @@ http://t.cn/RnAKafe
 一一一一系统消息一一一一
 
 您好！
-点击链接：http://t.cn/Rf0LUP0
+点击链接：'''+config.get('URL', 'proxy')+'''
 添加好友备注：跑堂优惠券代理
 
 客服人员将尽快和您取得联系，请耐心等待！

@@ -85,13 +85,17 @@ class Alimama:
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'movie')+'''
+京东优惠券商城：
+'''+config.get('URL', 'jdshop')+'''
+淘宝优惠券商城：
+'''+config.get('URL', 'tbshop')+'''
+邀请好友得返利说明：
+'''+config.get('URL', 'lnvit')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -157,13 +161,17 @@ http://t.cn/RnAKafe
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'movie')+'''
+京东优惠券商城：
+'''+config.get('URL', 'jdshop')+'''
+淘宝优惠券商城：
+'''+config.get('URL', 'tbshop')+'''
+邀请好友得返利说明：
+'''+config.get('URL', 'lnvit')+'''
                     '''
             itchat.send(info, msg['FromUserName'])
 
@@ -202,11 +210,11 @@ http://t.cn/RnAKafe
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -261,11 +269,11 @@ http://t.cn/RnAKMul
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
                     '''
             itchat.send(info, msg['FromUserName'])
 
@@ -1068,17 +1076,6 @@ http://t.cn/RnAKMul
     回复【提现】可申请账户余额提现
     回复【个人信息】可看个当前账户信息
 
-    分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-    分享【VIP视频链接】免费查看高清VIP视频！
-
-    优惠券使用教程：
-    http://t.cn/RnAKqWW
-    京东优惠券网站：
-    http://jdyhq.ptjob.net
-    淘宝优惠券网站：
-    http://tbyhq.ptjob.net
-    邀请好友得返利：
-    http://t.cn/RnAKafe
                     ''' % (order_id, add_balance)
                     cm.Close()
                     return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success', 'parent': get_parent_info[0][1]}
@@ -1127,18 +1124,6 @@ http://t.cn/RnAKMul
 
     回复【提现】可申请账户余额提现
     回复【个人信息】可看个当前账户信息
-
-    分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-    分享【VIP视频链接】免费查看高清VIP视频！
-
-    优惠券使用教程：
-    http://t.cn/RnAKqWW
-    京东优惠券网站：
-    http://jdyhq.ptjob.net
-    淘宝优惠券网站：
-    http://tbyhq.ptjob.net
-    邀请好友得返利：
-    http://t.cn/RnAKafe
                                 ''' % (order_id, add_balance)
                     cm.Close()
                     return {'user_text': user_text, 'info': 'not_parent_and_success'}
