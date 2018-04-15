@@ -27,12 +27,7 @@ movie = SharMovie()
 
 class Orther(object):
 
-    def is_valid_date(self, str):
-        try:
-            time.strptime(str, "%Y-%m-%d")
-            return True
-        except:
-            return False
+    
 
         # 创建用户账户
 
@@ -305,3 +300,10 @@ http://t.cn/RnAKqWW
             return {"res": "not_info", "text": send_text}
 
         return {"res": "have_info"}
+
+    def is_valid_date(self, str):
+        try:
+            time.strptime(str, "%Y-%m-%d")
+            return True
+        except:
+            return False

@@ -427,7 +427,7 @@ http://t.cn/RnAKafe
                                         '''
 
                     itchat.send(user_text, msg['FromUserName'])
-            elif (',' in msg['Text']) and (is_valid_date(msg['Text'].split(',')[0])):
+            elif (',' in msg['Text']) and (self.is_valid_date(msg['Text'].split(',')[0])):
                 user_text = '''
 一一一一系统消息一一一一
 
@@ -441,7 +441,7 @@ http://t.cn/RnAKafe
 请确认修改后重新发送
                                         '''
                 itchat.send(user_text, msg['FromUserName'])
-            elif ('，' in msg['Text']) and (is_valid_date(msg['Text'].split('，')[0])):
+            elif ('，' in msg['Text']) and (self.is_valid_date(msg['Text'].split('，')[0])):
                 user_text = '''
 一一一一系统消息一一一一
 
@@ -465,7 +465,7 @@ http://t.cn/RnAKafe
             if res2['res'] == 'not_info':
                 ort.create_user_info(msg, 0, tool=False)
 
-            wx_bot.text_reply(msg, msg['Text'])
+            mjd.getJd(msg, msg['Text'])
 
     def getGroupText(self, msg):
         cm = ConnectMysql()
