@@ -14,6 +14,7 @@ import webbrowser
 from libs import utils
 from urllib.parse import quote
 from itchat.content import *
+import configparser
 from threading import Thread
 from libs.mediaJd import MediaJd
 from libs.mysql import ConnectMysql
@@ -36,6 +37,8 @@ movie = SharMovie()
 tm = TextMessage()
 fm = FormData()
 ort = Orther()
+config = configparser.ConfigParser()
+config.read('config.conf',encoding="utf-8-sig")
 
 def text_reply(msg, good_url):
     mjd.getJd(msg, good_url)

@@ -11,6 +11,7 @@ import threading
 import traceback
 import random
 import webbrowser
+import configparser
 from libs import utils
 from urllib.parse import quote
 from itchat.content import *
@@ -24,6 +25,9 @@ from libs.tuling import tuling
 logger = utils.init_logger()
 
 movie = SharMovie()
+
+config = configparser.ConfigParser()
+config.read('config.conf',encoding="utf-8-sig")
 
 class Orther(object):
 

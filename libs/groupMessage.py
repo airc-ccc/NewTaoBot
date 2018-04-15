@@ -3,6 +3,7 @@ import time
 import webbrowser
 from flask import Flask
 from flask import request
+import configparser
 from libs.mysql import ConnectMysql
 from libs import wx_bot
 from threading import Thread
@@ -14,6 +15,8 @@ import datetime
 
 app = Flask(__name__)
 mjd = MediaJd()
+config = configparser.ConfigParser()
+config.read('config.conf',encoding="utf-8-sig")
 
 class FormData(object):
 	def run(self):
