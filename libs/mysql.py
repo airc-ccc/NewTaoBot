@@ -1,11 +1,15 @@
 # -*-coding: UTF-8-*-
 
 import pymysql
+import configparser
 
-host = 'localhost'
-user = 'root'
-pwd = ''
-db = 'taojin_bot'
+config = configparser.ConfigParser()
+config.read('config.conf',encoding="utf-8-sig")
+
+host = config.get('DB', 'DB_HOST')
+user = config.get('DB', 'DB_USERNAME')
+pwd = config.get('DB', 'DB_PASSWORD')
+db = config.get('DB', 'DB_DATABASE')
 
 
 class ConnectMysql:

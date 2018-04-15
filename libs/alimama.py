@@ -11,6 +11,7 @@ import itchat
 import requests
 import random
 import datetime
+import configparser
 
 if sys.version_info[0] < 3:
     import urllib
@@ -37,6 +38,8 @@ if (sysstr == "Linux") or (sysstr == "Darwin"):
     pass
 cookie_fname = 'cookies_taobao.txt'
 
+config = configparser.ConfigParser()
+config.read('config.conf',encoding="utf-8-sig")
 
 ort = Orther()
 
@@ -85,13 +88,17 @@ class Alimama:
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'movie')+'''
+京东优惠券商城：
+'''+config.get('URL', 'jdshop')+'''
+淘宝优惠券商城：
+'''+config.get('URL', 'tbshop')+'''
+邀请好友得返利说明：
+'''+config.get('URL', 'lnvit')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -157,13 +164,17 @@ http://t.cn/RnAKafe
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
-邀请好友得返利：
-http://t.cn/RnAKafe
+'''+config.get('URL', 'movie')+'''
+京东优惠券商城：
+'''+config.get('URL', 'jdshop')+'''
+淘宝优惠券商城：
+'''+config.get('URL', 'tbshop')+'''
+邀请好友得返利说明：
+'''+config.get('URL', 'lnvit')+'''
                     '''
             itchat.send(info, msg['FromUserName'])
 
@@ -202,11 +213,11 @@ http://t.cn/RnAKafe
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -261,11 +272,11 @@ http://t.cn/RnAKMul
 精准查询商品优惠券和返利信息
 
 优惠券使用教程：
-http://t.cn/RnAKqWW
-常见问题解答：
-http://t.cn/RnAK1w0
+'''+config.get('URL', 'course')+'''
+跑堂优惠券常见问题：
+'''+config.get('URL', 'faq')+'''
 免费看电影方法：
-http://t.cn/RnAKMul
+'''+config.get('URL', 'movie')+'''
                     '''
             itchat.send(info, msg['FromUserName'])
 
@@ -549,8 +560,8 @@ http://t.cn/RnAKMul
             return 'login failed'
 
     def open_do_login(self):
-        loginname = input('请输入淘宝联盟账号:')
-        nloginpwd = input('请输入淘宝联盟密码:')
+        # loginname = input('请输入淘宝联盟账号:')
+        # nloginpwd = input('请输入淘宝联盟密码:')
 
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             firefoxOptions = webdriver.FirefoxOptions()
@@ -574,11 +585,11 @@ http://t.cn/RnAKMul
         wd.find_element_by_class_name('login-switch').click()
         time.sleep(3)
         # 输入账号密码
-        wd.find_element_by_id('TPL_username_1').send_keys(loginname)
+        wd.find_element_by_id('TPL_username_1').send_keys(config.get('TB', 'TB_USERNAME'))
         # 休息3秒
         time.sleep(3)
         # 输入密码
-        wd.find_element_by_id('TPL_password_1').send_keys(nloginpwd)
+        wd.find_element_by_id('TPL_password_1').send_keys(config.get('TB', 'TB_PASSWORD'))
         # 点击登录按钮
         time.sleep(20)
         wd.find_element_by_id('J_SubmitStatic').click()
@@ -1064,21 +1075,9 @@ http://t.cn/RnAKMul
 
     订单【%s】已完成！
     返利金%s元已发放到您的个人账户！
-
     回复【提现】可申请账户余额提现
     回复【个人信息】可看个当前账户信息
 
-    分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-    分享【VIP视频链接】免费查看高清VIP视频！
-
-    优惠券使用教程：
-    http://t.cn/RnAKqWW
-    京东优惠券网站：
-    http://jdyhq.ptjob.net
-    淘宝优惠券网站：
-    http://tbyhq.ptjob.net
-    邀请好友得返利：
-    http://t.cn/RnAKafe
                     ''' % (order_id, add_balance)
                     cm.Close()
                     return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success', 'parent': get_parent_info[0][1]}
@@ -1127,18 +1126,6 @@ http://t.cn/RnAKMul
 
     回复【提现】可申请账户余额提现
     回复【个人信息】可看个当前账户信息
-
-    分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-    分享【VIP视频链接】免费查看高清VIP视频！
-
-    优惠券使用教程：
-    http://t.cn/RnAKqWW
-    京东优惠券网站：
-    http://jdyhq.ptjob.net
-    淘宝优惠券网站：
-    http://tbyhq.ptjob.net
-    邀请好友得返利：
-    http://t.cn/RnAKafe
                                 ''' % (order_id, add_balance)
                     cm.Close()
                     return {'user_text': user_text, 'info': 'not_parent_and_success'}

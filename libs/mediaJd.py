@@ -26,7 +26,7 @@ logger = utils.init_logger()
 cookie_fname = 'cookies_jd.txt'
 sysstr = platform.system()
 config = configparser.ConfigParser()
-# config.read('config.conf')
+config.read('config.conf',encoding="utf-8-sig")
 ort = Orther()
 tu = tuling()
 
@@ -183,8 +183,8 @@ class MediaJd:
             return 'Login Success'
 
     def do_login(self):
-        loginname = input('请输入京东联盟账号:')
-        nloginpwd = input('请输入京东联盟密码:')
+        # loginname = input('请输入京东联盟账号:')
+        # nloginpwd = input('请输入京东联盟密码:')
 
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             firefoxOptions = webdriver.FirefoxOptions()
@@ -197,11 +197,11 @@ class MediaJd:
             wd = webdriver.Firefox()
         wd.get('https://passport.jd.com/common/loginPage?from=media&ReturnUrl=https%3A%2F%2Fmedia.jd.com%2FloginJump')
         # 输入账号密码
-        wd.find_element_by_id('loginname').send_keys(loginname)
+        wd.find_element_by_id('loginname').send_keys(config.get('JD', 'JD_USERNAME'))
         # 休息3秒
         time.sleep(3)
         # 输入密码
-        wd.find_element_by_id('nloginpwd').send_keys(nloginpwd)
+        wd.find_element_by_id('nloginpwd').send_keys(config.get('JD', 'JD_PASSWORD'))
         # 点击登录按钮
         time.sleep(10)
         wd.find_element_by_id('paipaiLoginSubmit').click()
@@ -555,18 +555,6 @@ class MediaJd:
 
 回复【提现】可申请账户余额提现
 回复【个人信息】可看个当前账户信息
-
-分享【京东商品链接】或者【淘口令】精准查询商品优惠券和返利信息！
-分享【VIP视频链接】免费查看高清VIP视频！
-
-优惠券使用教程：
-http://t.cn/RnAKqWW
-京东优惠券网站：
-http://jdyhq.ptjob.net
-淘宝优惠券网站：
-http://tbyhq.ptjob.net
-邀请好友得返利：
-http://t.cn/RnAKafe
                         ''' % (order_id, add_balance)
                 cm.Close()
                 return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success',
@@ -612,6 +600,9 @@ http://t.cn/RnAKafe
 
 订单【%s】标记成功，返利金%s已发放到您的账户
 回复【个人信息】 查看订单及返利信息
+
+回复【提现】可申请账户余额提现
+回复【个人信息】可看个当前账户信息
                             ''' % (order_id, add_balance)
                 cm.Close()
                 return {'user_text': user_text, 'info': 'not_parent_and_success'}
