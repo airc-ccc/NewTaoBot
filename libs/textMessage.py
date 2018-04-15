@@ -565,4 +565,4 @@ class TextMessage(object):
             else:
                 return
         else:
-            ort.text_reply(msg, msg['Text'])
+            mjd.getGroupJd(msg, msg['Text'])
