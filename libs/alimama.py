@@ -69,6 +69,7 @@ class Alimama:
                 taokouling = re.search(r'￥.*?￥', msg['Text']).group()
                 parms = {'username': 'wx_tb_fanli', 'password': 'wx_tb_fanli', 'text': taokouling}
                 res = requests.post(taokoulingurl, data=parms)
+                self.logger.debug(res.text)
                 url = res.json()['url'].replace('https://', 'http://')
 
             real_url = self.get_real_url(url)
@@ -102,10 +103,10 @@ http://t.cn/RnAKafe
             real_price = round(price - coupon_amount, 2)
             res1 = self.get_tk_link(auctionid)
 
-            if res1 == None:
-                img = self.get_qr_image()
-                itchat.send(img, msg['FromUserName'])
-                return
+            # if res1 == None:
+            #     img = self.get_qr_image()
+            #     itchat.send(img, msg['FromUserName'])
+            #     return
             tao_token = res1['taoToken']
             coupon_link = res1['couponLink']
             if coupon_link != "":
@@ -291,13 +292,13 @@ http://t.cn/RnAKMul
         while True:
             time.sleep(60 * 5)
             try:
-                self.logger.debug("visit_main_url......,time:{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
+                # self.logger.debug("visit_main_url......,time:{}".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
                 self.get_url(url, headers)
-                self.logger.debug(self.check_login())
+                # self.logger.debug(self.check_login())
                 real_url = "https://detail.tmall.com/item.htm?id=42485910384"
                 res = self.get_detail2(real_url)
                 auctionid = res['auctionId']
-                self.logger.debug(self.get_tk_link(auctionid))
+                # self.logger.debug(self.get_tk_link(auctionid))
             except Exception as e:
                 trace = traceback.format_exc()
                 self.logger.warning("error:{},trace:{}".format(str(e), trace))
@@ -564,10 +565,11 @@ http://t.cn/RnAKMul
         wd.get('http://pub.alimama.com')
 
         time.sleep(10)
-		wd.switch_to.frame('taobaoLoginIfr')
+
         #js = "var pass = document.getElementById(\"TPL_password_1\").setAttribute(\"autocomplete\", \"on\")"
 
         #wd.execute_script(js)
+        wd.switch_to.frame('taobaoLoginIfr')
         time.sleep(3)
         wd.find_element_by_class_name('login-switch').click()
         time.sleep(3)
@@ -578,8 +580,15 @@ http://t.cn/RnAKMul
         # 输入密码
         wd.find_element_by_id('TPL_password_1').send_keys(nloginpwd)
         # 点击登录按钮
-        time.sleep(5)
+        time.sleep(20)
         wd.find_element_by_id('J_SubmitStatic').click()
+
+        # 判断是否需要验证码
+        time.sleep(10)
+
+        if self.isElementExist(wd, 'J_LoginCheck'):
+            print('验证码存在！睡眠120秒')
+            time.sleep(160)
 
         self.logger.debug('login success')
         with open(cookie_fname, 'w') as f:
@@ -590,6 +599,15 @@ http://t.cn/RnAKMul
             f.write(json.dumps(cookies_arr))
         # wd.close()
         return 'login success'
+
+
+    def isElementExist(self, bower, element):
+        try:
+            bower.find_element_by_id(element)
+            return True
+        except Exception as e:
+            print(e)
+            return False
 
     def get_tb_token(self):
         tb_token = None
@@ -604,7 +622,7 @@ http://t.cn/RnAKMul
         cm = ConnectMysql()
 
         userInfo = itchat.search_friends(userName=msg['FromUserName'])
-        botInfo = itchat.search_friends(userName=msg['ToUserName'])
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
 
         try:
             t = int(time.time() * 1000)
@@ -628,7 +646,7 @@ http://t.cn/RnAKMul
             print(res.text)
             rj = res.json()
             if rj['data']['pageList'] != None:
-                insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + botInfo['NickName'] + "', '" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + userInfo['NickName'] + "', '" + str(time.time()) + "')"
+                insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + bot_info['NickName'] + "', '" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + userInfo['NickName'] + "', '" + str(time.time()) + "')"
                 cm.ExecNonQuery(insert_sql)
                 cm.Close()
                 return rj['data']['pageList'][0]
@@ -643,7 +661,8 @@ http://t.cn/RnAKMul
         cm = ConnectMysql()
 
         chatrooms = itchat.search_chatrooms(userName=msg['FromUserName'])
-
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
+        print(bot_info)
         try:
             t = int(time.time() * 1000)
             tb_token = self.se.cookies.get('_tb_token_', domain="pub.alimama.com")
@@ -666,7 +685,7 @@ http://t.cn/RnAKMul
             print(res.text)
             rj = res.json()
             if rj['data']['pageList'] != None:
-                insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('group', '" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + chatrooms['NickName'] + "', '" + str(time.time()) + "')"
+                insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('" + bot_info['NickName'] + "', '" + rj['data']['pageList'][0]['title'] + "', '" + str(rj['data']['pageList'][0]['zkPrice']) + "', '"+ str(rj['data']['pageList'][0]['couponAmount']) +"', '" + chatrooms['NickName'] + "', '" + str(time.time()) + "')"
                 cm.ExecNonQuery(insert_sql)
                 cm.Close()
                 return rj['data']['pageList'][0]
@@ -694,6 +713,7 @@ http://t.cn/RnAKMul
     def __get_tk_link_s1(self, auctionid, tb_token, pvid):
         url = 'http://pub.alimama.com/common/adzone/newSelfAdzone2.json?tag=29&itemId=%s&blockId=&t=%s&_tb_token_=%s&pvid=%s' % (
             auctionid, int(time.time() * 1000), tb_token, pvid)
+        print(url)
         headers = {
             'Host': 'pub.alimama.com',
             'Accept': 'application/json, text/javascript, */*; q=0.01',
@@ -704,7 +724,6 @@ http://t.cn/RnAKMul
             'Accept-Language': 'zh,en-US;q=0.8,en;q=0.6,zh-CN;q=0.4,zh-TW;q=0.2',
         }
         res = self.get_url(url, headers)
-        # self.logger.debug(res.text)
         rj = res.json()
         gcid = rj['data']['otherList'][0]['gcid']
         siteid = rj['data']['otherList'][0]['siteid']
@@ -758,7 +777,6 @@ http://t.cn/RnAKMul
         return rj['data']
 
     def get_real_url(self, url):
-        # return "https://detail.tmall.com/item.htm?id=548726815314"
         try:
             headers = {
                 'Host': url.split('http://')[-1].split('/')[0],
@@ -862,8 +880,10 @@ http://t.cn/RnAKMul
 
         cm = ConnectMysql()
 
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
+
         # 查询用户是否有上线
-        check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "';"
+        check_order_sql = "SELECT * FROM taojin_order WHERE order_id='" + str(order_id) + "' AND wx_bot = '" +bot_info['NickName']+ "';"
         check_order_res = cm.ExecQuery(check_order_sql)
 
         # 判断该订单是否已经提现
@@ -907,7 +927,7 @@ http://t.cn/RnAKMul
 
             for item in res_dict['data']['paymentList']:
                 if int(order_id) == int(item['taobaoTradeParentId']):
-                    res = self.changeInfo(msg, item, order_id, userInfo)
+                    res = self.changeInfo(msg, item, order_id, userInfo, timestr)
                     return res
 
             user_text = '''
@@ -931,14 +951,15 @@ http://t.cn/RnAKMul
             return {"info":"feild"}
 
 
-    def changeInfo(self, msg, info, order_id, userInfo):
+    def changeInfo(self, msg, info, order_id, userInfo, timestr):
+        print('info dddddddd')
         try:
             cm = ConnectMysql()
 
-            botInfo = itchat.search_friends(userName=msg['ToUserName'])
+            bot_info = itchat.search_friends(userName=msg['ToUserName'])
 
             # 查询用户是否有上线
-            check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "';"
+            check_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + str(userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
             check_user_res = cm.ExecQuery(check_user_sql)
 
             # 判断是否已经有个人账户，没有返回信息
@@ -947,37 +968,69 @@ http://t.cn/RnAKMul
                 return {"info":"not_info"}
             else:
 
-                get_query_sql = "SELECT * FROM taojin_query_record WHERE good_title='" + info['auctionTitle'] + "'AND username='" + check_user_res[0][1] + "' ORDER BY create_time LIMIT 1;"
+                # 获取商品查询记录
+                get_query_sql = "SELECT * FROM taojin_query_record WHERE good_title='" + info['auctionTitle'] + "'AND username='" + check_user_res[0][2] + "' AND wx_bot='"+ bot_info['NickName'] +"' ORDER BY create_time LIMIT 1;"
 
                 get_query_info = cm.ExecQuery(get_query_sql)
 
+                if get_query_info == ():
+                    user_text = '''
+    一一一一订单信息一一一一
+
+    订单返利失败！
+
+    失败原因：当前商品不是通过当前机器人购买
+
+    请按照提示进行重新操作！
+                    '''
+                    return {'info': 'not_order', 'user_text': user_text}
+
                 # 定义SQL语句 查询用户是否已经存在邀请人
                 # 判断是否已经有邀请人了
-                if check_user_res and check_user_res[0][16] != 0:
+                if check_user_res.isdigit() and int(check_user_res[0][17]) != 0:
 
-                    get_parent_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + str(check_user_res[0][16]) + "';"
+                    # 获取邀请人信息
+                    get_parent_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + str(check_user_res[0][17]) + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                     get_parent_info = cm.ExecQuery(get_parent_sql)
 
+                    # 计算返佣
                     add_balance = round(float(info['feeString']) * 0.3, 2)
-                    withdrawals_amount = round(float(check_user_res[0][8]) + float(info['feeString']) * 0.3, 2)
-                    taobao_rebate_amount = round(float(check_user_res[0][7]) + float(info['feeString']) * 0.3, 2)
-                    total_rebate_amount = round(float(check_user_res[0][5]) + float(info['feeString']) * 0.3, 2)
-                    save_money = round(check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['realPayFeeString'])) + add_balance, 2)
-                    total_order_num = int(check_user_res[0][10]) + 1
-                    taobao_order_num = int(check_user_res[0][12]) + 1
+                    # 累加余额
+                    withdrawals_amount = round(float(check_user_res[0][9]) + add_balance, 2)
+                    # 累加淘宝总返利
+                    taobao_rebate_amount = round(float(check_user_res[0][8]) + add_balance, 2)
+                    # 累加总返利
+                    total_rebate_amount = round(float(check_user_res[0][6]) + add_balance, 2)
 
+                    jishen = (float(get_query_info[0][3]) - float(info['realPayFeeString']))
+
+                    if jishen < 0:
+                        jishen = 0
+
+                    # 计算共节省金额,商品原价减去实际支付价格，加上原有节省金额加上返佣
+                    save_money = round(check_user_res[0][10] + jishen + add_balance, 2)
+                    # 总订单数加一
+                    total_order_num = int(check_user_res[0][11]) + 1
+                    # 淘宝订单数加一
+                    taobao_order_num = int(check_user_res[0][13]) + 1
+
+                    # 邀请人返利金额
                     add_parent_balance = round(float(info['feeString']) * 0.1, 2)
-                    friends_rebatr = float(get_parent_info[0][18]) + float(add_balance)
-                    withdrawals_amount2 = round(float(get_parent_info[0][8]) + float(add_balance) * 0.1, 2)
 
-                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='"+ str(save_money) +"', taobao_rebate_amount='"+ str(taobao_rebate_amount) +"', total_rebate_amount='"+ str(total_rebate_amount) +"', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='"+str(time.time())+"' WHERE wx_number='" + str(userInfo['NickName']) + "';")
-                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', friends_rebate='"+str(friends_rebatr)+"', update_time='"+str(time.time())+"' WHERE lnivt_code='" + str(check_user_res[0][16]) + "';")
+                    # 给邀请人好友返利加上金额
+                    friends_rebatr = float(get_parent_info[0][19]) + float(add_balance)
+                    # 邀请人总钱数加上返利金额
+                    withdrawals_amount2 = round(float(get_parent_info[0][9]) + float(add_balance) * 0.1, 2)
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('" +botInfo['NickName']+ "', '"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
+                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount) + "', save_money='"+ str(save_money) +"', taobao_rebate_amount='"+ str(taobao_rebate_amount) +"', total_rebate_amount='"+ str(total_rebate_amount) +"', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='"+str(time.time())+"' WHERE wx_number='" + str(userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';")
+                    cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(withdrawals_amount2) + "', friends_rebate='"+str(friends_rebatr)+"', update_time='"+str(time.time())+"' WHERE lnivt_code='" + str(check_user_res[0][17]) + "' AND wx_bot='"+ bot_info['NickName'] +"';")
+
+                    cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, completion_time, order_source) VALUES('"+ bot_info['NickName'] +"', '"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '" + str(timestr) + "', '2')")
 
                     args = {
-                        'username': check_user_res[0][1],
+                        'wx_bot': bot_info['NickName'],
+                        'username': check_user_res[0][2],
                         'rebate_amount': add_balance,
                         'type': 3,
                         'create_time': time.time()
@@ -988,8 +1041,8 @@ http://t.cn/RnAKMul
                     cm.InsertRebateLog(args)
 
                     args2 = {
-                        'wx_bot': botInfo['NickName'],
-                        'username': get_parent_info[0][1],
+                        'wx_bot': bot_info['NickName'],
+                        'username': get_parent_info[0][2],
                         'rebate_amount': add_parent_balance,
                         'type': 4,
                         'create_time': time.time()
@@ -1004,7 +1057,7 @@ http://t.cn/RnAKMul
 
     您的好友【%s】又完成了一笔订单，返利提成%s元已发放到您的账户
     回复【个人信息】查询账户信息及提成
-                    ''' % (check_user_res[0][3], add_parent_balance)
+                    ''' % (check_user_res[0][4], add_parent_balance)
 
                     user_text = '''
     一一一一系统消息一一一一
@@ -1027,28 +1080,36 @@ http://t.cn/RnAKMul
     邀请好友得返利：
     http://t.cn/RnAKafe
                     ''' % (order_id, add_balance)
-
+                    cm.Close()
                     return {'parent_user_text': parent_user_text, 'user_text': user_text, 'info': 'success', 'parent': get_parent_info[0][1]}
                 else:
+                    print('aabbacc')
                     add_balance = round(float(info['feeString']) * 0.3, 2)
-                    withdrawals_amount = round(float(check_user_res[0][8]) + float(info['feeString']) * 0.3, 2)
-                    taobao_rebate_amount = round(float(check_user_res[0][7]) + float(info['feeString']) * 0.3, 2)
-                    total_rebate_amount = round(float(check_user_res[0][5]) + float(info['feeString']) * 0.3, 2)
-                    save_money = round(check_user_res[0][9] + (float(get_query_info[0][2]) - float(info['realPayFeeString'])) + add_balance, 2)
-                    total_order_num = int(check_user_res[0][10]) + 1
-                    taobao_order_num = int(check_user_res[0][12]) + 1
+                    withdrawals_amount = round(float(check_user_res[0][9]) + add_balance, 2)
+                    taobao_rebate_amount = round(float(check_user_res[0][8]) + add_balance, 2)
+                    total_rebate_amount = round(float(check_user_res[0][6]) + add_balance, 2)
+
+                    jishen = (float(get_query_info[0][3]) - float(info['realPayFeeString']))
+
+                    if jishen < 0:
+                        jishen = 0
+
+                    save_money = round(check_user_res[0][10] + (float(get_query_info[0][3]) - float(info['realPayFeeString'])) + add_balance, 2)
+                    total_order_num = int(check_user_res[0][11]) + 1
+                    taobao_order_num = int(check_user_res[0][13]) + 1
 
                     cm.ExecNonQuery("UPDATE taojin_user_info SET withdrawals_amount='" + str(
                         withdrawals_amount) + "', save_money='" + str(save_money) + "', taobao_rebate_amount='" + str(
                         taobao_rebate_amount) + "', total_rebate_amount='" + str(
                         total_rebate_amount) + "', order_quantity='"+str(total_order_num)+"', taobao_order_quantity='"+str(taobao_order_num)+"', update_time='" + str(time.time()) + "' WHERE wx_number='" + str(
-                        userInfo['NickName']) + "';")
+                        userInfo['NickName']) + "' AND wx_bot='"+ bot_info['NickName'] +"';")
 
-                    cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, order_source) VALUES('" +botInfo['NickName']+ "', '"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '2')")
+
+                    cm.ExecNonQuery("INSERT INTO taojin_order(wx_bot, username, order_id, completion_time, order_source) VALUES('"+ bot_info['NickName'] +"', '"+str(userInfo['NickName'])+"', '"+str(order_id)+"', '" + str(timestr) + "', '2')")
 
                     args = {
-                        'wx_bot': botInfo['NickName'],
-                        'username': check_user_res[0][1],
+                        'wx_bot': bot_info['NickName'],
+                        'username': check_user_res[0][2],
                         'rebate_amount': add_balance,
                         'type': 3,
                         'create_time': time.time()
@@ -1074,10 +1135,12 @@ http://t.cn/RnAKMul
     http://t.cn/RnAKqWW
     京东优惠券网站：
     http://jdyhq.ptjob.net
+    淘宝优惠券网站：
+    http://tbyhq.ptjob.net
     邀请好友得返利：
     http://t.cn/RnAKafe
                                 ''' % (order_id, add_balance)
-
+                    cm.Close()
                     return {'user_text': user_text, 'info': 'not_parent_and_success'}
         except Exception as e:
             self.logger.debug(e)

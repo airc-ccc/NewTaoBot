@@ -39,7 +39,15 @@ def text_reply(msg, good_url):
     mjd.getJd(msg, good_url)
 
 def check_if_is_tb_link(msg):
-    if msg['Type'] == 'Sharing':  # vip 电影
+    if re.search(r'【.*】', msg['Text']) and (
+            u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
+        text = '''
+一一一一系统消息一一一一
+
+亲，暂不支持淘口令，请分享京东商品
+                '''
+        itchat.send(text, msg['FromUserName'])
+    elif msg['Type'] == 'Sharing':  # vip 电影
         res = ort.ishaveuserinfo(msg)
         if res['res'] == 'not_info':
             ort.create_user_info(msg, 0, tool=False)
@@ -61,7 +69,15 @@ def check_if_is_tb_link(msg):
 
 
 def check_if_is_group(msg):
-    if msg['Type'] == 'Sharing':
+    if re.search(r'【.*】', msg['Text']) and (
+            u'打开👉手机淘宝👈' in msg['Text'] or u'打开👉天猫APP👈' in msg['Text'] or u'打开👉手淘👈' in msg['Text']):
+        text = '''
+一一一一系统消息一一一一
+
+亲，暂不支持淘口令，请分享京东商品
+                '''
+        itchat.send(text, msg['FromUserName'])
+    elif msg['Type'] == 'Sharing':
         htm = re.findall(r"<appname>.*?</appname>", msg['Content'])
 
         if htm:

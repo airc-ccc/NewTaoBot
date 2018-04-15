@@ -7,9 +7,11 @@ import json
 import requests
 import random
 from libs import utils
+import configparser
 from urllib.parse import quote
 from itchat.content import *
 from libs.mediaJd import MediaJd
+from libs.alimama import Alimama
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
 from libs.groupMessage import FormData
@@ -19,7 +21,11 @@ from libs.tuling import tuling
 from libs.wx_bot import *
 from libs.orther import Orther
 
-cm = ConnectMysql()
+
+logger = utils.init_logger()
+config = configparser.ConfigParser()
+config.read('config.conf', encoding="utf-8-sig")
+al = Alimama(logger)
 mjd = MediaJd()
 tu = tuling()
 ort = Orther()
@@ -55,8 +61,6 @@ class TextMessage(object):
                     ort.create_user_info(msg, 0, tool=False)
 
                 jdurl = quote("http://jdyhq.ptjob.net/?r=search?kw=" + msg['Text'][1:], safe='/:?=&')
-
-                tburl = quote('http://tbyhq.ptjob.net/index.php?r=l&kw=' + msg['Text'][1:], safe='/:?=&')
                 text = '''
 一一一一系统消息一一一一
 
@@ -85,7 +89,7 @@ class TextMessage(object):
 回复【找+商品名称】
 回复【搜+商品名称】查看商品优惠券合集
 
-分享【京东商品链接】
+分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
 分享【VIP视频链接】免费查看高清VIP视频！
 
@@ -102,25 +106,26 @@ http://t.cn/RnAKafe
                         '''
                 itchat.send(text, msg['FromUserName'])
             elif pattern_tixian.search(msg['Text']) != None:
+                cm = ConnectMysql()
                 res = ort.ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
                     ort.create_user_info(msg, 0, tool=False)
 
-                adminuser = itchat.search_friends(nickName="彭波")
-                select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
+                adminuser = itchat.search_friends(nickName=config.get('ADMIN', 'ADMIN_USER'))
+                select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
                 select_user_res = cm.ExecQuery(select_user_sql)
 
                 if select_user_res and float(select_user_res[0][9]) > 0:
                     try:
                         # 修改余额
                         update_sql = "UPDATE taojin_user_info SET withdrawals_amount='0',update_time='" + str(
-                            time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "';"
+                            time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                         total_amount = float(select_user_res[0][6]) + float(select_user_res[0][9]);
                         update_total_sql = "UPDATE taojin_user_info SET total_rebate_amount='" + str(
                             total_amount) + "',update_time='" + str(time.time()) + "' WHERE wx_number='" + wei_info[
-                                               'NickName'] + "';"
+                                               'NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                         # 插入提现日志
                         insert_current_log_sql = "INSERT INTO taojin_current_log(wx_bot, username, amount, create_time) VALUES('" + \
@@ -144,7 +149,7 @@ http://t.cn/RnAKafe
 提现成功！
 提现金额将以微信红包的形式发放，请耐心等待！
 
-分享【京东商品链接】
+分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
 
 优惠券使用教程：
@@ -175,23 +180,22 @@ http://t.cn/RnAKafe
                     text = '''
 一一一一 提现信息 一一一一
 
-提现申请失败，请稍后重试！
-余额必须大于0！
+提现申请失败，账户余额为0！
                                     '''
                     itchat.send(text, msg['FromUserName'])
                     return
             elif pattern_profile.search(msg['Text']) != None:
+                cm = ConnectMysql()
                 res = ort.ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
                     ort.create_user_info(msg, 0, tool=False)
 
-                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
+                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 user_info = cm.ExecQuery(user_sql)
 
-                current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + wei_info['NickName'] + "';"
-
+                current = "SELECT sum(amount) FROM taojin_current_log WHERE username='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
                 current_info = cm.ExecQuery(current)
 
                 # 如果总提现金额不存在，赋值为0
@@ -226,12 +230,13 @@ http://t.cn/RnAKafe
                 itchat.send(text, msg['FromUserName'])
                 return
             elif pattern_tuig.search(msg['Text']) != None:
+                cm = ConnectMysql()
                 res = ort.ishaveuserinfo(msg)
 
                 if res['res'] == 'not_info':
                     ort.create_user_info(msg, 0, tool=False)
 
-                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "';"
+                user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
                 cm.ExecQuery(user_sql)
 
@@ -258,7 +263,7 @@ http://t.cn/RnAKafe
 点击链接：http://t.cn/Rf0LUP0
 添加好友备注：跑堂优惠券代理
 
-客服人员将尽快和您取得联系，请耐心等待！
+客服人员将尽快和您取得联系，请耐心等待!
                         '''
                 itchat.send(text, msg['FromUserName'])
             elif (',' in msg['Text']) and (msg['Text'].split(',')[1].isdigit()) and (
@@ -339,81 +344,25 @@ http://t.cn/RnAKafe
                     itchat.send(user_text, msg['FromUserName'])
             elif (',' in msg['Text']) and (msg['Text'].split(',')[1].isdigit()) and (
                     len(msg['Text'].split(',')[1]) == 18):
-                res2 = ort.ishaveuserinfo(msg)
-
-                if res2['res'] == 'not_info':
-                    ort.create_user_info(msg, 0, tool=False)
-
-                res = al.get_order(msg, msg['Text'].split(',')[0], msg['Text'].split(',')[1], wei_info)
-
-                if res['info'] == 'success':
-                    itchat.send(res['user_text'], msg['FromUserName'])
-                    itchat.send(res['parent_user_text'], res['parent'])
-                    return
-                elif res['info'] == 'order_exit':
-                    itchat.send(res['send_text'], msg['FromUserName'])
-                elif res['info'] == 'not_order':
-                    itchat.send(res['user_text'], msg['FromUserName'])
-                elif res['info'] == 'not_parent_and_success':
-                    itchat.send(res['user_text'], msg['FromUserName'])
-                elif res['info'] == 'not_info':
-                    itchat.send('你当前没有个人账户请发送邀请人的邀请码注册个人账户！', msg['FromUserName'])
-                elif res['info'] == 'feild':
-                    user_text = '''
+                user_text = '''
 一一一一订单信息一一一一
 
 订单返利失败！
+暂不支持淘宝订单号返利！            
+                            '''
 
-失败原因：
-【1】未确认收货（打开App确认收货后重新发送）
-【2】当前商品不是通过机器人购买
-【3】查询格式不正确(正确格式：2018-03-20,73462222028 )
-【4】订单完成日期错误，请输入正确的订单查询日期
-【6】订单号错误，请输入正确的订单号
-
-请按照提示进行重新操作！            
-                                        '''
-
-                    itchat.send(user_text, msg['FromUserName'])
+                itchat.send(user_text, msg['FromUserName'])
             elif ('，' in msg['Text']) and (msg['Text'].split('，')[1].isdigit()) and (
                     len(msg['Text'].split('，')[1]) == 18):
-                res2 = ort.ishaveuserinfo(msg)
-
-                if res2['res'] == 'not_info':
-                    ort.create_user_info(msg, 0, tool=False)
-
-                res = al.get_order(msg, msg['Text'].split('，')[0], msg['Text'].split('，')[1], wei_info)
-
-                if res['info'] == 'success':
-                    itchat.send(res['user_text'], msg['FromUserName'])
-                    itchat.send(res['parent_user_text'], res['parent'])
-                    return
-                elif res['info'] == 'order_exit':
-                    itchat.send(res['send_text'], msg['FromUserName'])
-                elif res['info'] == 'not_order':
-                    itchat.send(res['user_text'], msg['FromUserName'])
-                elif res['info'] == 'not_parent_and_success':
-                    itchat.send(res['user_text'], msg['FromUserName'])
-                elif res['info'] == 'not_info':
-                    itchat.send('你当前没有个人账户请发送邀请人的邀请码注册个人账户！', msg['FromUserName'])
-                elif res['info'] == 'feild':
-                    user_text = '''
+                user_text = '''
 一一一一订单信息一一一一
 
 订单返利失败！
+暂不支持淘宝订单号返利！            
+                            '''
 
-失败原因：
-【1】未确认收货（打开App确认收货后重新发送）
-【2】当前商品不是通过机器人购买
-【3】查询格式不正确(正确格式：2018-03-20,73462222028 )
-【4】订单完成日期错误，请输入正确的订单查询日期
-【6】订单号错误，请输入正确的订单号
-
-请按照提示进行重新操作！            
-                                        '''
-
-                    itchat.send(user_text, msg['FromUserName'])
-            elif (',' in msg['Text']) and (is_valid_date(msg['Text'].split(',')[0])):
+                itchat.send(user_text, msg['FromUserName'])
+            elif (',' in msg['Text']) and (self.is_valid_date(msg['Text'].split(',')[0])):
                 user_text = '''
 一一一一系统消息一一一一
 
@@ -422,12 +371,12 @@ http://t.cn/RnAKafe
 订单完成时间+逗号+订单号
 (京东订单号长度11位)
 例如：
-2018-03-03,123456765432
+2018-03-03,12345676545
 
 请确认修改后重新发送
                                         '''
                 itchat.send(user_text, msg['FromUserName'])
-            elif ('，' in msg['Text']) and (is_valid_date(msg['Text'].split('，')[0])):
+            elif ('，' in msg['Text']) and (self.is_valid_date(msg['Text'].split('，')[0])):
                 user_text = '''
 一一一一系统消息一一一一
 
@@ -436,7 +385,7 @@ http://t.cn/RnAKafe
 订单完成时间+逗号+订单号
 (京东订单号长度11位)
 例如：
-2018-03-03,123456765432
+2018-03-03,12345676545
 
 请确认修改后重新发送
                                         '''
@@ -451,9 +400,18 @@ http://t.cn/RnAKafe
             if res2['res'] == 'not_info':
                 ort.create_user_info(msg, 0, tool=False)
 
-            wx_bot.text_reply(msg, msg['Text'])
+            mjd.getJd(msg, msg['Text'])
+
+
+    def is_valid_date(self, str):
+        try:
+            time.strptime(str, "%Y-%m-%d")
+            return True
+        except:
+            return False
 
     def getGroupText(self, msg):
+        cm = ConnectMysql()
         wei_info = itchat.search_friends(userName=msg['FromUserName'])
 
         patternURL = re.compile('^((https|http|ftp|rtsp|mms)?:\/\/)[^\s]+')
@@ -472,8 +430,6 @@ http://t.cn/RnAKafe
                     pattern_m.search(msg['Text']) != None):
 
                 jdurl = quote("http://jdyhq.ptjob.net/?r=search?kw=" + msg['Text'][1:], safe='/:?=&')
-
-                tburl = quote('http://tbyhq.ptjob.net/index.php?r=l&kw=' + msg['Text'][1:], safe='/:?=&')
                 text = '''
 一一一一系统消息一一一一
 
@@ -497,7 +453,7 @@ http://t.cn/RnAKafe
 回复【找+商品名称】
 回复【搜+商品名称】查看商品优惠券合集
 
-分享【京东商品链接】
+分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
 分享【VIP视频链接】免费查看高清VIP视频！
 
