@@ -90,12 +90,12 @@ class FormData(object):
 
 			a = datetime.datetime.now().hour
 
-			if int(a) < 8 | int(a) >= 20:
-				print('时间不够')
-				continue
+			# if int(a) < 8 | int(a) >= 20:
+			# 	print('时间不够')
+			# 	continue
 
-			print('ok')
-			time.sleep(1200)
+			print('ok!  begin start send group messages.....')
+			time.sleep(600)
 
 			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 AND wx_bot='"+ res['User']['NickName'] +"' LIMIT 1"
 
