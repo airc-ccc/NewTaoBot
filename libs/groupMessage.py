@@ -90,12 +90,12 @@ class FormData(object):
 
 			a = datetime.datetime.now().hour
 
-			# if int(a) < 8 | int(a) >= 20:
-			# 	print('时间不够')
-			# 	continue
+			if int(a) < 8 | int(a) >= 20:
+				print('时间不够')
+				continue
 
 			print('ok!  begin start send group messages.....')
-			time.sleep(600)
+			time.sleep(1200)
 
 			data_sql = "SELECT * FROM taojin_good_info WHERE status=1 AND wx_bot='"+ res['User']['NickName'] +"' LIMIT 1"
 
@@ -120,9 +120,10 @@ class FormData(object):
 			delete_sql = "UPDATE taojin_good_info SET status='2' WHERE id='" + str(data[0][0]) + "'  AND wx_bot='"+ res['User']['NickName'] +"'"
 			cm.ExecNonQuery(delete_sql)
 
-			img_name = data[0][3].split('/')
+			img_name = data[0][4].split('/')
 
 			img_path = "images/" + img_name[-1]
+			print(img_path)
 			for item in group_info:
 				time.sleep(30)
 				itchat.send_image(img_path, item[2])
