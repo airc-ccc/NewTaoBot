@@ -11,7 +11,6 @@ import os
 import webbrowser
 import configparser
 from selenium import webdriver
-from libs import utils
 from bs4 import BeautifulSoup
 from time import strftime,gmtime
 from libs.mysql import ConnectMysql
@@ -20,8 +19,6 @@ from itchat.content import *
 from libs.orther import Orther
 from libs.tuling import tuling
 from bottle import template
-
-logger = utils.init_logger()
 
 cookie_fname = 'cookies_jd.txt'
 sysstr = platform.system()

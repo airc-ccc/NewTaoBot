@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from bs4 import BeautifulSoup
+import configparser
+
+
+config = configparser.ConfigParser()
+config.read('config.conf', encoding="utf-8-sig")
 
 class SharMovie(object):
     def __init__(self):

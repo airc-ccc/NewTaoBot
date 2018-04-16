@@ -11,7 +11,7 @@ import threading
 import traceback
 import random
 import webbrowser
-from libs import utils
+import configparser
 from urllib.parse import quote
 from itchat.content import *
 from threading import Thread
@@ -19,20 +19,18 @@ from libs.mediaJd import MediaJd
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
 from bottle import template
-from libs.groupMessage import FormData
 from libs.movie import SharMovie
 from libs.tuling import tuling
 from libs.orther import Orther
 from libs.textMessage import TextMessage
 
-logger = utils.init_logger()
-
 mjd = MediaJd()
 mjd.login()
 movie = SharMovie()
 tm = TextMessage()
-fm = FormData()
 ort = Orther()
+config=configparser.ConfigParser()
+config.read('config.conf', encoding="utf-8-sig")
 
 def text_reply(msg, good_url):
     print(11)
@@ -153,7 +151,7 @@ class WxBot(object):
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             itchat.auto_login(enableCmdQR=2, hotReload=True, statusStorageDir='jd.pkl')
         else:
-            itchat.auto_login(True, statusStorageDir='jd_kehu.pkl',enableCmdQR=True)
+            itchat.auto_login(True, statusStorageDir='jd.pkl',enableCmdQR=True)
         itchat.run()
 
 if __name__ == '__main__':

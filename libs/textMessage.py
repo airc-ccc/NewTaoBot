@@ -6,26 +6,19 @@ import time
 import json
 import requests
 import random
-from libs import utils
 import configparser
 from urllib.parse import quote
 from itchat.content import *
 from libs.mediaJd import MediaJd
-from libs.alimama import Alimama
 from libs.mysql import ConnectMysql
 from bs4 import BeautifulSoup
-from libs.groupMessage import FormData
 from libs.movie import SharMovie
-from libs import utils
 from libs.tuling import tuling
 from libs.wx_bot import *
 from libs.orther import Orther
 
-
-logger = utils.init_logger()
 config = configparser.ConfigParser()
 config.read('config.conf', encoding="utf-8-sig")
-al = Alimama(logger)
 mjd = MediaJd()
 tu = tuling()
 ort = Orther()
@@ -101,8 +94,6 @@ class TextMessage(object):
 '''+config.get('URL', 'movie')+'''
 京东优惠券商城：
 '''+config.get('URL', 'jdshop')+'''
-淘宝优惠券商城：
-'''+config.get('URL', 'tbshop')+'''
 邀请好友得返利说明：
 '''+config.get('URL', 'lnvit')+'''
                         '''
@@ -467,8 +458,6 @@ class TextMessage(object):
 '''+config.get('URL', 'movie')+'''
 京东优惠券商城：
 '''+config.get('URL', 'jdshop')+'''
-淘宝优惠券商城：
-'''+config.get('URL', 'tbshop')+'''
 邀请好友得返利说明：
 '''+config.get('URL', 'lnvit')+'''
                         '''
