@@ -33,7 +33,7 @@ class SharMovie(object):
 '''+config.get('URL', 'movie')+'''
 邀请好友得返利说明：
 '''+config.get('URL', 'lnvit')+'''
-                        ''' % (player_url)
+                        ''' % player_url
                 return text
 
     def getGroupMovie(self, msg):
