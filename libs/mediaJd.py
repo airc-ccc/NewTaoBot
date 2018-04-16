@@ -111,8 +111,8 @@ class MediaJd:
         print('开始查询分享商品的信息......', msg['Text'])
 
         wei_info = itchat.search_chatrooms(userName=msg['FromUserName'])
-        bot_info = itchat.search_chatrooms(userName=msg['ToUserName'])
-		print(bot_info)
+        bot_info = itchat.search_friends(userName=msg['ToUserName'])
+        print(bot_info)
         sku_arr = good_url.split('https://item.m.jd.com/product/')
 
         if sku_arr == None:
