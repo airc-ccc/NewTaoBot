@@ -142,13 +142,6 @@ class WxBot(object):
 回复【个人信息】查看账户详情
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
                 '''
         itchat.send_msg(text, msg['RecommendInfo']['UserName'])
 

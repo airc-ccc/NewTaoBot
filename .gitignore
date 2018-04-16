@@ -1,8 +1,8 @@
-/.idea
+.idea
 cookies_jd.txt
 cookies_taobao.txt
-itchat.pkl
-/libs/__pycache__
+*.pkl
+libs/__pycache__
 geckodriver.log
 run_parse_url_server.log
-/images/*
+images/

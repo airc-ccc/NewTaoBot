@@ -86,19 +86,6 @@ class Alimama:
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-跑堂优惠券常见问题：
-'''+config.get('URL', 'faq')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-京东优惠券商城：
-'''+config.get('URL', 'jdshop')+'''
-淘宝优惠券商城：
-'''+config.get('URL', 'tbshop')+'''
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -162,19 +149,6 @@ class Alimama:
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-跑堂优惠券常见问题：
-'''+config.get('URL', 'faq')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-京东优惠券商城：
-'''+config.get('URL', 'jdshop')+'''
-淘宝优惠券商城：
-'''+config.get('URL', 'tbshop')+'''
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
                     '''
             itchat.send(info, msg['FromUserName'])
 
@@ -211,13 +185,6 @@ class Alimama:
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-跑堂优惠券常见问题：
-'''+config.get('URL', 'faq')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
                                 '''
                 itchat.send(text, msg['FromUserName'])
                 return
@@ -270,13 +237,6 @@ class Alimama:
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-跑堂优惠券常见问题：
-'''+config.get('URL', 'faq')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
                     '''
             itchat.send(info, msg['FromUserName'])
 

@@ -131,9 +131,6 @@ class Orther(object):
 
 0.3元奖励金已到账
 您将永久获得该好友永久购物返利佣金提成
-
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
             ''' % (user_info[0][4])
 
             cm.Close()
@@ -165,13 +162,6 @@ class Orther(object):
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
         `                   '''
                 itchat.send(gg_text, msg['FromUserName'])
                 return
@@ -184,13 +174,6 @@ class Orther(object):
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
         `                   '''
                 itchat.send(gg_text, msg['FromUserName'])
                 return
@@ -252,13 +235,6 @@ class Orther(object):
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
                         ''' % (check_user_res[0][4])
 
                 lnivt_text = '''
@@ -268,9 +244,6 @@ class Orther(object):
 
 0.3元奖励金已到账
 您将永久获得该好友永久购物返利佣金提成
-
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
                 ''' % (check_user_res[0][3])
                 itchat.send(text, msg['FromUserName'])
                 itchat.send(lnivt_text, lnivt_info[0][1])
@@ -297,9 +270,6 @@ class Orther(object):
 
 回复【邀请码】创建个人账户哦!
 还可以领取现金红包哦！
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
                         '''
             return {"res": "not_info", "text": send_text}
 
