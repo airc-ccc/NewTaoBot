@@ -44,7 +44,7 @@ class SharMovie(object):
 
         for item in shipin:
             if item == xml_info[0].string:
-                player_url = 'http://164dyw.duapp.com/youku/apiget.php?url=%s' % msg['Url']
+                player_url = config.get('URL', 'movieurl')+'%s' % msg['Url']
                 text = '''
 一一一一 视频信息 一一一一
 
