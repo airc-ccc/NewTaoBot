@@ -8,14 +8,13 @@ import json
 import platform
 import re
 import os
-import webbrowser
+import itchat
 import configparser
 from selenium import webdriver
 from libs import utils
 from bs4 import BeautifulSoup
 from time import strftime,gmtime
 from libs.mysql import ConnectMysql
-from libs.wx_bot import *
 from itchat.content import *
 from libs.orther import Orther
 from libs.tuling import tuling
@@ -46,14 +45,11 @@ class MediaJd:
 
         if sku_arr == None:
             msg_text = tu.tuling(msg)
-            print(msg_text)
             itchat.send(msg_text, msg['FromUserName'])
             return
 
         sku = sku_arr[1].split('.')
-
         res = self.get_good_link(sku[0])
-        logger.debug(res)
         if res['data']['shotCouponUrl'] == '':
             text = '''
 一一一一返利信息一一一一
@@ -71,7 +67,6 @@ class MediaJd:
 2018-01-01,12345678901
                 ''' % (res['logTitle'], res['logUnitPrice'], res['rebate'], res['data']['shotUrl'])
             itchat.send(text, msg['FromUserName'])
-
             insert_sql = "INSERT INTO taojin_query_record(wx_bot, good_title, good_price, good_coupon, username, create_time) VALUES('"+ bot_info['NickName'] +"', '" + \
                          res['logTitle'] + "', '" + str(res['logUnitPrice']) + "', '0', '" + wei_info[
                              'NickName'] + "', '" + str(time.time()) + "')"
@@ -108,23 +103,16 @@ class MediaJd:
 
     def getGroupJd(self, msg, good_url):
         cm = ConnectMysql()
-        print('开始查询分享商品的信息......', msg['Text'])
-
         wei_info = itchat.search_chatrooms(userName=msg['FromUserName'])
         bot_info = itchat.search_friends(userName=msg['ToUserName'])
-        print(bot_info)
         sku_arr = good_url.split('https://item.m.jd.com/product/')
-
         if sku_arr == None:
             msg_text = tu.tuling(msg)
-            print(msg_text)
             itchat.send(msg_text, msg['FromUserName'])
             return
 
         sku = sku_arr[1].split('.')
-
         res = self.get_good_link(sku[0])
-        logger.debug(res)
         if res['data']['shotCouponUrl'] == '':
             text = '''
 一一一一返利信息一一一一
@@ -183,9 +171,6 @@ class MediaJd:
             return 'Login Success'
 
     def do_login(self):
-        # loginname = input('请输入京东联盟账号:')
-        # nloginpwd = input('请输入京东联盟密码:')
-
         if (sysstr == "Linux") or (sysstr == "Darwin"):
             firefoxOptions = webdriver.FirefoxOptions()
 
@@ -240,21 +225,15 @@ class MediaJd:
         uu = "https://media.jd.com/gotoadv/goods?searchId=2011016742%23%23%23st1%23%23%23kt1%23%23%23598e10defb7f41debe6af038e875b61c&pageIndex=&pageSize=50&property=&sort=&goodsView=&adownerType=&pcRate=&wlRate=&category1=&category=&category3=&condition=0&fromPrice=&toPrice=&dataFlag=0&keyword='" + good_name + "'&input_keyword='" + good_name + "'&price=PC"
         # 搜索商品
         res = self.se.get(uu)
-
         # 使用BeautifulSoup解析HTML，并提取属性数据
         soup = BeautifulSoup(res.text, 'lxml')
-
         a = soup.select('.extension-btn')
-
         coupon = soup.find(attrs={'style':'color: #ff5400;'})
-
         coupon_price = 0;
-
         if coupon != None:
             coupon_text = coupon.string
 
             coupon_price = coupon_text.split('减')[1]
-
 
         request_id = soup.select('#requestId')
 
@@ -492,7 +471,7 @@ class MediaJd:
                 jd = round(float(check_user_res[0][7]) + add_balance, 2)
                 # 计算总返利金额
                 total_rebate_amount = round(float(check_user_res[0][6]) + add_balance, 2)
-                
+
                 jishen = round(float(get_query_info[0][3]) - float(info['skuList'][0]['payPrice']))
 
                 if jishen < 0:
@@ -609,7 +588,3 @@ class MediaJd:
         # except Exception as e:
         #     print(e)
         #     return {'info': 'feild'}
-
-
-
-

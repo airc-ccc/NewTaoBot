@@ -31,7 +31,7 @@ config.read('config.conf',encoding="utf-8-sig")
 
 class Orther(object):
 
-    
+
 
         # 创建用户账户
 
@@ -50,7 +50,7 @@ class Orther(object):
 
         is_ext = cm.ExecQuery(select)
 
-        if len(is_ext) >= 1:
+        if is_ext == None:
             return
 
         if lnivt_code == 0:
@@ -76,7 +76,6 @@ class Orther(object):
             lnivter_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + lnivt_code + "' AND wx_bot='"+ bot_info['NickName'] +"' LIMIT 1;"
             # 获取邀请人信息
             lnivt_info = cm.ExecQuery(lnivter_sql)
-            print(lnivt_info)
             if lnivt_info == ():
                 lnivter_sql = "SELECT * FROM taojin_user_info WHERE nickname='" + sourcname + "' AND wx_bot='"+ bot_info['NickName'] +"' LIMIT 1;"
                 # 获取邀请人信息
