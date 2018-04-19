@@ -59,14 +59,14 @@ def check_if_is_tb_link(msg):
             soup_xml = BeautifulSoup(msg['Content'], 'lxml')
             xml_info = soup_xml.select('appname')
             if xml_info[0].string == "京东":
-                text_reply(msg, msg['Url'])
+                mjd.getJd(msg, msg['Url'])
                 return
             else:
                 text = movie.getMovie(msg)
                 itchat.send(text, msg['FromUserName'])
                 return
 
-        
+
     elif msg['Type'] == 'Text':  # 关键字查询信息
         tm.getText(msg)
 
@@ -106,34 +106,30 @@ class WxBot(object):
     # 消息回复(文本类型和分享类型消息)
     @itchat.msg_register(['Text', 'Sharing', 'Card'])
     def text(msg):
-        print(msg)
+        print('Comming...')
         check_if_is_tb_link(msg)
 
     # 消息回复(文本类型和分享类型消息) 群聊
     @itchat.msg_register(['Text', 'Sharing'], isGroupChat=True)
     def text(msg):
-        print(msg)
+        print('Group Message Comming...')
         check_if_is_group(msg)
 
     @itchat.msg_register(FRIENDS)
     def add_friend(msg):
-        print(msg)
+        print('Add Friends ....')
         itchat.add_friend(**msg['Text'])  # 该操作会自动将新好友的消息录入，不需要重载通讯录
 
         soup = BeautifulSoup(msg['Content'], 'lxml')
-
         msg_soup = soup.find('msg')
-
         sourc = msg_soup.get('sourceusername')
         sourcname = msg_soup.get('sourcenickname')
-
         user_wxid = msg_soup.get('fromusername')
-
-        print(sourc)
         if sourc == '':
             sourc = 0
 
         ort.create_user_info(msg, lnivt_code=sourc, tool=True, wxid=user_wxid, sourcname=sourcname)
+
         text = '''
 一一一一 系统消息 一一一一
 

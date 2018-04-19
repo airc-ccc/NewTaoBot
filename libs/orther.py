@@ -30,7 +30,6 @@ config = configparser.ConfigParser()
 config.read('config.conf',encoding="utf-8-sig")
 
 class Orther(object):
-    # 创建用户账户
     def create_user_info(self, msg, lnivt_code=0, tool=False, wxid=0, sourcname=0):
         cm = ConnectMysql()
 
@@ -72,7 +71,6 @@ class Orther(object):
             lnivter_sql = "SELECT * FROM taojin_user_info WHERE lnivt_code='" + lnivt_code + "' AND wx_bot='"+ bot_info['NickName'] +"' LIMIT 1;"
             # 获取邀请人信息
             lnivt_info = cm.ExecQuery(lnivter_sql)
-            print(lnivt_info)
             if lnivt_info == ():
                 lnivter_sql = "SELECT * FROM taojin_user_info WHERE nickname='" + sourcname + "' AND wx_bot='"+ bot_info['NickName'] +"' LIMIT 1;"
                 # 获取邀请人信息

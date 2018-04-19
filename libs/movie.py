@@ -57,5 +57,7 @@ class SharMovie(object):
 '''+config.get('URL', 'course')+'''
 免费看电影方法：
 '''+config.get('URL', 'movie')+'''
+邀请好友得返利说明：
+'''+config.get('URL', 'lnvit')+'''
                         '''
                 return text
