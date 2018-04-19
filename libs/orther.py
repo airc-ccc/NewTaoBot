@@ -30,11 +30,7 @@ config = configparser.ConfigParser()
 config.read('config.conf',encoding="utf-8-sig")
 
 class Orther(object):
-
-    
-
-        # 创建用户账户
-
+    # 创建用户账户
     def create_user_info(self, msg, lnivt_code=0, tool=False, wxid=0, sourcname=0):
         cm = ConnectMysql()
 
@@ -50,7 +46,7 @@ class Orther(object):
 
         is_ext = cm.ExecQuery(select)
 
-        if len(is_ext) >= 1:
+        if is_ext == None:
             return
 
         if lnivt_code == 0:
