@@ -177,6 +177,7 @@ class TextMessage(object):
                         itchat.send(to_admin_text, adminuser[0]['UserName'])
                         return
                     except Exception as e:
+                        print('dfasfasd')
                         text = '''
 一一一一 系统信息 一一一一
 
