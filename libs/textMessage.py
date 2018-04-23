@@ -218,7 +218,7 @@ class TextMessage(object):
                     current_info = 0
                 else:
                     current_info = current_info[0][0]
-
+                print(user_info, current_info)
                 text = '''
 一一一一 个人信息 一一一一
 
@@ -233,13 +233,6 @@ class TextMessage(object):
 淘宝订单量: %s
 总好友返利: %s
 总好友个数: %s
-
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-邀请好友得返利：
-'''+config.get('URL', 'lnvit')+'''
                                     ''' % (
                 user_info[0][6], user_info[0][7], user_info[0][8], user_info[0][9], current_info, user_info[0][11],
                 user_info[0][12], user_info[0][13], user_info[0][19], user_info[0][20])
