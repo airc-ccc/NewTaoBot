@@ -153,6 +153,10 @@ class TextMessage(object):
                         bot_info['NickName'], wei_info['NickName'], select_user_res[0][9],
                         time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
+                        cm.ExecNonQuery(update_sql)
+                        cm.ExecNonQuery(update_total_sql)
+                        cm.ExecNonQuery(insert_current_log_sql)
+
                         to_user_text = '''
 一一一一 提现信息 一一一一
 
@@ -171,11 +175,6 @@ class TextMessage(object):
                                             '''
                         itchat.send(to_user_text, msg['FromUserName'])
                         itchat.send(to_admin_text, adminuser[0]['UserName'])
-
-                        cm.ExecNonQuery(update_sql)
-                        cm.ExecNonQuery(update_total_sql)
-                        cm.ExecNonQuery(insert_current_log_sql)
-
                         return
                     except Exception as e:
                         text = '''
