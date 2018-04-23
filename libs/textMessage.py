@@ -125,59 +125,51 @@ class TextMessage(object):
                 adminuser = itchat.search_friends(nickName=config.get('ADMIN', 'ADMIN_USER'))
                 select_user_sql = "SELECT * FROM taojin_user_info WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
                 select_user_res = cm.ExecQuery(select_user_sql)
-
-                if select_user_res and float(select_user_res[0][9]) > 0:
+                if float(select_user_res[0][9]) > 0:
                     try:
-                        # 修改余额
-                        update_sql = "UPDATE taojin_user_info SET withdrawals_amount='0',update_time='" + str(
-                            time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
+	                    # 修改余额
+	                    update_sql = "UPDATE taojin_user_info SET withdrawals_amount='0',update_time='" + str(
+	                        time.time()) + "' WHERE wx_number='" + wei_info['NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
-                        total_amount = float(select_user_res[0][6]) + float(select_user_res[0][9]);
-                        update_total_sql = "UPDATE taojin_user_info SET total_rebate_amount='" + str(
-                            total_amount) + "',update_time='" + str(time.time()) + "' WHERE wx_number='" + wei_info[
-                                               'NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
+	                    total_amount = float(select_user_res[0][6]) + float(select_user_res[0][9]);
+	                    update_total_sql = "UPDATE taojin_user_info SET total_rebate_amount='" + str(
+	                        total_amount) + "',update_time='" + str(time.time()) + "' WHERE wx_number='" + wei_info[
+	                                           'NickName'] + "' AND wx_bot='"+ bot_info['NickName'] +"';"
 
-                        # 插入提现日志
-                        insert_current_log_sql = "INSERT INTO taojin_current_log(wx_bot, username, amount, create_time) VALUES('" + \
-                                                 bot_info['NickName'] + "', '" + wei_info['NickName'] + "', '" + str(
-                            select_user_res[0][9]) + "', '" + str(time.time()) + "')"
+	                    # 插入提现日志
+	                    insert_current_log_sql = "INSERT INTO taojin_current_log(wx_bot, username, amount, create_time) VALUES('" + \
+	                                             bot_info['NickName'] + "', '" + wei_info['NickName'] + "', '" + str(
+	                        select_user_res[0][9]) + "', '" + str(time.time()) + "')"
 
-                        to_admin_text = '''
-一一一一 提现通知 一一一一
+	                    to_admin_text = '''
+	一一一一 提现通知 一一一一
 
-机器人：%s
-提现人：%s
-提现金额：%s 元
-提现时间：%s
-                                                ''' % (
-                        bot_info['NickName'], wei_info['NickName'], select_user_res[0][9],
-                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+	机器人：%s
+	提现人：%s
+	提现金额：%s 元
+	提现时间：%s
+	                                            ''' % (
+	                    bot_info['NickName'], wei_info['NickName'], select_user_res[0][9],
+	                    time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-                        cm.ExecNonQuery(update_sql)
-                        cm.ExecNonQuery(update_total_sql)
-                        cm.ExecNonQuery(insert_current_log_sql)
+	                    cm.ExecNonQuery(update_sql)
+	                    cm.ExecNonQuery(update_total_sql)
+	                    cm.ExecNonQuery(insert_current_log_sql)
 
-                        to_user_text = '''
-一一一一 提现信息 一一一一
+	                    to_user_text = '''
+	一一一一 提现信息 一一一一
 
-提现成功！
-提现金额将以微信红包的形式发放，请耐心等待！
+	提现成功！
+	提现金额将以微信红包的形式发放，请耐心等待！
 
-分享【京东商品链接】或者【淘口令】
-精准查询商品优惠券和返利信息！
+	分享【京东商品链接】或者【淘口令】
+	精准查询商品优惠券和返利信息！
+	                                        '''
+	                    itchat.send(to_user_text, msg['FromUserName'])
 
-优惠券使用教程：
-'''+config.get('URL', 'course')+'''
-免费看电影方法：
-'''+config.get('URL', 'movie')+'''
-邀请好友得返利：
-'''+config.get('URL', 'lnvit')+'''
-                                            '''
-                        itchat.send(to_user_text, msg['FromUserName'])
-                        itchat.send(to_admin_text, adminuser[0]['UserName'])
-                        return
+	                    itchat.send(to_admin_text, adminuser[0]['UserName'])
+	                    return
                     except Exception as e:
-                        print('dfasfasd')
                         text = '''
 一一一一 系统信息 一一一一
 
