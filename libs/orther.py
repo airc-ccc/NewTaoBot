@@ -130,9 +130,6 @@ class Orther(object):
 
 0.3元奖励金已到账
 您将永久获得该好友永久购物返利佣金提成
-
-邀请好友得返利说明：
-'''+config.get('URL', 'lnvit')+'''
             ''' % (user_info[0][4])
 
             cm.Close()
