@@ -53,6 +53,13 @@ class Alimama:
 
 
     def getTao(self, msg):
+        if config.get('SYS', 'tb') == 'no':
+            text = '''
+一一一一系统信息一一一一
+暂不支持商品查询
+                    '''
+            itchat.send(text, msg['FromUserName'])
+            return
         try:
             q = re.search(r'【.*】', msg['Text']).group().replace(u'【', '').replace(u'】', '')
             if u'打开👉天猫APP👈' in msg['Text']:
@@ -72,7 +79,6 @@ class Alimama:
                 taokouling = re.search(r'￥.*?￥', msg['Text']).group()
                 parms = {'username': 'wx_tb_fanli', 'password': 'wx_tb_fanli', 'text': taokouling}
                 res = requests.post(taokoulingurl, data=parms)
-                self.logger.debug(res.text)
                 url = res.json()['url'].replace('https://', 'http://')
 
             real_url = self.get_real_url(url)
@@ -179,6 +185,13 @@ class Alimama:
             itchat.send(info, msg['FromUserName'])
 
     def getGroupTao(self, msg):
+        if config.get('SYS', 'tb') == 'no':
+            text = '''
+一一一一系统信息一一一一
+暂不支持商品查询
+                    '''
+            itchat.send(text, msg['FromUserName'])
+            return
         try:
             q = re.search(r'【.*】', msg['Text']).group().replace(u'【', '').replace(u'】', '')
             if u'打开👉天猫APP👈' in msg['Text']:

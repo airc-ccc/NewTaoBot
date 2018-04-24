@@ -30,9 +30,7 @@ from libs.textMessage import TextMessage
 logger = utils.init_logger()
 
 mjd = MediaJd()
-mjd.login()
 al = Alimama(logger)
-al.login()
 movie = SharMovie()
 tm = TextMessage()
 fm = FormData()
@@ -98,8 +96,8 @@ def check_if_is_group(msg):
 class WxBot(object):
 
     def __init__(self):
-        # fm.groupMessages()
-        # mjd.get_good_info()
+        if config.get('SYS', 'gm') == 'yes':
+            fm.groupMessages()
         print('run.....')
         self.run()
 
@@ -149,6 +147,13 @@ class WxBot(object):
         itchat.send_msg(text, msg['RecommendInfo']['UserName'])
 
     def run(self):
+
+        if config.get('SYS', 'jd') == 'yes':
+            mjd.login() 
+
+        if config.get('SYS', 'tb') == 'yes':
+            al.login()
+
         sysstr = platform.system()
 
         if (sysstr == "Linux") or (sysstr == "Darwin"):
