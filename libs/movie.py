@@ -18,11 +18,11 @@ class SharMovie(object):
 
         for item in shipin:
             if item == xml_info[0].string:
-                player_url = config.get('URL', 'movieurl')+msg['Url']
+                player_url = config.get('URL', 'movieurl')+'%s' % msg['Url']
                 text = '''
 一一一一 视频信息 一一一一
 
-播放链接：'''+ player_url +'''
+播放链接：'''+player_url+'''
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
@@ -48,7 +48,7 @@ class SharMovie(object):
                 text = '''
 一一一一 视频信息 一一一一
 
-播放链接：'''+ player_url +'''
+播放链接：'''+player_url+'''
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
