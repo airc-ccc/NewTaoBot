@@ -20,6 +20,7 @@ from libs import utils
 from libs.tuling import tuling
 from libs.wx_bot import *
 from libs.orther import Orther
+from libs.movie import SharMovie
 
 
 logger = utils.init_logger()
@@ -27,6 +28,7 @@ al = Alimama(logger)
 mjd = MediaJd()
 tu = tuling()
 ort = Orther()
+movie = SharMovie()
 config = configparser.ConfigParser()
 config.read('config.conf',encoding="utf-8-sig")
 
@@ -70,12 +72,15 @@ class TextMessage(object):
                 jdurl = quote("http://jdyhq.ptjob.net/?r=search?kw=" + msg['Text'][1:], safe='/:?=&')
 
                 tburl = quote('http://tbyhq.ptjob.net/index.php?r=l&kw=' + msg['Text'][1:], safe='/:?=&')
+
+                res1 = movie.getShortUrl(jdurl)
+                res2 = movie.getShortUrl(tburl)
                 text = '''
 一一一一系统消息一一一一
 亲，以为您找到所有【%s】优惠券,
 快快点击领取吧！
 京东：%s淘宝：%s
-                ''' % (msg['Text'][1:], jdurl, tburl)
+                ''' % (msg['Text'][1:], res1, res2)
                 itchat.send(text, msg['FromUserName'])
 
             elif pattern_bz.search(msg['Text']) != None:
@@ -173,7 +178,7 @@ class TextMessage(object):
                         text = '''
 一一一一 系统信息 一一一一
 
-提现失败，请稍后重试！                        
+提现失败，请稍后重试！
                                 '''
                         print(e)
                         itchat.send(text, msg['FromUserName'])
@@ -303,7 +308,7 @@ class TextMessage(object):
 【4】订单完成日期错误，请输入正确的订单查询日期
 【6】订单号错误，请输入正确的订单号
 
-请按照提示进行重新操作！            
+请按照提示进行重新操作！
                                         '''
                     itchat.send(user_text, msg['FromUserName'])
             elif ('，' in msg['Text']) and (msg['Text'].split('，')[1].isdigit()) and (
@@ -340,7 +345,7 @@ class TextMessage(object):
 【4】订单完成日期错误，请输入正确的订单查询日期
 【6】订单号错误，请输入正确的订单号
 
-请按照提示进行重新操作！            
+请按照提示进行重新操作！
                                         '''
 
                     itchat.send(user_text, msg['FromUserName'])
@@ -378,7 +383,7 @@ class TextMessage(object):
 【4】订单完成日期错误，请输入正确的订单查询日期
 【6】订单号错误，请输入正确的订单号
 
-请按照提示进行重新操作！            
+请按照提示进行重新操作！
                                         '''
 
                     itchat.send(user_text, msg['FromUserName'])
@@ -416,7 +421,7 @@ class TextMessage(object):
 【4】订单完成日期错误，请输入正确的订单查询日期
 【6】订单号错误，请输入正确的订单号
 
-请按照提示进行重新操作！            
+请按照提示进行重新操作！
                                         '''
 
                     itchat.send(user_text, msg['FromUserName'])
@@ -482,14 +487,15 @@ class TextMessage(object):
                 jdurl = quote("http://jdyhq.ptjob.net/?r=search?kw=" + msg['Text'][1:], safe='/:?=&')
 
                 tburl = quote('http://tbyhq.ptjob.net/index.php?r=l&kw=' + msg['Text'][1:], safe='/:?=&')
+
+                res1 = movie.getShortUrl(jdurl)
+                res2 = movie.getShortUrl(tburl)
                 text = '''
 一一一一系统消息一一一一
-
-亲，以为您找到所有【%s】优惠券,快快点击领取吧！
-
-京东：%s
-淘宝：%s
-                        ''' % (msg['Text'][1:], jdurl, tburl)
+亲，以为您找到所有【%s】优惠券,
+快快点击领取吧！
+京东：%s淘宝：%s
+                ''' % (msg['Text'][1:], res1, res2)
                 itchat.send(text, msg['FromUserName'])
 
             elif pattern_bz.search(msg['Text']) != None:

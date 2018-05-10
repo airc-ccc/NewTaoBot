@@ -35,6 +35,15 @@ class MediaJd:
         self.load_cookies()
 
     def getJd(self, msg, good_url):
+
+        if config.get('SYS', 'jd') == 'no':
+            text = '''
+一一一一系统信息一一一一
+暂不支持京东链接
+                    '''
+            itchat.send(text, msg['FromUserName'])
+            return
+
         cm = ConnectMysql()
         print('开始查询分享商品的信息......', msg['Text'])
 
@@ -102,6 +111,13 @@ class MediaJd:
             return
 
     def getGroupJd(self, msg, good_url):
+        if config.get('SYS', 'jd') == 'no':
+            text = '''
+一一一一系统信息一一一一
+暂不支持京东链接
+                    '''
+            itchat.send(text, msg['FromUserName'])
+            return
         cm = ConnectMysql()
         wei_info = itchat.search_chatrooms(userName=msg['FromUserName'])
         bot_info = itchat.search_friends(userName=msg['ToUserName'])
