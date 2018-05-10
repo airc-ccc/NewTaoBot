@@ -19,10 +19,11 @@ class SharMovie(object):
         for item in shipin:
             if item == xml_info[0].string:
                 player_url = config.get('URL', 'movieurl')+'%s' % msg['Url']
+                res = self.getShortUrl(player_url)
                 text = '''
 一一一一 视频信息 一一一一
 
-播放链接：'''+player_url+'''
+播放链接：'''+res+'''
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
@@ -45,10 +46,11 @@ class SharMovie(object):
         for item in shipin:
             if item == xml_info[0].string:
                 player_url = config.get('URL', 'movieurl')+'%s' % msg['Url']
+                res = self.getShortUrl(player_url)
                 text = '''
 一一一一 视频信息 一一一一
 
-播放链接：'''+player_url+'''
+播放链接：'''+res+'''
 
 分享【京东商品链接】或者【淘口令】
 精准查询商品优惠券和返利信息！
@@ -61,3 +63,13 @@ class SharMovie(object):
 '''+config.get('URL', 'lnvit')+'''
                         '''
                 return text
+
+    def getShortUrl(self, longUrl):
+
+        url = "http://47.98.244.9/long2short/long2short.php?longurl="+longUrl+""
+
+        res = requests.get(url)
+
+        rj = json.loads(res.text)
+        print(rj)
+        return rj['short_url']
